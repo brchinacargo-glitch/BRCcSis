@@ -3859,22 +3859,22 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Net Weight (kg) *</label>
-                                    <input type="number" name="net_weight" min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="number" name="net_weight" required min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Gross Weight (kg) *</label>
-                                    <input type="number" name="gross_weight" min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="number" name="gross_weight" required min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cubagem (m³) *</label>
-                                    <input type="number" name="cubagem" min="0.001" step="0.001" placeholder="0.000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="number" name="cubagem" required min="0.001" step="0.001" placeholder="0.000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Incoterm *</label>
-                                    <select name="incoterm" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <select name="incoterm" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                         <option value="">Selecione o Incoterm</option>
                                         <option value="EXW">EXW - Ex Works</option>
                                         <option value="FCA">FCA - Free Carrier</option>
@@ -3891,7 +3891,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Carga *</label>
-                                    <select name="tipo_carga_maritima" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <select name="tipo_carga_maritima" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                         <option value="">Selecione</option>
                                         <option value="FCL">FCL - Full Container Load</option>
                                         <option value="LCL">LCL - Less than Container Load</option>
@@ -3920,11 +3920,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Porto de Origem *</label>
-                                    <input type="text" name="porto_origem" placeholder="Ex: Porto de Santos" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="porto_origem" required placeholder="Ex: Porto de Santos" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Porto de Destino *</label>
-                                    <input type="text" name="porto_destino" placeholder="Ex: Porto de Hamburgo" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="porto_destino" required placeholder="Ex: Porto de Hamburgo" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                             </div>
                             
@@ -5523,6 +5523,14 @@
                     body: JSON.stringify(formData)
                 });
 
+                // Verificar se a resposta é JSON válido
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Resposta não é JSON:', textResponse);
+                    throw new Error('Erro interno do servidor. Verifique os logs.');
+                }
+
                 const data = await response.json();
                 
                 if (response.ok) {
@@ -5537,7 +5545,11 @@
                 }
             } catch (error) {
                 console.error('Erro ao criar cotação:', error);
-                mostrarMensagem(error.message, 'error');
+                if (error.message.includes('Unexpected token')) {
+                    mostrarMensagem('Erro interno do servidor. Verifique se todos os campos estão preenchidos corretamente.', 'error');
+                } else {
+                    mostrarMensagem(error.message, 'error');
+                }
             }
         }
 
@@ -6312,6 +6324,11 @@
                                     const valorLimpo = value.replace(/[^\d,]/g, '').replace(',', '.');
                                     data[key] = parseFloat(valorLimpo) || 0;
                                 }
+                            } else if (key.includes('peso') || key.includes('weight') || key.includes('cubagem') || 
+                                      key.includes('comprimento') || key.includes('largura') || key.includes('altura')) {
+                                // Converter valores numéricos formatados (peso, dimensões, cubagem)
+                                const valorLimpo = value.replace(/\./g, '').replace(',', '.');
+                                data[key] = parseFloat(valorLimpo) || 0;
                             } else {
                                 data[key] = value;
                             }
@@ -7143,43 +7160,35 @@
         }
         
         // Função para formatar números normais (peso, dimensões, etc.)
-        function formatarNumeroNormal(valor) {
+        function formatarNumeroNormal(input) {
+            let valor = input.value;
+            
             // Remove tudo que não é número, ponto ou vírgula
-            valor = valor.replace(/[^\d.,]/g, '');
+            valor = valor.replace(/[^\d.,]/g, "");
             
-            // Se está vazio, retorna vazio
-            if (!valor) return '';
-            
-            // Se tem vírgula, trata como decimal brasileiro
-            if (valor.includes(',')) {
-                let partes = valor.split(',');
-                let inteira = partes[0].replace(/\./g, ''); // Remove pontos da parte inteira
-                let decimal = partes[1] ? partes[1].substring(0, 3) : ''; // Máximo 3 casas decimais para peso
-                
-                // Adiciona pontos como separadores de milhares
-                inteira = inteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                
-                return decimal ? inteira + ',' + decimal : inteira;
+            if (!valor) {
+                input.value = "";
+                return;
             }
             
-            // Se tem apenas ponto, verifica se é decimal ou separador de milhares
-            if (valor.includes('.')) {
-                let partes = valor.split('.');
-                if (partes[partes.length - 1].length <= 3 && partes.length === 2) {
-                    // Último ponto com 1-3 dígitos = decimal
-                    let inteira = partes[0];
-                    let decimal = partes[1];
-                    inteira = inteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    return inteira + ',' + decimal;
-                } else {
-                    // Pontos como separadores de milhares
-                    valor = valor.replace(/\./g, '');
-                    return valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                }
+            // Substitui vírgula por ponto para facilitar a conversão para float
+            let valorNumerico = parseFloat(valor.replace(".", "").replace(",", "."));
+            
+            if (isNaN(valorNumerico)) {
+                input.value = "";
+                return;
             }
             
-            // Apenas números inteiros - adiciona separadores de milhares
-            return valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            // Formata no padrão brasileiro (ponto para milhares, vírgula para decimais)
+            // Permite até 3 casas decimais para cubagem, 2 para outros
+            let casasDecimais = (input.name && input.name.includes("cubagem")) ? 3 : 2;
+            
+            const formatado = new Intl.NumberFormat("pt-BR", {
+                minimumFractionDigits: casasDecimais,
+                maximumFractionDigits: casasDecimais
+            }).format(valorNumerico);
+            
+            input.value = formatado;
         }
         
         // Função específica para formatação de peso (kg)
@@ -7195,8 +7204,7 @@
             }
             
             // Aplicar formatação brasileira para peso
-            const valorFormatado = formatarNumeroNormal(valor);
-            input.value = valorFormatado;
+            formatarNumeroNormal(input);
         }
         
         // Função para converter formato brasileiro para formato numérico
@@ -7241,22 +7249,8 @@
                     });
                 } else {
                     // Formatação durante a digitação para outros campos
-                    campo.addEventListener('input', function(e) {
-                        let valor = e.target.value;
-                        let posicaoCursor = e.target.selectionStart;
-                        
-                        // Aplicar formatação
-                        let valorFormatado = formatarNumeroNormal(valor);
-                        
-                        // Atualizar valor
-                        e.target.value = valorFormatado;
-                        
-                        // Ajustar posição do cursor
-                        let diferenca = valorFormatado.length - valor.length;
-                        let novaPosicao = posicaoCursor + diferenca;
-                        if (novaPosicao >= 0) {
-                            e.target.setSelectionRange(novaPosicao, novaPosicao);
-                        }
+                    campo.addEventListener("input", function(e) {
+                        formatarNumeroNormal(e.target);
                     });
                 }
                 
