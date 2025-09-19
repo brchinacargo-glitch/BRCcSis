@@ -2895,11 +2895,10 @@
             // Converte para número e formata
             const numero = parseInt(valor);
             
-            // Formata como moeda brasileira
+            // Formata no padrão brasileiro (4.000,00) sem símbolo de moeda
             const formatado = new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-                minimumFractionDigits: 2
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             }).format(numero / 100);
             
             input.value = formatado;
@@ -3729,29 +3728,7 @@
                             <div id="campos-porto-origem" class="space-y-3" style="display:none;">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Porto de Origem *</label>
-                                    <select name="origem_porto" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                                        <option value="">Selecione o porto...</option>
-                                        <option value="Porto de Santos (São Paulo)">Porto de Santos (São Paulo)</option>
-                                        <option value="Porto de Paranaguá (Paraná)">Porto de Paranaguá (Paraná)</option>
-                                        <option value="Porto de Itajaí (Santa Catarina)">Porto de Itajaí (Santa Catarina)</option>
-                                        <option value="Porto de Rio Grande (Rio Grande do Sul)">Porto de Rio Grande (Rio Grande do Sul)</option>
-                                        <option value="Porto de Vitória (Espírito Santo)">Porto de Vitória (Espírito Santo)</option>
-                                        <option value="Porto do Rio de Janeiro (Rio de Janeiro)">Porto do Rio de Janeiro (Rio de Janeiro)</option>
-                                        <option value="Porto de Salvador (Bahia)">Porto de Salvador (Bahia)</option>
-                                        <option value="Porto de Suape (Pernambuco)">Porto de Suape (Pernambuco)</option>
-                                        <option value="Porto de Fortaleza (Ceará)">Porto de Fortaleza (Ceará)</option>
-                                        <option value="Porto de Belém (Pará)">Porto de Belém (Pará)</option>
-                                        <option value="Porto de Manaus (Amazonas)">Porto de Manaus (Amazonas)</option>
-                                        <option value="Porto de São Francisco do Sul (Santa Catarina)">Porto de São Francisco do Sul (Santa Catarina)</option>
-                                        <option value="Porto de Antonina (Paraná)">Porto de Antonina (Paraná)</option>
-                                        <option value="Porto de Aratu (Bahia)">Porto de Aratu (Bahia)</option>
-                                        <option value="Porto de Cabedelo (Paraíba)">Porto de Cabedelo (Paraíba)</option>
-                                        <option value="Porto de Maceió (Alagoas)">Porto de Maceió (Alagoas)</option>
-                                        <option value="Porto de Natal (Rio Grande do Norte)">Porto de Natal (Rio Grande do Norte)</option>
-                                        <option value="Porto de Recife (Pernambuco)">Porto de Recife (Pernambuco)</option>
-                                        <option value="Porto de Ilhéus (Bahia)">Porto de Ilhéus (Bahia)</option>
-                                        <option value="Porto de Santarém (Pará)">Porto de Santarém (Pará)</option>
-                                    </select>
+                                    <input type="text" name="origem_porto" placeholder="Ex: Porto de Santos, Porto de Paranaguá..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                                 </div>
                             </div>
                         </div>
@@ -5872,9 +5849,9 @@
             modal.querySelector('#det-carga-valor').textContent = formatarMoeda(cotacao.carga_valor_mercadoria) || '0,00';
             
             // Cubagem para transporte rodoviário
-            if (cotacao.empresa_transporte === 'brcargo_rodoviario' && cotacao.carga_cubagem) {
+            if (cotacao.empresa_transporte === 'brcargo_rodoviario' && cotacao.cubagem) {
                 modal.querySelector('#det-carga-cubagem-rodoviario').style.display = 'block';
-                modal.querySelector('#det-carga-cubagem').textContent = cotacao.carga_cubagem || '0';
+                modal.querySelector('#det-carga-cubagem').textContent = cotacao.cubagem.toFixed(3) || '0.000';
             } else {
                 modal.querySelector('#det-carga-cubagem-rodoviario').style.display = 'none';
             }
@@ -6275,8 +6252,8 @@
                 const tipoOrigemRodoviario = document.getElementById('tipo-origem-rodoviario');
                 const rodoviarioInput = document.querySelector('input[value="brcargo_rodoviario"]');
                 
-                if (tipoOrigemRodoviario && rodoviarioInput) {
-                    // Mostrar tipo de origem se rodoviário estiver disponível
+                if (tipoOrigemRodoviario) {
+                    // Sempre mostrar tipo de origem para rodoviário
                     tipoOrigemRodoviario.style.display = 'block';
                     
                     // Inicializar com "endereço" selecionado por padrão
@@ -7137,6 +7114,34 @@
             input.dataset.valorNumerico = valorDecimal.toString();
         }
         
+        // Função para formatação monetária no padrão brasileiro (4.000,00) sem símbolo de moeda
+        function formatarValorMonetario(input) {
+            let valor = input.value;
+            
+            // Remove tudo que não é dígito
+            valor = valor.replace(/\D/g, '');
+            
+            if (!valor) {
+                input.value = '';
+                input.dataset.valorNumerico = '';
+                return;
+            }
+            
+            // Converte para centavos
+            const numero = parseInt(valor);
+            const valorDecimal = numero / 100;
+            
+            // Formata no padrão brasileiro (4.000,00)
+            const formatado = new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorDecimal);
+            
+            input.value = formatado;
+            // Armazenar valor numérico para envio
+            input.dataset.valorNumerico = valorDecimal.toString();
+        }
+        
         // Função para formatar números normais (peso, dimensões, etc.)
         function formatarNumeroNormal(valor) {
             // Remove tudo que não é número, ponto ou vírgula
@@ -7215,9 +7220,9 @@
             
             // Aplicar formatação monetária
             camposMonetarios.forEach(campo => {
-                // Usar a nova função de formatação melhorada
+                // Usar a nova função de formatação no padrão brasileiro (4.000,00)
                 campo.addEventListener('input', function(e) {
-                    formatarMoedaBrasileira(e.target);
+                    formatarValorMonetario(e.target);
                 });
                 
                 // Converter para formato numérico antes do envio
