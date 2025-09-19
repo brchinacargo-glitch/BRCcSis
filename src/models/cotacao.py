@@ -327,7 +327,7 @@ class Cotacao(db.Model):
             # Aliases para compatibilidade com frontend
             'net_weight': float(self.numero_net_weight) if self.numero_net_weight else None,
             'gross_weight': float(self.numero_gross_weight) if self.numero_gross_weight else None,
-            'cubagem': float(self.cubagem) if self.cubagem else None,
+            'cubagem': float(self.cubagem) if self.cubagem else (float(self.carga_comprimento_cm * self.carga_largura_cm * self.carga_altura_cm / 6000) if self.carga_comprimento_cm and self.carga_largura_cm and self.carga_altura_cm else None),
             'incoterm': self.incoterm,
             'tipo_carga_maritima': self.tipo_carga_maritima,
             'tamanho_container': self.tamanho_container,

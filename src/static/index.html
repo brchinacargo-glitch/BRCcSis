@@ -1090,6 +1090,13 @@
             document.getElementById('empresas').style.display = 'none';
             document.getElementById('cadastro').style.display = 'none';
             
+            // Ocultar seção de analytics
+            const secaoAnalytics = document.getElementById('analytics');
+            if (secaoAnalytics) {
+                secaoAnalytics.style.display = 'none';
+                secaoAnalytics.classList.add('hidden');
+            }
+            
             // Mostrar rodapé na seção de cotações
             const footers = document.querySelectorAll('footer');
             footers.forEach(footer => {
@@ -1105,6 +1112,43 @@
                 carregarEstatisticasCotacoes();
             } else {
                 console.log('ERRO: Seção de cotações não encontrada!');
+            }
+        }
+
+        // Função para mostrar seção de Analytics
+        function mostrarSecaoAnalytics() {
+            console.log('Navegando para Analytics...');
+            
+            // Ocultar todas as seções principais
+            const sections = ['dashboard', 'empresas', 'cadastro'];
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Ocultar seção de cotações
+            const secaoCotacoes = document.getElementById('secao-cotacoes');
+            if (secaoCotacoes) {
+                secaoCotacoes.style.display = 'none';
+                secaoCotacoes.classList.add('hidden');
+            }
+            
+            // Ocultar rodapé na seção de analytics
+            const footers = document.querySelectorAll('footer');
+            footers.forEach(footer => {
+                footer.style.display = 'none';
+            });
+            
+            // Mostrar seção de analytics
+            const secaoAnalytics = document.getElementById('analytics');
+            if (secaoAnalytics) {
+                secaoAnalytics.style.display = 'block';
+                secaoAnalytics.classList.remove('hidden');
+                carregarConteudoAnalytics();
+            } else {
+                console.log('ERRO: Seção de analytics não encontrada!');
             }
         }
 
@@ -1289,6 +1333,7 @@
                 limparFormularioCadastro();
             }
             
+            // Lista completa de seções para controlar
             const sections = ['dashboard', 'empresas', 'cadastro'];
             sections.forEach(id => {
                 const section = document.getElementById(id);
@@ -1296,6 +1341,20 @@
                     section.style.display = id === sectionId ? 'block' : 'none';
                 }
             });
+            
+            // Controlar seções especiais (cotações e analytics)
+            const secaoCotacoes = document.getElementById('secao-cotacoes');
+            const secaoAnalytics = document.getElementById('analytics');
+            
+            if (secaoCotacoes) {
+                secaoCotacoes.style.display = 'none';
+                secaoCotacoes.classList.add('hidden');
+            }
+            
+            if (secaoAnalytics) {
+                secaoAnalytics.style.display = 'none';
+                secaoAnalytics.classList.add('hidden');
+            }
             
             // Controlar visibilidade do rodapé - mostrar apenas no dashboard e cotações
             const footers = document.querySelectorAll('footer');
@@ -3669,8 +3728,30 @@
                             <!-- Campo de porto (alternativa ao endereço) -->
                             <div id="campos-porto-origem" class="space-y-3" style="display:none;">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Porto *</label>
-                                    <input type="text" name="origem_porto" placeholder="Ex: Porto de Santos, Porto de Paranaguá..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Porto de Origem *</label>
+                                    <select name="origem_porto" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                        <option value="">Selecione o porto...</option>
+                                        <option value="Porto de Santos (São Paulo)">Porto de Santos (São Paulo)</option>
+                                        <option value="Porto de Paranaguá (Paraná)">Porto de Paranaguá (Paraná)</option>
+                                        <option value="Porto de Itajaí (Santa Catarina)">Porto de Itajaí (Santa Catarina)</option>
+                                        <option value="Porto de Rio Grande (Rio Grande do Sul)">Porto de Rio Grande (Rio Grande do Sul)</option>
+                                        <option value="Porto de Vitória (Espírito Santo)">Porto de Vitória (Espírito Santo)</option>
+                                        <option value="Porto do Rio de Janeiro (Rio de Janeiro)">Porto do Rio de Janeiro (Rio de Janeiro)</option>
+                                        <option value="Porto de Salvador (Bahia)">Porto de Salvador (Bahia)</option>
+                                        <option value="Porto de Suape (Pernambuco)">Porto de Suape (Pernambuco)</option>
+                                        <option value="Porto de Fortaleza (Ceará)">Porto de Fortaleza (Ceará)</option>
+                                        <option value="Porto de Belém (Pará)">Porto de Belém (Pará)</option>
+                                        <option value="Porto de Manaus (Amazonas)">Porto de Manaus (Amazonas)</option>
+                                        <option value="Porto de São Francisco do Sul (Santa Catarina)">Porto de São Francisco do Sul (Santa Catarina)</option>
+                                        <option value="Porto de Antonina (Paraná)">Porto de Antonina (Paraná)</option>
+                                        <option value="Porto de Aratu (Bahia)">Porto de Aratu (Bahia)</option>
+                                        <option value="Porto de Cabedelo (Paraíba)">Porto de Cabedelo (Paraíba)</option>
+                                        <option value="Porto de Maceió (Alagoas)">Porto de Maceió (Alagoas)</option>
+                                        <option value="Porto de Natal (Rio Grande do Norte)">Porto de Natal (Rio Grande do Norte)</option>
+                                        <option value="Porto de Recife (Pernambuco)">Porto de Recife (Pernambuco)</option>
+                                        <option value="Porto de Ilhéus (Bahia)">Porto de Ilhéus (Bahia)</option>
+                                        <option value="Porto de Santarém (Pará)">Porto de Santarém (Pará)</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -6296,7 +6377,7 @@
             if (navAnalytics) {
                 navAnalytics.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showSection('analytics');
+                    mostrarSecaoAnalytics();
                 });
             }
             
