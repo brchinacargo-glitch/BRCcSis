@@ -1,0 +1,357 @@
+// ==================== MÓDULO DE DASHBOARD ====================
+// Gerencia o dashboard e gráficos
+
+const Dashboard = {
+    // Instâncias dos gráficos
+    charts: {},
+    
+    // Dados do dashboard
+    stats: null,
+    
+    // ==================== CARREGAMENTO ====================
+    
+    /**
+     * Carrega dados do dashboard
+     */
+    async load() {
+        try {
+            await this.loadStats();
+            await this.loadCharts();
+        } catch (error) {
+            console.error('Erro ao carregar dashboard:', error);
+            Utils.showError('Erro ao carregar dados do dashboard');
+        }
+    },
+    
+    /**
+     * Carrega estatísticas do dashboard (otimizado com single endpoint)
+     */
+    async loadStats() {
+        try {
+            const response = await API.getDashboardStats();
+            
+            if (response.success) {
+                this.stats = response.data;
+                this.renderStats(response.data);
+            } else {
+                // Fallback: carregar manualmente se o endpoint não existir
+                await this.loadStatsManually();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+            // Fallback: carregar manualmente
+            await this.loadStatsManually();
+        }
+    },
+    
+    /**
+     * Carrega estatísticas manualmente (fallback)
+     */
+    async loadStatsManually() {
+        try {
+            const response = await API.getEmpresas();
+            
+            if (response.success) {
+                const empresas = response.data;
+                
+                const stats = {
+                    total_empresas: empresas.length,
+                    empresas_certificadas: empresas.filter(e => e.certificacoes && e.certificacoes.length > 0).length,
+                    empresas_armazem: empresas.filter(e => e.possui_armazem === true).length,
+                    empresas_nacional: empresas.filter(e => e.abrangencia === 'Nacional').length
+                };
+                
+                this.stats = stats;
+                this.renderStats(stats);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas manualmente:', error);
+        }
+    },
+    
+    /**
+     * Renderiza estatísticas
+     * @param {object} stats - Estatísticas
+     */
+    renderStats(stats) {
+        Utils.setTextContent(document.getElementById('total-empresas'), stats.total_empresas || 0);
+        Utils.setTextContent(document.getElementById('empresas-certificadas'), stats.empresas_certificadas || 0);
+        Utils.setTextContent(document.getElementById('empresas-armazem'), stats.empresas_armazem || 0);
+        Utils.setTextContent(document.getElementById('empresas-nacional'), stats.empresas_nacional || 0);
+    },
+    
+    /**
+     * Carrega dados dos gráficos
+     */
+    async loadCharts() {
+        try {
+            const response = await API.getDashboardCharts();
+            
+            if (response.success) {
+                this.renderCharts(response.data);
+            } else {
+                // Fallback: carregar manualmente
+                await this.loadChartsManually();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar gráficos:', error);
+            // Fallback: carregar manualmente
+            await this.loadChartsManually();
+        }
+    },
+    
+    /**
+     * Carrega dados dos gráficos manualmente (fallback)
+     */
+    async loadChartsManually() {
+        try {
+            const response = await API.getEmpresas();
+            
+            if (response.success) {
+                const empresas = response.data;
+                
+                // Processar dados para gráficos
+                const chartData = this.processChartData(empresas);
+                this.renderCharts(chartData);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar gráficos manualmente:', error);
+        }
+    },
+    
+    /**
+     * Processa dados para os gráficos
+     * @param {Array} empresas - Lista de empresas
+     * @returns {object} - Dados processados
+     */
+    processChartData(empresas) {
+        // Empresas por região
+        const regioes = {};
+        empresas.forEach(e => {
+            const regiao = e.regiao || 'Não especificado';
+            regioes[regiao] = (regioes[regiao] || 0) + 1;
+        });
+        
+        // Tipos de carga
+        const tiposCarga = {};
+        empresas.forEach(e => {
+            if (e.tipos_carga && Array.isArray(e.tipos_carga)) {
+                e.tipos_carga.forEach(tipo => {
+                    tiposCarga[tipo] = (tiposCarga[tipo] || 0) + 1;
+                });
+            }
+        });
+        
+        return {
+            regioes: {
+                labels: Object.keys(regioes),
+                data: Object.values(regioes)
+            },
+            tipos_carga: {
+                labels: Object.keys(tiposCarga).slice(0, 10), // Top 10
+                data: Object.values(tiposCarga).slice(0, 10)
+            }
+        };
+    },
+    
+    /**
+     * Renderiza todos os gráficos
+     * @param {object} data - Dados dos gráficos
+     */
+    renderCharts(data) {
+        this.renderChartRegiao(data.regioes);
+        this.renderChartTiposCarga(data.tipos_carga);
+        this.renderChartCrescimento();
+        this.renderChartCertificacoes();
+    },
+    
+    // ==================== GRÁFICOS ====================
+    
+    /**
+     * Renderiza gráfico de empresas por região
+     * @param {object} data - Dados do gráfico
+     */
+    renderChartRegiao(data) {
+        const ctx = document.getElementById('chart-empresas-regiao');
+        if (!ctx) return;
+        
+        // Destruir gráfico existente se houver
+        if (this.charts.regiao) {
+            this.charts.regiao.destroy();
+        }
+        
+        this.charts.regiao = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    label: 'Empresas',
+                    data: data.data || [],
+                    backgroundColor: 'rgba(34, 139, 34, 0.6)',
+                    borderColor: 'rgba(34, 139, 34, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Renderiza gráfico de tipos de carga
+     * @param {object} data - Dados do gráfico
+     */
+    renderChartTiposCarga(data) {
+        const ctx = document.getElementById('chart-tipos-carga');
+        if (!ctx) return;
+        
+        // Destruir gráfico existente se houver
+        if (this.charts.tiposCarga) {
+            this.charts.tiposCarga.destroy();
+        }
+        
+        this.charts.tiposCarga = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    data: data.data || [],
+                    backgroundColor: [
+                        '#228B22', '#DC143C', '#3b82f6', '#f59e0b', '#10b981',
+                        '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Renderiza gráfico de crescimento
+     */
+    renderChartCrescimento() {
+        const ctx = document.getElementById('chart-crescimento');
+        if (!ctx) return;
+        
+        // Destruir gráfico existente se houver
+        if (this.charts.crescimento) {
+            this.charts.crescimento.destroy();
+        }
+        
+        // Dados de exemplo (pode ser substituído por dados reais)
+        const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        const dados = [10, 15, 18, 22, 28, 32, 38, 42, 48, 52, 58, 65];
+        
+        this.charts.crescimento = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: meses,
+                datasets: [{
+                    label: 'Empresas Cadastradas',
+                    data: dados,
+                    borderColor: '#228B22',
+                    backgroundColor: 'rgba(34, 139, 34, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Renderiza gráfico de certificações
+     */
+    renderChartCertificacoes() {
+        const ctx = document.getElementById('chart-certificacoes');
+        if (!ctx) return;
+        
+        // Destruir gráfico existente se houver
+        if (this.charts.certificacoes) {
+            this.charts.certificacoes.destroy();
+        }
+        
+        // Dados de exemplo (pode ser substituído por dados reais)
+        const certificacoes = ['ISO 9001', 'ISO 14001', 'OHSAS 18001', 'OEA', 'Outras'];
+        const dados = [25, 18, 12, 8, 10];
+        
+        this.charts.certificacoes = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: certificacoes,
+                datasets: [{
+                    label: 'Empresas Certificadas',
+                    data: dados,
+                    backgroundColor: 'rgba(220, 20, 60, 0.6)',
+                    borderColor: 'rgba(220, 20, 60, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    },
+    
+    // ==================== EXPORTAÇÃO ====================
+    
+    /**
+     * Exporta dashboard para PDF
+     */
+    async exportPDF() {
+        try {
+            Utils.showSuccess('Funcionalidade de exportação PDF em desenvolvimento');
+        } catch (error) {
+            console.error('Erro ao exportar PDF:', error);
+            Utils.showError('Erro ao exportar PDF');
+        }
+    },
+    
+    /**
+     * Exporta dashboard para Excel
+     */
+    async exportExcel() {
+        try {
+            Utils.showSuccess('Funcionalidade de exportação Excel em desenvolvimento');
+        } catch (error) {
+            console.error('Erro ao exportar Excel:', error);
+            Utils.showError('Erro ao exportar Excel');
+        }
+    }
+};
+
+// Exportar para uso global
+window.Dashboard = Dashboard;

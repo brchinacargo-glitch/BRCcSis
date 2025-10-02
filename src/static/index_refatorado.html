@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRCcSis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <!-- Bibliotecas para exportação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #228B22 0%, #DC143C 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Estilos específicos para botões de cotação */
+        #btn-solicitar-cotacao,
+        #btn-nova-cotacao,
+        #salvar-cotacao,
+        button[onclick*="cotacao"],
+        .bg-orange-600 {
+            background-color: #ea580c !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        #btn-solicitar-cotacao:hover,
+        #btn-nova-cotacao:hover,
+        #salvar-cotacao:hover,
+        button[onclick*="cotacao"]:hover,
+        .bg-orange-600:hover {
+            background-color: #c2410c !important;
+        }
+        
+        /* Garantir que links com aparência de botão também funcionem */
+        a.bg-orange-600 {
+            background-color: #ea580c !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+        
+        a.bg-orange-600:hover {
+            background-color: #c2410c !important;
+            color: white !important;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilos para abas de modalidade */
+        .tab-modalidade {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tab-modalidade.active {
+            border-color: #ea580c !important;
+            color: #ea580c !important;
+        }
+        
+        .tab-modalidade:hover:not(.active) {
+            border-color: #d1d5db !important;
+            color: #374151 !important;
+        }
+        
+        /* Estilos para cards de cotação */
+        .cotacao-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .cotacao-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cotacao-card.solicitada {
+            border-left-color: #3b82f6;
+        }
+        
+        .cotacao-card.aceita_operador {
+            border-left-color: #f59e0b;
+        }
+        
+        .cotacao-card.cotacao_enviada {
+            border-left-color: #8b5cf6;
+        }
+        
+        .cotacao-card.aceita_consultor {
+            border-left-color: #10b981;
+        }
+        
+        .cotacao-card.negada_consultor {
+            border-left-color: #ef4444;
+        }
+        
+        .cotacao-card.finalizada {
+            border-left-color: #6b7280;
+        }
+        
+        /* Badge de status */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-solicitada {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-aceita_operador {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-cotacao_enviada {
+            background-color: #ede9fe;
+            color: #6b21a8;
+        }
+        
+        .status-aceita_consultor {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-negada_consultor {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-finalizada {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="logo-brchina.png" alt="BRChina" class="h-10 mr-3">
+                    <div>
+                        <h1 class="text-2xl font-bold">BRCcSis</h1>
+                        <p class="text-sm text-green-200">v1.3.4</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-dashboard">Dashboard</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-empresas">Empresas</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-cotacoes">Cotações</a>
