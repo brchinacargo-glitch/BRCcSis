@@ -7218,26 +7218,60 @@
             return valor.replace(/\./g, '').replace(',', '.');
         }
         
-        /* ==================== CÓDIGO ORIGINAL REMOVIDO ====================
-         * O código de formatação original (linhas 7220-7270) foi removido
-         * porque causava o problema de campos numéricos não aceitarem digitação.
-         * 
-         * Motivo: Tentava formatar campos type="number" com vírgulas e pontos,
-         * mas navegadores rejeitam formatação em campos type="number".
-         * 
-         * Solução: Scripts externos que convertem type="number" para type="text"
-         * e aplicam formatação corretamente.
-         * ================================================================== */
+        // Aplicar formatação aos campos numéricos (exceto CNPJ)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Selecionar campos monetários (valor da mercadoria)
+            const camposMonetarios = document.querySelectorAll('input[name*="valor_mercadoria"], input[name*="valor"], input[name*="preco"]');
+            
+            // Selecionar outros campos numéricos (peso, dimensões, etc.)
+            const camposNumericos = document.querySelectorAll('input[type="number"]:not([name*="cnpj"]):not([name*="cep"]):not([name*="telefone"]):not([name*="valor_mercadoria"]):not([name*="valor"]):not([name*="preco"])');
+            
+            // Aplicar formatação monetária
+            camposMonetarios.forEach(campo => {
+                // Usar a nova função de formatação no padrão brasileiro (4.000,00)
+                campo.addEventListener('input', function(e) {
+                    formatarValorMonetario(e.target);
+                });
+                
+                // Converter para formato numérico antes do envio
+                campo.addEventListener('blur', function(e) {
+                    let valorFormatado = e.target.value;
+                    e.target.dataset.valorOriginal = valorFormatado;
+                });
+            });
+            
+            // Aplicar formatação numérica normal
+            camposNumericos.forEach(campo => {
+                // Verificar se é campo de peso para usar formatação específica
+                if (campo.name && (campo.name.includes('peso') || campo.name.includes('weight'))) {
+                    campo.addEventListener('input', function(e) {
+                        formatarPeso(e.target);
+                    });
+                } else {
+                    // Formatação durante a digitação para outros campos
+                    campo.addEventListener("input", function(e) {
+                        formatarNumeroNormal(e.target);
+                    });
+                }
+                
+                // Converter para formato numérico antes do envio
+                campo.addEventListener('blur', function(e) {
+                    let valorFormatado = e.target.value;
+                    e.target.dataset.valorOriginal = valorFormatado;
+                });
+            });
+            
+            // Interceptar envio de formulários para converter valores
+            document.addEventListener('submit', function(e) {
+                const camposNumericos = e.target.querySelectorAll('input[type="number"]:not([name*="cnpj"]):not([name*="cep"]):not([name*="telefone"])');
+                
+                camposNumericos.forEach(campo => {
+                    if (campo.value) {
+                        campo.value = converterParaNumero(campo.value);
+                    }
+                });
+            });
+        });
     </script>
-    
-    <!-- ==================== SCRIPTS CORRIGIDOS ==================== -->
-    <!-- IMPORTANTE: Estes scripts DEVEM ser carregados nesta ordem -->
-    
-    <!-- 1. Corrige tipos de input (number → text) -->
-    <script src="js/fix-input-types.js"></script>
-    
-    <!-- 2. Aplica formatação brasileira -->
-    <script src="js/formatacao-corrigida.js"></script>
-    
 </body>
 </html>
