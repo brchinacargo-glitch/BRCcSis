@@ -8,6 +8,8 @@ const ModalCotacaoMelhorado = {
         this.setupNumericFields();
         this.setupValidation();
         this.setupModalScroll();
+        this.setupModalidadeToggle();
+        this.setupOrigemToggle();
         console.log('✅ Modal de Cotação Melhorado inicializado');
     },
     
@@ -248,22 +250,45 @@ const ModalCotacaoMelhorado = {
         // Limpar erros anteriores
         this.clearErrors();
         
-        // Validar campos obrigatórios
+        // Validar campos obrigatórios (apenas os visíveis)
         const camposObrigatorios = form.querySelectorAll('[required]');
-        camposObrigatorios.forEach(campo => {
-            if (!this.validateField(campo)) {
+        const camposVisiveis = Array.from(camposObrigatorios).filter(campo => {
+            // Verificar se o campo e seus pais estão visíveis
+            let elemento = campo;
+            while (elemento && elemento !== form) {
+                const style = window.getComputedStyle(elemento);
+                if (style.display === 'none' || style.visibility === 'hidden') {
+                    return false;
+                }
+                elemento = elemento.parentElement;
+            }
+            return true;
+        });
+        
+        console.log(`🔍 Validando ${camposVisiveis.length} campos obrigatórios visíveis (de ${camposObrigatorios.length} totais)`);
+        
+        camposVisiveis.forEach(campo => {
+            const fieldValid = this.validateField(campo);
+            if (!fieldValid) {
+                console.log(`❌ Campo inválido: ${campo.name} = "${campo.value}"`);
                 isValid = false;
+            } else {
+                console.log(`✅ Campo válido: ${campo.name} = "${campo.value}"`);
             }
         });
         
         // Validações específicas por modalidade
         const modalidade = form.querySelector('input[name="empresa_transporte"]:checked')?.value;
+        console.log(`🚛 Modalidade selecionada: ${modalidade}`);
         
         if (modalidade === 'brcargo_maritimo') {
             if (!this.validateMaritimoFields()) {
+                console.log('❌ Validação marítima falhou');
                 isValid = false;
             }
         }
+        
+        console.log(`📋 Validação final: ${isValid ? 'APROVADA' : 'REJEITADA'}`);
         
         if (isValid) {
             this.submitForm();
@@ -277,11 +302,14 @@ const ModalCotacaoMelhorado = {
         const valor = campo.value.trim();
         const isRequired = campo.hasAttribute('required');
         
+        console.log(`🔍 Validando campo: ${campo.name}, valor: "${valor}", obrigatório: ${isRequired}`);
+        
         // Limpar erro anterior
         this.clearFieldError(campo);
         
         // Verificar se campo obrigatório está vazio
         if (isRequired && valor === '') {
+            console.log(`❌ Campo obrigatório vazio: ${campo.name}`);
             this.showFieldError(campo, 'Este campo é obrigatório');
             return false;
         }
@@ -289,6 +317,7 @@ const ModalCotacaoMelhorado = {
         // Validações específicas por tipo
         if (campo.classList.contains('campo-numerico') && valor !== '') {
             const tipo = campo.dataset.tipo;
+            console.log(`🔢 Validando campo numérico: ${campo.name}, tipo: ${tipo}`);
             
             switch (tipo) {
                 case 'peso':
@@ -495,6 +524,112 @@ const ModalCotacaoMelhorado = {
             modalContent.style.maxHeight = '95vh';
             modalContent.style.padding = '1rem';
         }
+    },
+    
+    // ==================== CONTROLE DE MODALIDADES ====================
+    
+    setupModalidadeToggle() {
+        const radioButtons = document.querySelectorAll('input[name="empresa_transporte"]');
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.toggleModalidadeSections(radio.value);
+            });
+        });
+        
+        // Configurar estado inicial
+        const selectedRadio = document.querySelector('input[name="empresa_transporte"]:checked');
+        if (selectedRadio) {
+            this.toggleModalidadeSections(selectedRadio.value);
+        }
+    },
+    
+    toggleModalidadeSections(modalidade) {
+        // Seções específicas por modalidade
+        const camposMaritimo = document.getElementById('campos-maritimo');
+        const camposAereo = document.getElementById('campos-aereo');
+        const tipoOrigemRodoviario = document.getElementById('tipo-origem-rodoviario');
+        
+        // Ocultar todas as seções específicas
+        if (camposMaritimo) camposMaritimo.style.display = 'none';
+        if (camposAereo) camposAereo.style.display = 'none';
+        if (tipoOrigemRodoviario) tipoOrigemRodoviario.style.display = 'none';
+        
+        // Mostrar seção específica da modalidade selecionada
+        switch (modalidade) {
+            case 'brcargo_maritimo':
+                if (camposMaritimo) camposMaritimo.style.display = 'block';
+                break;
+            case 'frete_aereo':
+                if (camposAereo) camposAereo.style.display = 'block';
+                break;
+            case 'brcargo_rodoviario':
+                if (tipoOrigemRodoviario) tipoOrigemRodoviario.style.display = 'block';
+                // Configurar origem padrão como endereço
+                this.toggleOrigemFields('endereco');
+                break;
+        }
+        
+        console.log(`🚛 Modalidade alterada para: ${modalidade}`);
+    },
+    
+    setupOrigemToggle() {
+        const radioButtons = document.querySelectorAll('input[name="tipo_origem"]');
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.toggleOrigemFields(radio.value);
+            });
+        });
+    },
+    
+    toggleOrigemFields(tipoOrigem) {
+        const camposEndereco = document.getElementById('campos-endereco-origem');
+        const camposPorto = document.getElementById('campos-porto-origem');
+        const camposEnderecoInputs = camposEndereco?.querySelectorAll('input, select');
+        const camposPortoInputs = camposPorto?.querySelectorAll('input, select');
+        
+        if (tipoOrigem === 'endereco') {
+            // Mostrar campos de endereço
+            if (camposEndereco) camposEndereco.style.display = 'block';
+            if (camposPorto) camposPorto.style.display = 'none';
+            
+            // Adicionar required aos campos de endereço
+            camposEnderecoInputs?.forEach(input => {
+                if (input.name && (
+                    input.name.includes('origem_cep') ||
+                    input.name.includes('origem_endereco') ||
+                    input.name.includes('origem_cidade') ||
+                    input.name.includes('origem_estado')
+                )) {
+                    input.setAttribute('required', 'required');
+                }
+            });
+            
+            // Remover required dos campos de porto
+            camposPortoInputs?.forEach(input => {
+                input.removeAttribute('required');
+            });
+            
+        } else if (tipoOrigem === 'porto') {
+            // Mostrar campos de porto
+            if (camposEndereco) camposEndereco.style.display = 'none';
+            if (camposPorto) camposPorto.style.display = 'block';
+            
+            // Remover required dos campos de endereço
+            camposEnderecoInputs?.forEach(input => {
+                input.removeAttribute('required');
+            });
+            
+            // Adicionar required ao campo de porto
+            camposPortoInputs?.forEach(input => {
+                if (input.name === 'origem_porto') {
+                    input.setAttribute('required', 'required');
+                }
+            });
+        }
+        
+        console.log(`📍 Tipo de origem alterado para: ${tipoOrigem}`);
     },
     
     // ==================== SUBMISSÃO ====================
