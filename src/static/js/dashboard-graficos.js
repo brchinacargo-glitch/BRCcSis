@@ -666,14 +666,8 @@ const DashboardGraficos = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-setTimeout(() => {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => DashboardGraficos.init());
-    } else {
-        DashboardGraficos.init();
-    }
-}, 100);
+// Inicialização controlada pelo main.js
+// DashboardGraficos.init() é chamado centralmente com delay apropriado
 
 // Exportar para uso global
 window.DashboardGraficos = DashboardGraficos;

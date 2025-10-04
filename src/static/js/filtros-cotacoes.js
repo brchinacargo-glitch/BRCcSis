@@ -856,10 +856,8 @@ const FiltrosCotacoes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    FiltrosCotacoes.init();
-});
+// Inicialização controlada pelo main.js
+// FiltrosCotacoes.init() é chamado centralmente
 
 // Exportar para uso global
 window.FiltrosCotacoes = FiltrosCotacoes;

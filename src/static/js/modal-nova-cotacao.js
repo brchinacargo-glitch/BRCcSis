@@ -417,10 +417,8 @@ const ModalNovaCotacao = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    ModalNovaCotacao.init();
-});
+// Inicialização controlada pelo main.js
+// ModalNovaCotacao.init() é chamado centralmente
 
 // Exportar para uso global
 window.ModalNovaCotacao = ModalNovaCotacao;

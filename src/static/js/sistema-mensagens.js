@@ -671,10 +671,8 @@ const SistemaMensagens = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    SistemaMensagens.init();
-});
+// Inicialização controlada pelo main.js
+// SistemaMensagens.init() é chamado centralmente
 
 // Exportar para uso global
 window.SistemaMensagens = SistemaMensagens;

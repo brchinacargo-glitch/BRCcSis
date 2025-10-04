@@ -629,10 +629,8 @@ const CotacaoDetalhes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    CotacaoDetalhes.init();
-});
+// Inicialização controlada pelo main.js
+// CotacaoDetalhes.init() é chamado centralmente
 
 // Exportar para uso global
 window.CotacaoDetalhes = CotacaoDetalhes;

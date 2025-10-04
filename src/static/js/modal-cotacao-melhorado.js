@@ -892,13 +892,8 @@ const ModalCotacaoMelhorado = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    // Aguardar um pouco para garantir que outros scripts carregaram
-    setTimeout(() => {
-        ModalCotacaoMelhorado.init();
-    }, 1000);
-});
+// Inicialização controlada pelo main.js
+// ModalCotacaoMelhorado.init() é chamado centralmente
 
 // Também inicializar quando o modal for aberto
 document.addEventListener('click', (e) => {

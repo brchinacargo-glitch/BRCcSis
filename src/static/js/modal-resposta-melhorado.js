@@ -563,10 +563,8 @@ const ModalRespostaMelhorado = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    ModalRespostaMelhorado.init();
-});
+// Inicialização controlada pelo main.js
+// ModalRespostaMelhorado.init() é chamado centralmente
 
 // Exportar para uso global
 window.ModalRespostaMelhorado = ModalRespostaMelhorado;

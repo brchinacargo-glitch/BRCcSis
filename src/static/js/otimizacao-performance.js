@@ -422,11 +422,8 @@ const OtimizacaoPerformance = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    OtimizacaoPerformance.init();
-    OtimizacaoPerformance.aplicarOtimizacoesAutomaticas();
-});
+// Inicialização controlada pelo main.js
+// OtimizacaoPerformance.init() e aplicarOtimizacoesAutomaticas() são chamados centralmente
 
 // Executar limpeza periódica
 setInterval(() => {

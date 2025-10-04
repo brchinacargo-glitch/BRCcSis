@@ -281,10 +281,8 @@ const FinalizarCotacoes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    FinalizarCotacoes.init();
-});
+// Inicialização controlada pelo main.js
+// FinalizarCotacoes.init() é chamado centralmente
 
 // Exportar para uso global
 window.FinalizarCotacoes = FinalizarCotacoes;

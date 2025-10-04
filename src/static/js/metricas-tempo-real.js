@@ -134,10 +134,6 @@ const MetricasTempoReal = {
     // ==================== MONITORAMENTO ====================
     
     iniciarMonitoramento() {
-        // TEMPORARIAMENTE DESABILITADO para evitar gráficos infinitos
-        console.log('⚠️ Monitoramento em tempo real temporariamente desabilitado');
-        return;
-        
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }
@@ -145,9 +141,9 @@ const MetricasTempoReal = {
         // Primeira atualização imediata
         this.atualizarMetricas();
         
-        // Configurar intervalo
+        // Configurar intervalo com verificação inteligente
         this.intervalId = setInterval(() => {
-            this.atualizarMetricas();
+            this.atualizarMetricasComVerificacao();
         }, this.configuracoes.intervaloAtualizacao);
         
         // Configurar intervalo para verificar alertas
@@ -156,6 +152,64 @@ const MetricasTempoReal = {
         }, this.configuracoes.intervaloNotificacoes);
         
         console.log('🔄 Monitoramento em tempo real iniciado');
+    },
+
+    atualizarMetricasComVerificacao() {
+        // Verificar se ainda estamos na seção correta antes de atualizar
+        const secaoAtual = this.obterSecaoAtiva();
+        
+        if (secaoAtual === 'dashboard') {
+            // Atualizar métricas do dashboard
+            this.atualizarMetricas();
+        } else if (secaoAtual === 'analytics') {
+            // Atualizar gráficos apenas se estivermos na seção analytics
+            const analyticsSection = document.getElementById('secao-analytics-v133');
+            if (window.DashboardGraficos && analyticsSection && analyticsSection.style.display !== 'none') {
+                // Verificar se não está renderizando para evitar loop
+                if (!window.DashboardGraficos.renderizando && !window.DashboardGraficos.carregandoDados) {
+                    console.log('📊 Atualizando gráficos do dashboard (métricas tempo real)');
+                    window.DashboardGraficos.atualizarDados();
+                }
+            }
+        }
+        
+        // Sempre atualizar métricas básicas
+        this.atualizarMetricasBasicas();
+    },
+
+    obterSecaoAtiva() {
+        // Verificar qual seção está ativa
+        const dashboard = document.getElementById('dashboard');
+        const analytics = document.getElementById('secao-analytics-v133');
+        
+        if (dashboard && dashboard.style.display !== 'none') {
+            return 'dashboard';
+        } else if (analytics && analytics.style.display !== 'none') {
+            return 'analytics';
+        }
+        
+        return 'outras';
+    },
+
+    atualizarMetricasBasicas() {
+        // Atualizar apenas métricas básicas sem gráficos
+        if (window.API && typeof API.getCotacoes === 'function') {
+            API.getCotacoes().then(response => {
+                if (response.success && response.cotacoes) {
+                    const total = response.cotacoes.length;
+                    const finalizadas = response.cotacoes.filter(c => c.status === 'finalizada').length;
+                    
+                    // Atualizar elementos de métricas se existirem
+                    const totalElement = document.querySelector('[data-metric="total"]');
+                    const finalizadasElement = document.querySelector('[data-metric="finalizadas"]');
+                    
+                    if (totalElement) totalElement.textContent = total;
+                    if (finalizadasElement) finalizadasElement.textContent = finalizadas;
+                }
+            }).catch(error => {
+                console.log('Métricas básicas: API não disponível');
+            });
+        }
     },
     
     pararMonitoramento() {
@@ -531,13 +585,8 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    // Aguardar dashboard estar pronto
-    setTimeout(() => {
-        MetricasTempoReal.init();
-    }, 1000);
-});
+// Inicialização controlada pelo main.js
+// MetricasTempoReal.init() é chamado centralmente com delay apropriado
 
 // Exportar para uso global
 window.MetricasTempoReal = MetricasTempoReal;

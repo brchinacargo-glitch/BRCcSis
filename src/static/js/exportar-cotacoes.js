@@ -381,10 +381,8 @@ const ExportarCotacoes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    ExportarCotacoes.init();
-});
+// Inicialização controlada pelo main.js
+// ExportarCotacoes.init() é chamado centralmente
 
 // Exportar para uso global
 window.ExportarCotacoes = ExportarCotacoes;

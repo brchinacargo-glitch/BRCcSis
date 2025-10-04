@@ -556,10 +556,8 @@ const AceitarNegarCotacoes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    AceitarNegarCotacoes.init();
-});
+// Inicialização controlada pelo main.js
+// AceitarNegarCotacoes.init() é chamado centralmente
 
 // Exportar para uso global
 window.AceitarNegarCotacoes = AceitarNegarCotacoes;

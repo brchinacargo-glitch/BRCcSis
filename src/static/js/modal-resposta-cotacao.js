@@ -613,10 +613,8 @@ const ModalRespostaCotacao = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    ModalRespostaCotacao.init();
-});
+// Inicialização controlada pelo main.js
+// ModalRespostaCotacao.init() é chamado centralmente
 
 // Exportar para uso global
 window.ModalRespostaCotacao = ModalRespostaCotacao;

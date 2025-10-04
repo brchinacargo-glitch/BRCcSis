@@ -5,12 +5,40 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('BRCcSis v1.3.4 - Sistema Iniciado');
     
-    // Inicializar módulos
+    // Inicializar módulos principais
     UI.init();
     Dashboard.init();
     Empresas.init();
     Cotacoes.init();
     Analytics.init();
+    
+    // Inicializar sistemas de cotações
+    if (typeof AceitarNegarCotacoes !== 'undefined') AceitarNegarCotacoes.init();
+    if (typeof FinalizarCotacoes !== 'undefined') FinalizarCotacoes.init();
+    if (typeof ModalRespostaMelhorado !== 'undefined') ModalRespostaMelhorado.init();
+    if (typeof ModalCotacaoMelhorado !== 'undefined') ModalCotacaoMelhorado.init();
+    if (typeof ModalNovaCotacao !== 'undefined') ModalNovaCotacao.init();
+    if (typeof ModalRespostaCotacao !== 'undefined') ModalRespostaCotacao.init();
+    if (typeof CotacaoDetalhes !== 'undefined') CotacaoDetalhes.init();
+    
+    // Inicializar sistemas auxiliares
+    if (typeof FiltrosCotacoes !== 'undefined') FiltrosCotacoes.init();
+    if (typeof ExportarCotacoes !== 'undefined') ExportarCotacoes.init();
+    if (typeof HistoricoVisual !== 'undefined') HistoricoVisual.init();
+    if (typeof SistemaMensagens !== 'undefined') SistemaMensagens.init();
+    
+    // Inicializar sistemas de performance
+    if (typeof OtimizacaoPerformance !== 'undefined') {
+        OtimizacaoPerformance.init();
+        OtimizacaoPerformance.aplicarOtimizacoesAutomaticas();
+    }
+    
+    // Inicializar métricas (com delay para evitar conflitos)
+    setTimeout(() => {
+        if (typeof MetricasTempoReal !== 'undefined') MetricasTempoReal.init();
+        if (typeof DashboardGraficos !== 'undefined') DashboardGraficos.init();
+        if (typeof SistemaTestes !== 'undefined') SistemaTestes.init();
+    }, 500);
     
     // Carregar dashboard inicial
     UI.showSection('dashboard');

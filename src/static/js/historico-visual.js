@@ -436,10 +436,8 @@ const HistoricoVisual = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    HistoricoVisual.init();
-});
+// Inicialização controlada pelo main.js
+// HistoricoVisual.init() é chamado centralmente
 
 // Exportar para uso global
 window.HistoricoVisual = HistoricoVisual;

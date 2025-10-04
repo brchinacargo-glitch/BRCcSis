@@ -485,13 +485,8 @@ const SistemaTestes = {
     }
 };
 
-// Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    // Aguardar um pouco para outros módulos carregarem
-    setTimeout(() => {
-        SistemaTestes.init();
-    }, 2000);
-});
+// Inicialização controlada pelo main.js
+// SistemaTestes.init() é chamado centralmente com delay apropriado
 
 // Exportar para uso global
 window.SistemaTestes = SistemaTestes;
