@@ -1158,26 +1158,55 @@
 
         // Configurar event listeners para navegação
         function setupNavigationListeners() {
-            // Navegação principal
-            document.getElementById('nav-dashboard').addEventListener('click', function(e) {
-                e.preventDefault();
-                showSection('dashboard');
-            });
+            console.log('🔧 Configurando listeners de navegação...');
             
-            document.getElementById('nav-empresas').addEventListener('click', function(e) {
-                e.preventDefault();
-                showSection('empresas');
-            });
+            // Navegação principal com verificações de segurança
+            const navDashboard = document.getElementById('nav-dashboard');
+            const navEmpresas = document.getElementById('nav-empresas');
+            const navCotacoes = document.getElementById('nav-cotacoes');
+            const navCadastro = document.getElementById('nav-cadastro');
             
-            document.getElementById('nav-cotacoes').addEventListener('click', function(e) {
-                e.preventDefault();
-                mostrarSecaoCotacoes();
-            });
+            if (navDashboard) {
+                navDashboard.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showSection('dashboard');
+                });
+                console.log('✅ Listener nav-dashboard configurado');
+            } else {
+                console.warn('❌ Elemento nav-dashboard não encontrado');
+            }
             
-            document.getElementById('nav-cadastro').addEventListener('click', function(e) {
-                e.preventDefault();
-                showSection('cadastro');
-            });
+            if (navEmpresas) {
+                navEmpresas.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔍 Clique em nav-empresas detectado');
+                    showSection('empresas');
+                });
+                console.log('✅ Listener nav-empresas configurado');
+            } else {
+                console.warn('❌ Elemento nav-empresas não encontrado');
+            }
+            
+            if (navCotacoes) {
+                navCotacoes.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mostrarSecaoCotacoes();
+                });
+                console.log('✅ Listener nav-cotacoes configurado');
+            } else {
+                console.warn('❌ Elemento nav-cotacoes não encontrado');
+            }
+            
+            if (navCadastro) {
+                navCadastro.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔍 Clique em nav-cadastro detectado');
+                    showSection('cadastro');
+                });
+                console.log('✅ Listener nav-cadastro configurado');
+            } else {
+                console.warn('❌ Elemento nav-cadastro não encontrado');
+            }
         }
 
         // Configurar event listeners para botões
