@@ -265,16 +265,21 @@ const Cotacoes = {
      * @param {object} cotacao - Dados da cotação
      */
     showDetailsModal(cotacao) {
-        // Implementação simplificada
-        const details = `
+        // Usar o novo modal de detalhes expandido
+        if (window.CotacaoDetalhes) {
+            window.CotacaoDetalhes.abrirModal(cotacao.id);
+        } else {
+            // Fallback para implementação simples
+            const details = `
 Cotação #${cotacao.numero_cotacao || cotacao.id}
 Empresa: ${cotacao.empresa_nome || 'N/A'}
 Status: ${this.getStatusDisplay(cotacao.status)}
 Modalidade: ${cotacao.modalidade || 'N/A'}
 Origem: ${cotacao.origem || 'N/A'}
 Destino: ${cotacao.destino || 'N/A'}
-        `;
-        alert(details);
+            `;
+            alert(details);
+        }
     },
     
     /**
