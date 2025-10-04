@@ -1434,13 +1434,17 @@
                 displayEmpresas(data.empresas);
                 updatePagination(data);
                 
-                document.getElementById('resultado-count').textContent = 
-                    `${data.total} empresa(s) encontrada(s)`;
+                const resultadoCount = document.getElementById('resultado-count');
+                if (resultadoCount) {
+                    resultadoCount.textContent = `${data.total} empresa(s) encontrada(s)`;
+                }
                 
             } catch (error) {
                 console.error('Erro ao carregar empresas:', error);
-                document.getElementById('lista-empresas').innerHTML = 
-                    '<div class="p-6 text-center text-red-600">Erro ao carregar empresas</div>';
+                const listaEmpresas = document.getElementById('lista-empresas');
+                if (listaEmpresas) {
+                    listaEmpresas.innerHTML = '<div class="p-6 text-center text-red-600">Erro ao carregar empresas</div>';
+                }
             }
         }
 
@@ -1448,7 +1452,12 @@
         function displayEmpresas(empresas) {
             const container = document.getElementById('lista-empresas');
             
-            if (empresas.length === 0) {
+            if (!container) {
+                console.warn('Container lista-empresas não encontrado');
+                return;
+            }
+            
+            if (!empresas || empresas.length === 0) {
                 container.innerHTML = '<div class="p-6 text-center text-gray-500">Nenhuma empresa encontrada</div>';
                 return;
             }
@@ -4235,6 +4244,11 @@
                         <i class="fas fa-sync-alt mr-2"></i>Atualizar
                     </button>
                 </div>
+            </div>
+
+            <!-- Container para Dashboard de Gráficos -->
+            <div id="dashboard-analytics" class="mb-8">
+                <!-- Os gráficos serão inseridos aqui dinamicamente pelo dashboard-graficos.js -->
             </div>
 
             <!-- Abas de Analytics -->

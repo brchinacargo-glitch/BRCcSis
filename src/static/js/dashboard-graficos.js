@@ -281,20 +281,22 @@ const DashboardGraficos = {
     
     // ==================== MÉTRICAS ====================
     
-    atualizarMetricas() {
-        if (!this.dados || !this.dados.metricas) return;
+    atualizarMetricas(dados) {
+        // Atualizar cards de métricas com verificação de segurança
+        const totalElement = document.getElementById('total-cotacoes');
+        const finalizadasElement = document.getElementById('cotacoes-finalizadas');
+        const pendentesElement = document.getElementById('cotacoes-pendentes');
+        const taxaElement = document.getElementById('taxa-conversao');
         
-        const metricas = this.dados.metricas;
-        
-        document.getElementById('total-cotacoes').textContent = metricas.total.toLocaleString('pt-BR');
-        document.getElementById('cotacoes-finalizadas').textContent = metricas.finalizadas.toLocaleString('pt-BR');
-        document.getElementById('cotacoes-pendentes').textContent = metricas.pendentes.toLocaleString('pt-BR');
-        document.getElementById('taxa-conversao').textContent = metricas.taxaConversao.toFixed(1) + '%';
+        if (totalElement) totalElement.textContent = dados.total || 0;
+        if (finalizadasElement) finalizadasElement.textContent = dados.finalizadas || 0;
+        if (pendentesElement) pendentesElement.textContent = dados.pendentes || 0;
+        if (taxaElement) taxaElement.textContent = `${dados.taxaConversao || 0}%`;
     },
     
     // ==================== RENDERIZAÇÃO DE GRÁFICOS ====================
     
-    renderizarTodosGraficos() {
+    renderizarTodosGraficos(dados) {
         this.renderizarGraficoStatus();
         this.renderizarGraficoModalidade();
         this.renderizarGraficoEvolucao();
@@ -304,7 +306,10 @@ const DashboardGraficos = {
     
     renderizarGraficoStatus() {
         const ctx = document.getElementById('grafico-status');
-        if (!ctx || !this.dados) return;
+        if (!ctx || !this.dados) {
+            console.warn('Elemento grafico-status não encontrado ou dados indisponíveis');
+            return;
+        }
         
         // Destruir gráfico anterior se existir
         if (this.graficosRenderizados.status) {
@@ -357,7 +362,10 @@ const DashboardGraficos = {
     
     renderizarGraficoModalidade() {
         const ctx = document.getElementById('grafico-modalidade');
-        if (!ctx || !this.dados) return;
+        if (!ctx || !this.dados) {
+            console.warn('Elemento grafico-modalidade não encontrado ou dados indisponíveis');
+            return;
+        }
         
         if (this.graficosRenderizados.modalidade) {
             this.graficosRenderizados.modalidade.destroy();
@@ -407,7 +415,10 @@ const DashboardGraficos = {
     
     renderizarGraficoEvolucao(dias = 30) {
         const ctx = document.getElementById('grafico-evolucao');
-        if (!ctx || !this.dados) return;
+        if (!ctx || !this.dados) {
+            console.warn('Elemento grafico-evolucao não encontrado ou dados indisponíveis');
+            return;
+        }
         
         if (this.graficosRenderizados.evolucao) {
             this.graficosRenderizados.evolucao.destroy();
@@ -469,7 +480,10 @@ const DashboardGraficos = {
     
     renderizarGraficoOperadores() {
         const ctx = document.getElementById('grafico-operadores');
-        if (!ctx || !this.dados) return;
+        if (!ctx || !this.dados) {
+            console.warn('Elemento grafico-operadores não encontrado ou dados indisponíveis');
+            return;
+        }
         
         if (this.graficosRenderizados.operadores) {
             this.graficosRenderizados.operadores.destroy();
@@ -520,7 +534,10 @@ const DashboardGraficos = {
     
     renderizarGraficoValores() {
         const ctx = document.getElementById('grafico-valores');
-        if (!ctx || !this.dados) return;
+        if (!ctx || !this.dados) {
+            console.warn('Elemento grafico-valores não encontrado ou dados indisponíveis');
+            return;
+        }
         
         if (this.graficosRenderizados.valores) {
             this.graficosRenderizados.valores.destroy();

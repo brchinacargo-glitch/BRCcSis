@@ -211,6 +211,13 @@ const API = {
         return await response.json();
     },
     
+    // ==================== OPERADORES ====================
+    
+    async getOperadores() {
+        const response = await fetch(`${this.baseURL}/v133/operadores`);
+        return await response.json();
+    },
+    
     // ==================== UTILITÁRIOS ====================
     
     handleError(error) {
