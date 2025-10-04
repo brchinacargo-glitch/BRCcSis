@@ -145,15 +145,29 @@ const OtimizacaoPerformance = {
         const elementosOcultos = document.querySelectorAll('[style*="display: none"]');
         let removidos = 0;
         
+        // IDs das seções principais que NÃO devem ser removidas
+        const secoesPrincipais = ['dashboard', 'empresas', 'cadastro', 'secao-cotacoes', 'secao-analytics-v133'];
+        
         elementosOcultos.forEach(elemento => {
-            if (!elemento.dataset.keepHidden) {
+            // Não remover se:
+            // 1. Tem dataset.keepHidden
+            // 2. É uma seção principal do sistema
+            // 3. É um modal (pode estar oculto mas é necessário)
+            if (!elemento.dataset.keepHidden && 
+                !secoesPrincipais.includes(elemento.id) &&
+                !elemento.classList.contains('modal') &&
+                !elemento.closest('.modal')) {
+                
+                console.log(`🗑️ Removendo elemento oculto: ${elemento.tagName}#${elemento.id || 'sem-id'}`);
                 elemento.remove();
                 removidos++;
             }
         });
         
         if (removidos > 0) {
-            console.log(`🗑️ ${removidos} elementos ocultos removidos`);
+            console.log(`🗑️ ${removidos} elementos ocultos removidos (seções principais preservadas)`);
+        } else {
+            console.log(`✅ Nenhum elemento removido - seções principais preservadas`);
         }
     },
 
