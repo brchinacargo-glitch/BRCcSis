@@ -1366,7 +1366,11 @@
             sections.forEach(id => {
                 const section = document.getElementById(id);
                 if (section) {
-                    section.style.display = id === sectionId ? 'block' : 'none';
+                    const shouldShow = id === sectionId;
+                    section.style.display = shouldShow ? 'block' : 'none';
+                    console.log(`Seção ${id}: ${shouldShow ? 'mostrar' : 'ocultar'}`);
+                } else {
+                    console.warn(`Seção ${id} não encontrada`);
                 }
             });
             
@@ -1398,7 +1402,10 @@
             });
             
             if (sectionId === 'empresas') {
-                loadEmpresas(1, true); // forçar carregamento
+                // Aguardar um pouco para a seção estar visível antes de carregar
+                setTimeout(() => {
+                    loadEmpresas(1, true); // forçar carregamento
+                }, 100);
             } else if (sectionId === 'dashboard') {
                 loadDashboardStats();
             }
@@ -1544,14 +1551,27 @@
             currentPage = data.current_page;
             totalPages = data.pages;
             
-            document.getElementById('showing-from').textContent = 
-                data.empresas.length > 0 ? ((currentPage - 1) * data.per_page) + 1 : 0;
-            document.getElementById('showing-to').textContent = 
-                Math.min(currentPage * data.per_page, data.total);
-            document.getElementById('total-results').textContent = data.total;
+            const showingFrom = document.getElementById('showing-from');
+            const showingTo = document.getElementById('showing-to');
+            const totalResults = document.getElementById('total-results');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
             
-            document.getElementById('btn-prev').disabled = currentPage <= 1;
-            document.getElementById('btn-next').disabled = currentPage >= totalPages;
+            if (showingFrom) {
+                showingFrom.textContent = data.empresas.length > 0 ? ((currentPage - 1) * data.per_page) + 1 : 0;
+            }
+            if (showingTo) {
+                showingTo.textContent = Math.min(currentPage * data.per_page, data.total);
+            }
+            if (totalResults) {
+                totalResults.textContent = data.total;
+            }
+            if (btnPrev) {
+                btnPrev.disabled = currentPage <= 1;
+            }
+            if (btnNext) {
+                btnNext.disabled = currentPage >= totalPages;
+            }
         }
 
         // Navegação de páginas
