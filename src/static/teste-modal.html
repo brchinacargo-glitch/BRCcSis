@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Resposta</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Teste do Modal de Resposta de Cotação</h1>
+        
+        <!-- Simulação de Card de Cotação -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900">Cotação #COT-TEST-001</h4>
+                    <p class="text-sm text-gray-600">Empresa: Empresa Teste Ltda</p>
+                </div>
+                <span class="status-badge status-aceita_operador">Aceita pelo Operador</span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
+                <div>
+                    <span class="font-medium text-gray-700">Modalidade: </span>
+                    <span class="text-gray-600">Rodoviário</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">Origem: </span>
+                    <span class="text-gray-600">São Paulo - SP</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">Destino: </span>
+                    <span class="text-gray-600">Rio de Janeiro - RJ</span>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2 mt-4">
+                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" 
+                        onclick="testarModal()">
+                    Responder
+                </button>
+            </div>
+        </div>
+        
+        <!-- Botões de Teste -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Testes Disponíveis</h2>
+            
+            <div class="space-y-2">
+                <button onclick="verificarModal()" 
+                        class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    1. Verificar se Modal Está Carregado
+                </button>
+                
+                <button onclick="testarModal()" 
+                        class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    2. Abrir Modal de Teste
+                </button>
+                
+                <button onclick="testarValidacao()" 
+                        class="w-full px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                    3. Testar Validação de Campos
+                </button>
+                
+                <button onclick="testarSubmissao()" 
+                        class="w-full px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+                    4. Testar Submissão (Mock)
+                </button>
+            </div>
+            
+            <div id="resultado-teste" class="mt-4 p-4 bg-gray-50 rounded hidden">
+                <h3 class="font-semibold">Resultado do Teste:</h3>
+                <pre id="resultado-conteudo" class="text-sm mt-2"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resposta de Cotação -->
+    <div id="modal-resposta-cotacao" class="modal hidden">
+        <div class="modal-backdrop">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Responder Cotação #<span id="numero-cotacao"></span></h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- Resumo da Cotação -->
+                    <div class="cotacao-resumo">
+                        <!-- Dados básicos da cotação serão preenchidos via JavaScript -->
+                    </div>
+                    
+                    <!-- Formulário de Resposta -->
+                    <form id="form-resposta-cotacao">
+                        <div class="form-group">
+                            <label for="valor-frete">Valor do Frete (R$)</label>
+                            <input type="text" id="valor-frete" name="valor-frete" required placeholder="0,00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prazo-entrega">Prazo de Entrega</label>
+                            <select id="prazo-entrega" name="prazo-entrega" required>
+                                <option value="">Selecione...</option>
+                                <option value="24h">24 horas</option>
+                                <option value="48h">48 horas</option>
+                                <option value="72h">72 horas</option>
+                                <option value="5_dias">5 dias úteis</option>
+                                <option value="7_dias">7 dias úteis</option>
+                                <option value="10_dias">10 dias úteis</option>
+                                <option value="15_dias">15 dias úteis</option>
+                                <option value="30_dias">30 dias úteis</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="empresa-prestadora">Empresa Prestadora</label>
+                            <select id="empresa-prestadora" name="empresa-prestadora" required>
+                                <option value="">Selecione...</option>
+                                <!-- Lista de empresas será preenchida via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="observacoes">Observações</label>
+                            <textarea id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais (opcional)" maxlength="500"></textarea>
+                            <small class="text-gray-500">Máximo 500 caracteres</small>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="ModalRespostaCotacao.close()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="ModalRespostaCotacao.submit()">
+                        Enviar Resposta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/modal-resposta-cotacao.js"></script>
+    
+    <script>
+        function mostrarResultado(titulo, conteudo) {
+            const resultadoDiv = document.getElementById('resultado-teste');
+            const conteudoDiv = document.getElementById('resultado-conteudo');
+            
+            resultadoDiv.classList.remove('hidden');
+            conteudoDiv.textContent = `${titulo}\n\n${JSON.stringify(conteudo, null, 2)}`;
+        }
+        
+        function verificarModal() {
+            const resultado = {
+                modalCarregado: !!window.ModalRespostaCotacao,
+                empresasCarregadas: window.ModalRespostaCotacao?.empresas?.length || 0,
+                metodosDisponiveis: window.ModalRespostaCotacao ? Object.keys(window.ModalRespostaCotacao) : []
+            };
+            
+            mostrarResultado('Verificação do Modal', resultado);
+        }
+        
+        function testarModal() {
+            if (!window.ModalRespostaCotacao) {
+                alert('Modal não está carregado!');
+                return;
+            }
+            
+            // Simular cotação
+            window.ModalRespostaCotacao.cotacaoAtual = {
+                id: 1,
+                numero_cotacao: 'COT-TEST-001',
+                status: 'aceita_operador',
+                cliente_nome: 'Empresa Teste Ltda',
+                modalidade: 'rodoviario',
+                origem: 'São Paulo - SP',
+                destino: 'Rio de Janeiro - RJ',
+                peso: 150.5,
+                valor_mercadoria: 25000
+            };
+            
+            // Preencher dados
+            window.ModalRespostaCotacao.populateCotacaoData();
+            window.ModalRespostaCotacao.populateEmpresasDropdown();
+            
+            // Abrir modal
+            window.ModalRespostaCotacao.showModal();
+        }
+        
+        function testarValidacao() {
+            if (!window.ModalRespostaCotacao) {
+                alert('Modal não está carregado!');
+                return;
+            }
+            
+            // Abrir modal primeiro
+            testarModal();
+            
+            // Testar validação após um pequeno delay
+            setTimeout(() => {
+                const resultado = window.ModalRespostaCotacao.validateForm();
+                mostrarResultado('Teste de Validação', {
+                    formularioValido: resultado,
+                    mensagem: resultado ? 'Formulário válido' : 'Formulário inválido - campos obrigatórios vazios'
+                });
+            }, 500);
+        }
+        
+        function testarSubmissao() {
+            alert('Teste de submissão: Como não há backend real, o modal mostrará erro de API, mas isso é esperado.');
+            testarModal();
+        }
+        
+        // Mock da API para teste
+        window.API = {
+            responderCotacao: async (id, dados) => {
+                console.log('Mock API - Responder Cotação:', { id, dados });
+                return {
+                    success: true,
+                    message: 'Resposta enviada com sucesso (MOCK)'
+                };
+            }
+        };
+    </script>
+</body>
+</html>

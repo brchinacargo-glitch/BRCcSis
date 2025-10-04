@@ -219,10 +219,394 @@ a.btn-cotacao:hover {
     white-space: nowrap;
 }
 
+/* ==================== MODAL DE RESPOSTA DE COTAÇÃO ==================== */
+
+/* Modal backdrop e container */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Modal header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+/* Modal body */
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Modal footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Resumo da cotação */
+.cotacao-resumo {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.cotacao-resumo h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Formulário */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Estados de validação */
+.field-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.field-error {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Botões do modal */
+.modal-footer .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+.modal-footer .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.modal-footer .btn-primary:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Loading no botão */
+.modal-footer .btn .loading {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+/* Grid responsivo para resumo */
+.cotacao-resumo .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.cotacao-resumo .grid > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.cotacao-resumo .grid span:first-child {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.cotacao-resumo .grid span:last-child {
+    color: #6b7280;
+}
+
 /* ==================== RESPONSIVIDADE ==================== */
 
 @media (max-width: 768px) {
     .chart-container {
         height: 250px;
     }
+    
+    /* Modal responsivo */
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+        max-height: 95vh;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cotacao-resumo .grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+/* ==================== MELHORIAS MODAL DE COTAÇÃO ==================== */
+
+/* Campos com erro */
+.border-red-500 {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Mensagens de erro */
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+    font-weight: 500;
+}
+
+/* Melhorias no scroll do modal */
+#modal-cotacao .max-h-\[90vh\] {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+#modal-cotacao .max-h-\[90vh\]::-webkit-scrollbar {
+    width: 8px;
+}
+
+#modal-cotacao .max-h-\[90vh\]::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+#modal-cotacao .max-h-\[90vh\]::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+#modal-cotacao .max-h-\[90vh\]::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Campos numéricos com formatação */
+.campo-numerico {
+    font-family: 'Courier New', monospace;
+    text-align: right;
+    min-width: 200px; /* Largura mínima para acomodar até 15 dígitos */
+    font-size: 0.9rem;
+}
+
+.campo-numerico:focus {
+    text-align: left;
+}
+
+/* Ajuste específico para campos de peso e cubagem */
+input[data-tipo="peso"],
+input[data-tipo="cubagem"] {
+    min-width: 220px;
+    font-size: 0.85rem;
+}
+
+/* Ajuste para campos de dimensão e inteiro */
+input[data-tipo="dimensao"],
+input[data-tipo="inteiro"] {
+    min-width: 200px;
+    font-size: 0.9rem;
+}
+
+/* Indicador visual para campos obrigatórios */
+input[required]:not([value=""]):valid,
+select[required]:not([value=""]):valid,
+textarea[required]:not([value=""]):valid {
+    border-left: 3px solid #10b981;
+}
+
+/* Animação suave para campos com erro */
+.border-red-500 {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Melhorias para mobile */
+@media (max-width: 768px) {
+    #modal-cotacao .max-h-\[90vh\] {
+        max-height: 95vh !important;
+        padding: 1rem !important;
+    }
+    
+    .campo-numerico {
+        font-size: 16px; /* Evita zoom no iOS */
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-2,
+    .grid.grid-cols-1.md\\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* Notificações */
+.notification {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading state para botões */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
 }

@@ -3574,7 +3574,7 @@
 
     <!-- Modal de Cotação -->
     <div id="modal-cotacao" class="modal">
-        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 fade-in max-h-screen overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-2xl font-bold text-gray-800">
@@ -3804,7 +3804,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Peso Total (kg) *</label>
-                                    <input type="number" name="carga_peso_kg" required min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_peso_kg" required placeholder="123.456.789.012.345,00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="peso">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Valor da Mercadoria (R$) *</label>
@@ -3828,15 +3828,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Comprimento (cm)</label>
-                                    <input type="number" name="carga_comprimento_cm" min="1" placeholder="0" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_comprimento_cm" placeholder="123.456.789.012.345" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="dimensao">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Largura (cm)</label>
-                                    <input type="number" name="carga_largura_cm" min="1" placeholder="0" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_largura_cm" placeholder="123.456.789.012.345" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="dimensao">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Altura (cm)</label>
-                                    <input type="number" name="carga_altura_cm" min="1" placeholder="0" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_altura_cm" placeholder="123.456.789.012.345" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="dimensao">
                                 </div>
                             </div>
                             
@@ -3844,7 +3844,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cubagem Total (m³) *</label>
-                                    <input type="number" name="carga_cubagem" required min="0.001" step="0.001" placeholder="0.000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_cubagem" required placeholder="123.456.789.012.345,000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="cubagem">
                                 </div>
                             </div>
                         </div>
@@ -3859,15 +3859,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Net Weight (kg) *</label>
-                                    <input type="number" name="net_weight" required min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="net_weight" required placeholder="123.456.789.012.345,00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="peso">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Gross Weight (kg) *</label>
-                                    <input type="number" name="gross_weight" required min="0.01" step="0.01" placeholder="0.00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="gross_weight" required placeholder="123.456.789.012.345,00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="peso">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cubagem (m³) *</label>
-                                    <input type="number" name="cubagem" required min="0.001" step="0.001" placeholder="0.000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="cubagem" required placeholder="123.456.789.012.345,000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="cubagem">
                                 </div>
                             </div>
                             
@@ -3913,7 +3913,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade de Containers</label>
-                                    <input type="number" name="quantidade_containers" min="1" placeholder="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="quantidade_containers" placeholder="123.456.789.012.345" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="inteiro">
                                 </div>
                             </div>
                             
@@ -3935,7 +3935,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Peso Total (kg)</label>
-                                    <input type="number" name="carga_peso_kg" step="0.01" min="0" placeholder="0,00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                    <input type="text" name="carga_peso_kg" placeholder="123.456.789.012.345,00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="peso">
                                 </div>
                             </div>
                         </div>
@@ -4024,7 +4024,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Prazo Desejado (dias)</label>
-                                <input type="number" name="servico_prazo_desejado" min="1" placeholder="Ex: 5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <input type="text" name="servico_prazo_desejado" placeholder="123.456.789.012.345" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 campo-numerico" data-tipo="inteiro">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Serviço</label>
@@ -7229,6 +7229,71 @@
          * e aplicam formatação corretamente.
          * ================================================================== */
     </script>
+
+    <!-- Modal de Resposta de Cotação -->
+    <div id="modal-resposta-cotacao" class="modal hidden">
+        <div class="modal-backdrop">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Responder Cotação #<span id="numero-cotacao"></span></h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- Resumo da Cotação -->
+                    <div class="cotacao-resumo">
+                        <!-- Dados básicos da cotação serão preenchidos via JavaScript -->
+                    </div>
+                    
+                    <!-- Formulário de Resposta -->
+                    <form id="form-resposta-cotacao">
+                        <div class="form-group">
+                            <label for="valor-frete">Valor do Frete (R$)</label>
+                            <input type="text" id="valor-frete" name="valor-frete" required placeholder="0,00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prazo-entrega">Prazo de Entrega</label>
+                            <select id="prazo-entrega" name="prazo-entrega" required>
+                                <option value="">Selecione...</option>
+                                <option value="24h">24 horas</option>
+                                <option value="48h">48 horas</option>
+                                <option value="72h">72 horas</option>
+                                <option value="5_dias">5 dias úteis</option>
+                                <option value="7_dias">7 dias úteis</option>
+                                <option value="10_dias">10 dias úteis</option>
+                                <option value="15_dias">15 dias úteis</option>
+                                <option value="30_dias">30 dias úteis</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="empresa-prestadora">Empresa Prestadora</label>
+                            <select id="empresa-prestadora" name="empresa-prestadora" required>
+                                <option value="">Selecione...</option>
+                                <!-- Lista de empresas será preenchida via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="observacoes">Observações</label>
+                            <textarea id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais (opcional)" maxlength="500"></textarea>
+                            <small class="text-gray-500">Máximo 500 caracteres</small>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="ModalRespostaCotacao.close()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="ModalRespostaCotacao.submit()">
+                        Enviar Resposta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- ==================== SCRIPTS CORRIGIDOS ==================== -->
     <!-- IMPORTANTE: Estes scripts DEVEM ser carregados nesta ordem -->
@@ -7241,6 +7306,12 @@
     
     <!-- 3. Modal integrado com backend -->
     <script src="js/modal-integrado.js"></script>
+    
+    <!-- 4. Modal de resposta de cotação -->
+    <script src="js/modal-resposta-cotacao.js"></script>
+    
+    <!-- 5. Melhorias do modal de cotação -->
+    <script src="js/modal-cotacao-melhorado.js"></script>
     
 </body>
 </html>

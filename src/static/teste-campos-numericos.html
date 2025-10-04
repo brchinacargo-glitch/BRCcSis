@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Campos Numéricos - 10 Decimais</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">Teste de Formatação Brasileira - Separadores de Milhares</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-6">Digite números e veja a formatação automática com pontos e vírgula:</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Campo de Peso -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Peso (kg) - Formato: 123.456.789,99
+                    </label>
+                    <input type="text" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 campo-numerico" 
+                           data-tipo="peso"
+                           placeholder="123.456.789.012.345,00">
+                    <small class="text-gray-500">Digite: 1234567 → Vira: 1.234.567,00</small>
+                </div>
+                
+                <!-- Campo de Cubagem -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Cubagem (m³) - Formato: 123.456.789,123
+                    </label>
+                    <input type="text" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 campo-numerico" 
+                           data-tipo="cubagem"
+                           placeholder="123.456.789.012.345,000">
+                    <small class="text-gray-500">Digite: 9876543 → Vira: 9.876.543,000</small>
+                </div>
+                
+                <!-- Campo Genérico -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Campo Genérico - Formato: 123.456.789,99
+                    </label>
+                    <input type="text" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 campo-numerico"
+                           placeholder="123.456.789.012.345,00">
+                    <small class="text-gray-500">Digite: 5555555 → Vira: 5.555.555,00</small>
+                </div>
+                
+                <!-- Campo de Dimensão (inteiro) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Dimensão (cm) - Formato: 123.456.789
+                    </label>
+                    <input type="text" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 campo-numerico" 
+                           data-tipo="dimensao"
+                           placeholder="123.456.789.012.345">
+                    <small class="text-gray-500">Digite: 1234567 → Vira: 1.234.567</small>
+                </div>
+            </div>
+            
+            <!-- Área de Teste -->
+            <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">Teste de Validação:</h3>
+                
+                <div class="space-y-4">
+                    <button onclick="testarCampos()" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Testar Validação dos Campos
+                    </button>
+                    
+                    <button onclick="preencherExemplos()" 
+                            class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        Preencher com Exemplos
+                    </button>
+                    
+                    <button onclick="limparCampos()" 
+                            class="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                        Limpar Campos
+                    </button>
+                </div>
+                
+                <div id="resultado" class="mt-4 p-3 bg-white rounded border hidden">
+                    <h4 class="font-semibold">Resultado do Teste:</h4>
+                    <pre id="resultado-conteudo" class="text-sm mt-2"></pre>
+                </div>
+            </div>
+            
+            <!-- Instruções -->
+            <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-blue-800">Instruções de Teste:</h3>
+                <ul class="list-disc list-inside text-blue-700 space-y-1">
+                    <li><strong>Formatação automática</strong>: Digite apenas números</li>
+                    <li><strong>Separadores de milhares</strong>: Pontos a cada 3 dígitos</li>
+                    <li><strong>Decimais</strong>: Vírgula para separar decimais</li>
+                    <li>Peso: 1234567 → 1.234.567,00 (2 decimais)</li>
+                    <li>Cubagem: 9876543 → 9.876.543,000 (3 decimais)</li>
+                    <li>Dimensão: 1234567 → 1.234.567 (sem decimais)</li>
+                    <li><strong>Padrão brasileiro</strong>: 123.456.789,99</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/modal-cotacao-melhorado.js"></script>
+    
+    <script>
+        function testarCampos() {
+            const campos = document.querySelectorAll('.campo-numerico');
+            const resultados = {};
+            
+            campos.forEach((campo, index) => {
+                const tipo = campo.dataset.tipo || 'generico';
+                const valor = campo.value;
+                const decimais = valor.includes(',') ? valor.split(',')[1]?.length || 0 : 0;
+                
+                resultados[`Campo ${index + 1} (${tipo})`] = {
+                    valor: valor,
+                    decimais: decimais,
+                    valido: decimais <= 10
+                };
+            });
+            
+            mostrarResultado('Teste de Validação', resultados);
+        }
+        
+        function preencherExemplos() {
+            const campos = document.querySelectorAll('.campo-numerico');
+            const exemplos = [
+                '1234567',  // peso - será formatado para 1.234.567,00
+                '9876543',  // cubagem - será formatado para 9.876.543,000
+                '5555555',  // genérico - será formatado para 5.555.555,00
+                '1234567'   // dimensão - será formatado para 1.234.567
+            ];
+            
+            campos.forEach((campo, index) => {
+                if (exemplos[index]) {
+                    campo.value = exemplos[index];
+                    // Simular evento de input para ativar formatação
+                    campo.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        }
+        
+        function limparCampos() {
+            const campos = document.querySelectorAll('.campo-numerico');
+            campos.forEach(campo => {
+                campo.value = '';
+            });
+            
+            const resultado = document.getElementById('resultado');
+            resultado.classList.add('hidden');
+        }
+        
+        function mostrarResultado(titulo, dados) {
+            const resultadoDiv = document.getElementById('resultado');
+            const conteudoDiv = document.getElementById('resultado-conteudo');
+            
+            resultadoDiv.classList.remove('hidden');
+            conteudoDiv.textContent = `${titulo}\n\n${JSON.stringify(dados, null, 2)}`;
+        }
+        
+        // Inicializar quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ Página de teste carregada');
+            
+            // Verificar se o sistema de formatação está funcionando
+            setTimeout(() => {
+                const campos = document.querySelectorAll('.campo-numerico');
+                console.log(`📊 ${campos.length} campos numéricos encontrados`);
+                
+                if (window.ModalCotacaoMelhorado) {
+                    console.log('✅ Sistema de formatação carregado');
+                } else {
+                    console.warn('⚠️ Sistema de formatação não encontrado');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -177,6 +177,16 @@ const Cotacoes = {
             actions.appendChild(btnReject);
         }
         
+        // Botão para responder cotação aceita pelo operador
+        if (cotacao.status === 'aceita_operador' && this.canRespond(cotacao)) {
+            const btnResponder = Utils.createElement('button', {
+                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
+            });
+            Utils.setTextContent(btnResponder, 'Responder');
+            btnResponder.addEventListener('click', () => this.openResponseModal(cotacao.id));
+            actions.appendChild(btnResponder);
+        }
+        
         card.appendChild(header);
         card.appendChild(details);
         card.appendChild(actions);
@@ -332,6 +342,31 @@ Destino: ${cotacao.destino || 'N/A'}
         } catch (error) {
             console.error('Erro ao criar cotação:', error);
             Utils.showError('Erro ao criar cotação');
+        }
+    },
+    
+    /**
+     * Verifica se pode responder a cotação
+     * @param {object} cotacao - Dados da cotação
+     * @returns {boolean}
+     */
+    canRespond(cotacao) {
+        // Verificar se usuário tem permissão (operador)
+        // Por enquanto, assumindo que todos podem responder
+        // Esta lógica pode ser expandida conforme necessário
+        return cotacao && cotacao.status === 'aceita_operador';
+    },
+    
+    /**
+     * Abre modal de resposta de cotação
+     * @param {number} cotacaoId - ID da cotação
+     */
+    openResponseModal(cotacaoId) {
+        if (window.ModalRespostaCotacao) {
+            window.ModalRespostaCotacao.open(cotacaoId);
+        } else {
+            console.error('Modal de resposta de cotação não encontrado');
+            Utils.showError('Erro ao abrir modal de resposta');
         }
     }
 };

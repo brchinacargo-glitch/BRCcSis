@@ -180,6 +180,15 @@ const API = {
         return await response.json();
     },
     
+    async responderCotacao(id, dados) {
+        const response = await fetch(`${this.baseURL}/v133/cotacoes/${id}/responder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+        return await response.json();
+    },
+    
     // ==================== ANALYTICS ====================
     
     async getAnalyticsGeral() {
