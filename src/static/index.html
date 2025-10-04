@@ -5176,11 +5176,11 @@
             }
 
             container.innerHTML = cotacoesData.map(cotacao => `
-                <div class="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div class="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow" data-cotacao-id="${cotacao.id}">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-4">
                             <h3 class="text-lg font-semibold text-gray-800">${cotacao.numero_cotacao}</h3>
-                            <span class="px-3 py-1 rounded-full text-sm font-medium ${cotacao.status_color}">
+                            <span class="status-badge status-${cotacao.status}" data-status="${cotacao.status}">
                                 ${cotacao.status_display}
                             </span>
                         </div>
@@ -5223,7 +5223,7 @@
                         <div class="text-sm text-gray-500">
                             ${cotacao.operador_nome ? `Operador: ${cotacao.operador_nome}` : 'Aguardando operador'}
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="cotacao-actions">
                             ${getBotoesAcao(cotacao)}
                         </div>
                     </div>
@@ -5245,24 +5245,58 @@
             // Verificar tipo de usuário (será obtido via API)
             // Por enquanto, vamos assumir que operadores podem aceitar cotações
             
-            if (cotacao.status === 'solicitada' && !cotacao.operador_id) {
-                console.log('Adicionando botão ACEITAR para cotação', cotacao.id);
-                // Cotação pode ser aceita por qualquer operador
-                botoes.push(`<button onclick="aceitarCotacao(${cotacao.id})" class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
-                    <i class="fas fa-check mr-1"></i>Aceitar
+            if (cotacao.status === 'solicitada' && !cotacao.operador_responsavel) {
+                console.log('Adicionando botões ACEITAR/NEGAR para cotação', cotacao.id);
+                // Cotação pode ser aceita ou negada por qualquer operador
+                botoes.push(`<button data-action="aceitar-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-success">
+                    <i class="fas fa-check"></i>Aceitar
                 </button>`);
-            } else if (cotacao.status === 'em_analise' && cotacao.operador_id) {
+                botoes.push(`<button data-action="negar-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-danger">
+                    <i class="fas fa-times"></i>Negar
+                </button>`);
+            } else if (cotacao.status === 'aceita_operador' && cotacao.operador_responsavel) {
                 console.log('Adicionando botão RESPONDER para cotação', cotacao.id);
-                // Cotação em análise - operador pode responder
-                botoes.push(`<button onclick="responderCotacao(${cotacao.id})" class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm">
-                    <i class="fas fa-reply mr-1"></i>Responder
+                // Cotação aceita - operador pode responder
+                botoes.push(`<button data-action="responder-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-primary">
+                    <i class="fas fa-reply"></i>Responder
+                </button>`);
+                botoes.push(`<button data-action="reatribuir-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-secondary">
+                    <i class="fas fa-exchange-alt"></i>Reatribuir
                 </button>`);
             } else if (cotacao.status === 'cotacao_enviada') {
-                console.log('Adicionando botão FINALIZAR para cotação', cotacao.id);
-                // Cotação enviada - pode finalizar
-                botoes.push(`<button onclick="finalizarCotacao(${cotacao.id})" class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
-                    <i class="fas fa-flag-checkered mr-1"></i>Finalizar
+                console.log('Adicionando botões APROVAR/RECUSAR para cotação', cotacao.id);
+                // Cotação enviada - consultor pode aprovar/recusar
+                botoes.push(`<button data-action="aprovar-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-success">
+                    <i class="fas fa-thumbs-up"></i>Aprovar
                 </button>`);
+                botoes.push(`<button data-action="recusar-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-danger">
+                    <i class="fas fa-thumbs-down"></i>Recusar
+                </button>`);
+                // Operador também pode editar a resposta
+                botoes.push(`<button data-action="editar-resposta" data-cotacao-id="${cotacao.id}" class="btn-action btn-secondary">
+                    <i class="fas fa-edit"></i>Editar
+                </button>`);
+            } else if (cotacao.status === 'aceita_consultor') {
+                console.log('Adicionando botão FINALIZAR para cotação', cotacao.id);
+                // Cotação aprovada - pode finalizar
+                botoes.push(`<button data-action="finalizar-cotacao" data-cotacao-id="${cotacao.id}" class="btn-action btn-success">
+                    <i class="fas fa-flag-checkered"></i>Finalizar
+                </button>`);
+            } else if (cotacao.status === 'negada') {
+                // Cotação negada - apenas mostrar status
+                botoes.push(`<span class="text-red-600 text-sm">
+                    <i class="fas fa-times-circle mr-1"></i>Cotação negada
+                </span>`);
+            } else if (cotacao.status === 'recusada_consultor') {
+                // Cotação recusada pelo consultor
+                botoes.push(`<span class="text-orange-600 text-sm">
+                    <i class="fas fa-thumbs-down mr-1"></i>Recusada pelo cliente
+                </span>`);
+            } else if (cotacao.status === 'finalizada') {
+                // Cotação finalizada
+                botoes.push(`<span class="text-green-600 text-sm">
+                    <i class="fas fa-check-circle mr-1"></i>Finalizada
+                </span>`);
             }
             
             console.log('Botões gerados para cotação', cotacao.id, ':', botoes.length);
@@ -7586,6 +7620,12 @@
     
     <!-- Sistema de otimização de performance -->
     <script src="js/otimizacao-performance.js"></script>
+    
+    <!-- Sistema de aceitar/negar cotações -->
+    <script src="js/aceitar-negar-cotacoes.js"></script>
+    
+    <!-- Sistema de finalização de cotações -->
+    <script src="js/finalizar-cotacoes.js"></script>
     
 </body>
 </html>

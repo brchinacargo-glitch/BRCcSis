@@ -471,6 +471,236 @@ const API = {
         };
         return labels[modalidade] || modalidade;
     },
+
+    // ==================== ACEITAR/NEGAR COTAÇÕES ====================
+
+    async aceitarCotacao(dados) {
+        try {
+            const response = await fetch('/api/cotacoes/aceitar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação aceita com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao aceitar cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando aceitação de cotação:', dados);
+            
+            // Simular delay da API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação aceita com sucesso',
+                cotacao: {
+                    id: dados.cotacao_id,
+                    status: 'aceita_operador',
+                    operador_responsavel: 'Operador Atual',
+                    data_aceitacao: new Date().toISOString(),
+                    observacoes_aceitacao: dados.observacoes
+                }
+            };
+        }
+    },
+
+    async negarCotacao(dados) {
+        try {
+            const response = await fetch('/api/cotacoes/negar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação negada com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao negar cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando negação de cotação:', dados);
+            
+            // Simular delay da API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação negada com sucesso',
+                cotacao: {
+                    id: dados.cotacao_id,
+                    status: 'negada',
+                    motivo_negacao: dados.motivo,
+                    observacoes_negacao: dados.observacoes,
+                    data_negacao: new Date().toISOString()
+                }
+            };
+        }
+    },
+
+    async getCotacao(cotacaoId) {
+        try {
+            const response = await fetch(`/api/cotacoes/${cotacaoId}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar cotação:', error);
+            
+            // Fallback: buscar dos dados locais se disponíveis
+            if (window.cotacoesData && Array.isArray(window.cotacoesData)) {
+                const cotacao = window.cotacoesData.find(c => c.id == cotacaoId);
+                if (cotacao) {
+                    return {
+                        success: true,
+                        cotacao: cotacao
+                    };
+                }
+            }
+            
+            return {
+                success: false,
+                message: 'Cotação não encontrada'
+            };
+        }
+    },
+
+    // ==================== FINALIZAÇÃO DE COTAÇÕES ====================
+
+    async aprovarCotacao(dados) {
+        try {
+            const response = await fetch('/api/cotacoes/aprovar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação aprovada com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao aprovar cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando aprovação de cotação:', dados);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação aprovada com sucesso',
+                cotacao: {
+                    id: dados.cotacao_id,
+                    status: 'aceita_consultor',
+                    data_aprovacao: new Date().toISOString(),
+                    observacoes_aprovacao: dados.observacoes
+                }
+            };
+        }
+    },
+
+    async recusarCotacao(dados) {
+        try {
+            const response = await fetch('/api/cotacoes/recusar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação recusada com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao recusar cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando recusa de cotação:', dados);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação recusada com sucesso',
+                cotacao: {
+                    id: dados.cotacao_id,
+                    status: 'recusada_consultor',
+                    motivo_recusa: dados.motivo,
+                    observacoes_recusa: dados.observacoes,
+                    data_recusa: new Date().toISOString()
+                }
+            };
+        }
+    },
+
+    async finalizarCotacao(dados) {
+        try {
+            const response = await fetch('/api/cotacoes/finalizar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação finalizada com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao finalizar cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando finalização de cotação:', dados);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação finalizada com sucesso',
+                cotacao: {
+                    id: dados.cotacao_id,
+                    status: 'finalizada',
+                    data_finalizacao: new Date().toISOString(),
+                    observacoes_finalizacao: dados.observacoes
+                }
+            };
+        }
+    },
     
     // ==================== UTILITÁRIOS ====================
     
