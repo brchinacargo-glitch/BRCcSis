@@ -4097,25 +4097,6 @@
                 </button>
             </div>
 
-            <!-- Abas de Modalidade -->
-            <div class="mb-6">
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <button id="tab-todas" class="tab-modalidade active border-orange-500 text-orange-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-modalidade="todas">
-                            <i class="fas fa-list mr-2"></i>Todas as Cotações
-                        </button>
-                        <button id="tab-rodoviarias" class="tab-modalidade border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-modalidade="rodoviarias">
-                            <i class="fas fa-truck mr-2"></i>Rodoviárias
-                        </button>
-                        <button id="tab-maritimas" class="tab-modalidade border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-modalidade="maritimas">
-                            <i class="fas fa-ship mr-2"></i>Marítimas
-                        </button>
-                        <button id="tab-aereas" class="tab-modalidade border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-modalidade="aereas">
-                            <i class="fas fa-plane mr-2"></i>Aéreas
-                        </button>
-                    </nav>
-                </div>
-            </div>
 
             <!-- Filtros por Perfil de Usuário -->
             <div id="filtros-usuario" class="mb-6">
@@ -5318,27 +5299,10 @@
             filtrosUsuario.tipo = tipoUsuarioMap[tipoUsuario] || 'todas';
         }
         
-        // Função para configurar abas de modalidade
+        // Função para configurar abas de modalidade - DESABILITADA (usando sistema de filtros unificado)
         function configurarAbasModalidade() {
-            document.querySelectorAll('.tab-modalidade').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remover classe active de todas as abas
-                    document.querySelectorAll('.tab-modalidade').forEach(t => {
-                        t.classList.remove('active', 'border-orange-500', 'text-orange-600');
-                        t.classList.add('border-transparent', 'text-gray-500');
-                    });
-                    
-                    // Adicionar classe active à aba clicada
-                    this.classList.add('active', 'border-orange-500', 'text-orange-600');
-                    this.classList.remove('border-transparent', 'text-gray-500');
-                    
-                    // Atualizar modalidade ativa
-                    modalidadeAtiva = this.dataset.modalidade;
-                    
-                    // Carregar cotações da modalidade
-                    carregarCotacoesPorModalidade();
-                });
-            });
+            // Sistema de tabs desabilitado - usando filtros avançados
+            console.log('Sistema de tabs desabilitado - usando filtros avançados');
         }
         
         // Função para carregar cotações por modalidade

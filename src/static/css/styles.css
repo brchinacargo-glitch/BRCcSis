@@ -1,5 +1,47 @@
 /* ==================== BRCCSIS v1.3.4 - ESTILOS PRINCIPAIS ==================== */
 
+/* ==================== STATUS BADGES ==================== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-solicitada {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-aceita_operador {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-cotacao_enviada {
+    background-color: #e0e7ff;
+    color: #5b21b6;
+}
+
+.status-aceita_consultor {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-negada_consultor {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-finalizada {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
 /* Gradiente do header */
 .gradient-bg {
     background: linear-gradient(135deg, #228B22 0%, #DC143C 100%);

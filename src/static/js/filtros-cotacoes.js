@@ -24,7 +24,33 @@ const FiltrosCotacoes = {
         this.criarInterfaceFiltros();
         this.setupEventListeners();
         this.carregarDadosFiltros();
+        
+        // Mostrar mensagem inicial
+        this.mostrarMensagemInicial();
+        
         console.log('✅ Sistema de Filtros inicializado');
+    },
+    
+    mostrarMensagemInicial() {
+        const container = document.getElementById('lista-cotacoes');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-filter text-blue-400 text-4xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Sistema de Filtros Ativo</h3>
+                <p class="text-gray-500 mb-4">Use os filtros acima para buscar cotações ou clique em "Aplicar" para ver todas.</p>
+                <button 
+                    onclick="FiltrosCotacoes.aplicarFiltros()" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <i class="fas fa-search mr-2"></i>Carregar Todas as Cotações
+                </button>
+            </div>
+        `;
+        
+        // Zerar contador
+        this.atualizarContador(0, 0);
     },
     
     criarInterfaceFiltros() {
@@ -224,15 +250,19 @@ const FiltrosCotacoes = {
     async carregarOperadores() {
         try {
             if (window.API && typeof API.getOperadores === 'function') {
+                console.log('Carregando operadores da API...');
                 const response = await API.getOperadores();
-                this.operadores = response.data || [];
+                
+                if (response.success) {
+                    this.operadores = response.data || [];
+                    console.log(`${this.operadores.length} operadores carregados`);
+                } else {
+                    console.error('Erro ao carregar operadores:', response.message);
+                    this.operadores = [];
+                }
             } else {
-                // Operadores padrão
-                this.operadores = [
-                    { id: 1, nome: 'João Silva' },
-                    { id: 2, nome: 'Maria Santos' },
-                    { id: 3, nome: 'Pedro Costa' }
-                ];
+                console.warn('API getOperadores não disponível');
+                this.operadores = [];
             }
             
             this.preencherDropdownOperadores();
@@ -240,6 +270,7 @@ const FiltrosCotacoes = {
         } catch (error) {
             console.error('Erro ao carregar operadores:', error);
             this.operadores = [];
+            this.preencherDropdownOperadores();
         }
     },
     
@@ -362,26 +393,81 @@ const FiltrosCotacoes = {
         this.aplicarFiltros();
     },
     
-    filtrarCotacoes() {
+    async filtrarCotacoes() {
+        // Mostrar loading
+        this.mostrarLoading();
+        
         // Integrar com o sistema de cotações existente
-        if (window.CotacoesManager && typeof CotacoesManager.aplicarFiltros === 'function') {
-            CotacoesManager.aplicarFiltros(this.filtrosAtivos);
-        } else if (window.Cotacoes && typeof Cotacoes.aplicarFiltros === 'function') {
-            Cotacoes.aplicarFiltros(this.filtrosAtivos);
+        if (window.Cotacoes && typeof Cotacoes.aplicarFiltros === 'function') {
+            console.log('Aplicando filtros via Cotacoes.aplicarFiltros:', this.filtrosAtivos);
+            
+            // Primeiro carregar as cotações se necessário
+            if (!window.Cotacoes.cotacoes || window.Cotacoes.cotacoes.length === 0) {
+                console.log('Carregando cotações primeiro...');
+                await window.Cotacoes.load();
+            }
+            
+            // Aplicar filtros
+            window.Cotacoes.aplicarFiltros(this.filtrosAtivos);
         } else {
-            // Implementação direta
-            this.filtrarCotacoesDireto();
+            console.warn('Sistema de cotações não encontrado, usando implementação direta');
+            await this.filtrarCotacoesDireto();
         }
     },
     
-    filtrarCotacoesDireto() {
-        const cotacoes = window.cotacoesData || [];
-        const cotacoesFiltradas = cotacoes.filter(cotacao => {
-            return this.cotacaoPassaFiltros(cotacao);
-        });
+    mostrarLoading() {
+        const container = document.getElementById('lista-cotacoes');
+        if (!container) return;
         
-        // Renderizar cotações filtradas
-        this.renderizarCotacoesFiltradas(cotacoesFiltradas);
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Carregando Cotações...</h3>
+                <p class="text-gray-500">Aguarde enquanto buscamos os dados.</p>
+            </div>
+        `;
+    },
+    
+    async filtrarCotacoesDireto() {
+        try {
+            // Carregar cotações apenas da API
+            let cotacoes = [];
+            
+            if (window.API && typeof API.getCotacoes === 'function') {
+                console.log('Carregando cotações da API...');
+                const response = await API.getCotacoes();
+                
+                if (response.success) {
+                    cotacoes = response.data || [];
+                    console.log(`${cotacoes.length} cotações carregadas da API`);
+                } else {
+                    console.error('Erro na resposta da API:', response.message);
+                    this.mostrarErroCarregamento('Erro ao carregar cotações: ' + (response.message || 'Erro desconhecido'));
+                    return;
+                }
+            } else {
+                console.error('API não disponível');
+                this.mostrarErroCarregamento('Sistema de API não está disponível');
+                return;
+            }
+            
+            // Aplicar filtros apenas se houver cotações
+            if (cotacoes.length > 0) {
+                const cotacoesFiltradas = cotacoes.filter(cotacao => {
+                    return this.cotacaoPassaFiltros(cotacao);
+                });
+                
+                console.log(`Filtros aplicados: ${cotacoesFiltradas.length} de ${cotacoes.length} cotações`);
+                this.renderizarCotacoesFiltradas(cotacoesFiltradas, cotacoes.length);
+            } else {
+                console.log('Nenhuma cotação encontrada na API');
+                this.renderizarCotacoesFiltradas([], 0);
+            }
+            
+        } catch (error) {
+            console.error('Erro ao filtrar cotações:', error);
+            this.mostrarErroCarregamento('Erro de conexão com o servidor');
+        }
     },
     
     cotacaoPassaFiltros(cotacao) {
@@ -530,14 +616,143 @@ const FiltrosCotacoes = {
         return operador ? operador.nome : `Operador ${operadorId}`;
     },
     
-    renderizarCotacoesFiltradas(cotacoes) {
-        // Esta função será implementada ou integrada com o sistema existente
+    mostrarErroCarregamento(mensagem) {
+        const container = document.getElementById('lista-cotacoes');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Erro ao Carregar Cotações</h3>
+                <p class="text-gray-500 mb-4">${mensagem}</p>
+                <button 
+                    onclick="FiltrosCotacoes.recarregarDados()" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <i class="fas fa-sync-alt mr-2"></i>Tentar Novamente
+                </button>
+            </div>
+        `;
+        
+        // Atualizar contador
+        this.atualizarContador(0, 0);
+    },
+    
+    recarregarDados() {
+        console.log('Recarregando dados...');
+        this.filtrarCotacoesDireto();
+    },
+    
+    renderizarCotacoesFiltradas(cotacoes, total = null) {
         console.log(`Renderizando ${cotacoes.length} cotações filtradas`);
+        
+        // Atualizar contador
+        this.atualizarContador(cotacoes.length, total || cotacoes.length);
+        
+        // Renderizar lista
+        const container = document.getElementById('lista-cotacoes');
+        if (!container) {
+            console.warn('Container lista-cotacoes não encontrado');
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        if (cotacoes.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma cotação encontrada</h3>
+                    <p class="text-gray-500">Tente ajustar os filtros para encontrar mais resultados.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        cotacoes.forEach(cotacao => {
+            const card = this.criarCardCotacao(cotacao);
+            container.appendChild(card);
+        });
         
         // Emitir evento para outros componentes
         document.dispatchEvent(new CustomEvent('cotacoesFiltradas', {
-            detail: { cotacoes }
+            detail: { cotacoes, total }
         }));
+    },
+    
+    criarCardCotacao(cotacao) {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-6 mb-4 hover:shadow-lg transition-shadow';
+        
+        card.innerHTML = `
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900">
+                        Cotação #${cotacao.numero_cotacao || cotacao.id}
+                    </h4>
+                    <p class="text-sm text-gray-600">${cotacao.cliente_nome}</p>
+                </div>
+                <span class="status-badge status-${cotacao.status}">
+                    ${this.getStatusDisplay(cotacao.status)}
+                </span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                <div>
+                    <span class="font-medium text-gray-700">Modalidade:</span>
+                    <span class="text-gray-600">${this.getModalidadeDisplay(cotacao.modalidade)}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">Operador:</span>
+                    <span class="text-gray-600">${cotacao.operador_nome || 'N/A'}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">Origem:</span>
+                    <span class="text-gray-600">${cotacao.origem_cidade}/${cotacao.origem_estado}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-700">Destino:</span>
+                    <span class="text-gray-600">${cotacao.destino_cidade}/${cotacao.destino_estado}</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-500">
+                    Criada em ${this.formatarData(cotacao.data_criacao)}
+                </div>
+                <div class="flex space-x-2">
+                    <button 
+                        onclick="FiltrosCotacoes.verDetalhes(${cotacao.id})"
+                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                    >
+                        Ver Detalhes
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        return card;
+    },
+    
+    atualizarContador(filtradas, total) {
+        const contador = document.getElementById('contador-cotacoes');
+        if (contador) {
+            if (filtradas === total) {
+                contador.textContent = `${total} cotação${total !== 1 ? 'ões' : ''}`;
+            } else {
+                contador.textContent = `${filtradas} de ${total} cotação${total !== 1 ? 'ões' : ''}`;
+            }
+        }
+    },
+    
+    verDetalhes(id) {
+        // Integrar com sistema de detalhes
+        if (window.CotacaoDetalhes && typeof CotacaoDetalhes.abrirModal === 'function') {
+            CotacaoDetalhes.abrirModal(id);
+        } else {
+            console.log(`Ver detalhes da cotação ${id}`);
+            alert(`Funcionalidade de detalhes será implementada para cotação ${id}`);
+        }
     }
 };
 
