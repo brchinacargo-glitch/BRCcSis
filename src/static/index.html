@@ -4098,9 +4098,9 @@
             </div>
 
 
-            <!-- Filtros por Perfil de Usuário -->
-            <div id="filtros-usuario" class="mb-6">
-                <!-- Filtros serão adicionados dinamicamente baseados no tipo de usuário -->
+            <!-- Contador de Resultados -->
+            <div class="mb-4">
+                <span id="contador-cotacoes" class="text-sm text-gray-600">Carregue os filtros para ver as cotações</span>
             </div>
 
             <!-- Estatísticas -->
@@ -5218,85 +5218,10 @@
         let modalidadeAtiva = 'todas';
         let filtrosUsuario = {};
         
-        // Função para configurar filtros baseados no tipo de usuário
+        // Função para configurar filtros baseados no tipo de usuário - REMOVIDA
+        // Agora integrada ao sistema de filtros avançados
         function configurarFiltrosUsuario() {
-            const filtrosContainer = document.getElementById('filtros-usuario');
-            if (!filtrosContainer) return;
-            
-            // Obter informações do usuário (será implementado)
-            const tipoUsuario = window.userInfo?.tipo || 'consultor';
-            
-            let filtrosHTML = '<div class="flex flex-wrap gap-4">';
-            
-            if (tipoUsuario === 'consultor') {
-                filtrosHTML += `
-                    <button id="filtro-minhas-solicitacoes" class="filtro-usuario active px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" data-filtro="minhas-solicitacoes">
-                        <i class="fas fa-user mr-2"></i>Minhas Solicitações
-                    </button>
-                `;
-            } else if (tipoUsuario === 'operador') {
-                filtrosHTML += `
-                    <button id="filtro-disponiveis" class="filtro-usuario active px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" data-filtro="disponiveis">
-                        <i class="fas fa-clock mr-2"></i>Disponíveis
-                    </button>
-                    <button id="filtro-minhas-operacoes" class="filtro-usuario px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-filtro="minhas-operacoes">
-                        <i class="fas fa-cogs mr-2"></i>Minhas Operações
-                    </button>
-                `;
-            } else {
-                // Admin/Gerente - ver todas
-                filtrosHTML += `
-                    <button id="filtro-todas" class="filtro-usuario active px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors" data-filtro="todas">
-                        <i class="fas fa-list mr-2"></i>Todas
-                    </button>
-                    <button id="filtro-disponiveis" class="filtro-usuario px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-filtro="disponiveis">
-                        <i class="fas fa-clock mr-2"></i>Disponíveis
-                    </button>
-                `;
-            }
-            
-            filtrosHTML += '</div>';
-            filtrosContainer.innerHTML = filtrosHTML;
-            
-            // Adicionar event listeners
-            document.querySelectorAll('.filtro-usuario').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Remover classe active de todos
-                    document.querySelectorAll('.filtro-usuario').forEach(b => {
-                        b.classList.remove('active');
-                        b.classList.add('bg-gray-200', 'text-gray-700');
-                        b.classList.remove('bg-blue-600', 'text-white', 'bg-green-600', 'bg-purple-600');
-                    });
-                    
-                    // Adicionar classe active ao clicado
-                    this.classList.add('active');
-                    this.classList.remove('bg-gray-200', 'text-gray-700');
-                    
-                    const filtro = this.dataset.filtro;
-                    if (filtro === 'disponiveis') {
-                        this.classList.add('bg-green-600', 'text-white');
-                    } else if (filtro === 'minhas-operacoes') {
-                        this.classList.add('bg-orange-600', 'text-white');
-                    } else if (filtro === 'minhas-solicitacoes') {
-                        this.classList.add('bg-blue-600', 'text-white');
-                    } else {
-                        this.classList.add('bg-purple-600', 'text-white');
-                    }
-                    
-                    filtrosUsuario.tipo = filtro;
-                    carregarCotacoesPorModalidade();
-                });
-            });
-            
-            // Definir filtro inicial
-            const tipoUsuarioMap = {
-                'consultor': 'minhas-solicitacoes',
-                'operador': 'disponiveis',
-                'administrador': 'todas',
-                'gerente': 'todas'
-            };
-            
-            filtrosUsuario.tipo = tipoUsuarioMap[tipoUsuario] || 'todas';
+            console.log('Filtros de usuário integrados ao sistema de filtros avançados');
         }
         
         // Função para configurar abas de modalidade - DESABILITADA (usando sistema de filtros unificado)

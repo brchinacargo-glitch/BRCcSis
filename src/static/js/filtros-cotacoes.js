@@ -4,6 +4,7 @@
 const FiltrosCotacoes = {
     // Estado dos filtros
     filtrosAtivos: {
+        tipoUsuario: '', // Filtro por tipo de usuário (disponiveis, minhas-operacoes, etc)
         status: '',
         modalidade: '',
         operador: '',
@@ -22,6 +23,7 @@ const FiltrosCotacoes = {
     
     init() {
         this.criarInterfaceFiltros();
+        this.criarFiltrosTipoUsuario();
         this.setupEventListeners();
         this.carregarDadosFiltros();
         
@@ -65,7 +67,7 @@ const FiltrosCotacoes = {
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-800 flex items-center">
                         <i class="fas fa-filter text-blue-600 mr-2"></i>
-                        Filtros Avançados
+                        Sistema de Filtros
                     </h3>
                     <div class="flex space-x-2">
                         <button id="btn-aplicar-filtros" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -77,6 +79,14 @@ const FiltrosCotacoes = {
                         <button id="btn-toggle-filtros" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
                             <i class="fas fa-chevron-up mr-2"></i>Ocultar
                         </button>
+                    </div>
+                </div>
+                
+                <!-- Filtros por Tipo de Usuário -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Filtros por Perfil</label>
+                    <div id="filtros-tipo-usuario" class="flex flex-wrap gap-2">
+                        <!-- Será preenchido dinamicamente -->
                     </div>
                 </div>
                 
@@ -215,6 +225,73 @@ const FiltrosCotacoes = {
         });
     },
     
+    criarFiltrosTipoUsuario() {
+        const container = document.getElementById('filtros-tipo-usuario');
+        if (!container) return;
+        
+        // Detectar tipo de usuário (pode vir de window.userInfo ou localStorage)
+        const tipoUsuario = window.userInfo?.tipo || localStorage.getItem('userType') || 'operador';
+        
+        let filtros = [];
+        
+        if (tipoUsuario === 'consultor') {
+            filtros = [
+                { id: 'minhas-solicitacoes', label: 'Minhas Solicitações', icon: 'fas fa-user', color: 'blue' }
+            ];
+        } else if (tipoUsuario === 'operador') {
+            filtros = [
+                { id: 'disponiveis', label: 'Disponíveis', icon: 'fas fa-clock', color: 'green' },
+                { id: 'minhas-operacoes', label: 'Minhas Operações', icon: 'fas fa-cogs', color: 'orange' }
+            ];
+        } else {
+            // Admin/Gerente
+            filtros = [
+                { id: 'todas', label: 'Todas', icon: 'fas fa-list', color: 'purple' },
+                { id: 'disponiveis', label: 'Disponíveis', icon: 'fas fa-clock', color: 'green' },
+                { id: 'minhas-operacoes', label: 'Minhas Operações', icon: 'fas fa-cogs', color: 'orange' }
+            ];
+        }
+        
+        // Criar botões
+        container.innerHTML = filtros.map((filtro, index) => `
+            <button 
+                id="filtro-${filtro.id}" 
+                class="filtro-tipo-usuario px-4 py-2 rounded-lg transition-colors ${index === 0 ? `bg-${filtro.color}-600 text-white` : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+                data-tipo="${filtro.id}"
+                data-color="${filtro.color}"
+            >
+                <i class="${filtro.icon} mr-2"></i>${filtro.label}
+            </button>
+        `).join('');
+        
+        // Definir filtro inicial
+        this.filtrosAtivos.tipoUsuario = filtros[0]?.id || 'todas';
+        
+        // Adicionar event listeners
+        this.setupFiltrosTipoUsuario();
+    },
+    
+    setupFiltrosTipoUsuario() {
+        document.querySelectorAll('.filtro-tipo-usuario').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Remover ativo de todos
+                document.querySelectorAll('.filtro-tipo-usuario').forEach(b => {
+                    b.className = 'filtro-tipo-usuario px-4 py-2 rounded-lg transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300';
+                });
+                
+                // Ativar o clicado
+                const color = btn.dataset.color;
+                btn.className = `filtro-tipo-usuario px-4 py-2 rounded-lg transition-colors bg-${color}-600 text-white`;
+                
+                // Atualizar filtro
+                this.filtrosAtivos.tipoUsuario = btn.dataset.tipo;
+                
+                // Aplicar filtros automaticamente
+                this.aplicarFiltros();
+            });
+        });
+    },
+    
     configurarCamposMonetarios() {
         const camposMonetarios = document.querySelectorAll('.campo-monetario');
         camposMonetarios.forEach(campo => {
@@ -309,6 +386,7 @@ const FiltrosCotacoes = {
     
     coletarFiltros() {
         this.filtrosAtivos = {
+            tipoUsuario: this.filtrosAtivos.tipoUsuario, // Manter o valor atual
             status: document.getElementById('filtro-status')?.value || '',
             modalidade: document.getElementById('filtro-modalidade')?.value || '',
             operador: document.getElementById('filtro-operador')?.value || '',
@@ -435,14 +513,31 @@ const FiltrosCotacoes = {
             
             if (window.API && typeof API.getCotacoes === 'function') {
                 console.log('Carregando cotações da API...');
-                const response = await API.getCotacoes();
                 
-                if (response.success) {
-                    cotacoes = response.data || [];
+                // Determinar endpoint baseado no tipo de usuário
+                let endpoint = '/api/v133/cotacoes';
+                const tipoUsuario = this.filtrosAtivos.tipoUsuario;
+                
+                if (tipoUsuario === 'disponiveis') {
+                    endpoint = '/api/v133/cotacoes/disponiveis';
+                } else if (tipoUsuario === 'minhas-operacoes') {
+                    endpoint = '/api/v133/cotacoes/minhas-operacoes';
+                } else if (tipoUsuario === 'minhas-solicitacoes') {
+                    endpoint = '/api/v133/cotacoes/minhas-solicitacoes';
+                }
+                
+                console.log(`Usando endpoint: ${endpoint}`);
+                
+                // Fazer chamada para API com endpoint específico
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                
+                if (data.success) {
+                    cotacoes = data.data || [];
                     console.log(`${cotacoes.length} cotações carregadas da API`);
                 } else {
-                    console.error('Erro na resposta da API:', response.message);
-                    this.mostrarErroCarregamento('Erro ao carregar cotações: ' + (response.message || 'Erro desconhecido'));
+                    console.error('Erro na resposta da API:', data.message);
+                    this.mostrarErroCarregamento('Erro ao carregar cotações: ' + (data.message || 'Erro desconhecido'));
                     return;
                 }
             } else {
@@ -538,9 +633,14 @@ const FiltrosCotacoes = {
     // ==================== AÇÕES ====================
     
     limparFiltros() {
+        // Manter o tipo de usuário, limpar o resto
+        const tipoUsuarioAtual = this.filtrosAtivos.tipoUsuario;
+        
         // Limpar objeto de filtros
         Object.keys(this.filtrosAtivos).forEach(key => {
-            this.filtrosAtivos[key] = '';
+            if (key !== 'tipoUsuario') {
+                this.filtrosAtivos[key] = '';
+            }
         });
         
         // Limpar campos do formulário
@@ -556,10 +656,10 @@ const FiltrosCotacoes = {
         // Ocultar filtros ativos
         document.getElementById('filtros-ativos').classList.add('hidden');
         
-        // Reaplicar filtros (vazio = mostrar todos)
+        // Reaplicar filtros (vazio = mostrar todos do tipo de usuário)
         this.filtrarCotacoes();
         
-        console.log('Filtros limpos');
+        console.log('Filtros limpos, mantendo tipo de usuário:', tipoUsuarioAtual);
     },
     
     togglePainelFiltros() {
