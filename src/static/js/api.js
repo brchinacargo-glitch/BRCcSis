@@ -230,6 +230,156 @@ const API = {
             };
         }
     },
+
+    // ==================== DASHBOARD ANALYTICS ====================
+
+    async getDashboardData() {
+        try {
+            // Carregar dados reais de cotações
+            const cotacoesResponse = await this.getCotacoes();
+            
+            if (cotacoesResponse.success && cotacoesResponse.cotacoes) {
+                return this.processarDadosDashboard(cotacoesResponse.cotacoes);
+            }
+            
+            // Se não conseguir dados reais, retornar null para usar fallback
+            return null;
+            
+        } catch (error) {
+            console.warn('Erro ao carregar dados do dashboard:', error);
+            return null;
+        }
+    },
+
+    processarDadosDashboard(cotacoes) {
+        console.log('📊 Processando dados reais para dashboard:', cotacoes.length, 'cotações');
+        
+        // Contar por status
+        const porStatus = {};
+        const porModalidade = {};
+        const porOperador = {};
+        let valorTotal = 0;
+        let finalizadas = 0;
+        
+        cotacoes.forEach(cotacao => {
+            // Status
+            const status = cotacao.status || 'solicitada';
+            porStatus[status] = (porStatus[status] || 0) + 1;
+            
+            // Modalidade
+            const modalidade = cotacao.modalidade || 'brcargo_rodoviario';
+            porModalidade[modalidade] = (porModalidade[modalidade] || 0) + 1;
+            
+            // Operador
+            const operador = cotacao.operador_responsavel || 'Não atribuído';
+            porOperador[operador] = (porOperador[operador] || 0) + 1;
+            
+            // Valores
+            if (cotacao.valor_frete && cotacao.status === 'finalizada') {
+                valorTotal += parseFloat(cotacao.valor_frete) || 0;
+                finalizadas++;
+            }
+        });
+        
+        // Calcular evolução temporal (últimos 30 dias)
+        const evolucao = this.calcularEvolucaoTemporal(cotacoes);
+        
+        const dados = {
+            metricas: {
+                total: cotacoes.length,
+                finalizadas: finalizadas,
+                pendentes: cotacoes.length - finalizadas,
+                taxaConversao: cotacoes.length > 0 ? Math.round((finalizadas / cotacoes.length) * 100) : 0,
+                valorTotal: valorTotal
+            },
+            porStatus: Object.entries(porStatus).map(([status, count]) => ({
+                status,
+                count,
+                label: this.getLabelStatus(status)
+            })),
+            porModalidade: Object.entries(porModalidade).map(([modalidade, count]) => ({
+                modalidade,
+                count,
+                label: this.getLabelModalidade(modalidade)
+            })),
+            porOperador: Object.entries(porOperador).map(([operador, count]) => ({
+                operador,
+                count,
+                finalizadas: cotacoes.filter(c => c.operador_responsavel === operador && c.status === 'finalizada').length
+            })),
+            evolucao: evolucao,
+            valoresPorModalidade: this.calcularValoresPorModalidade(cotacoes)
+        };
+        
+        console.log('✅ Dados do dashboard processados:', dados);
+        return dados;
+    },
+
+    calcularEvolucaoTemporal(cotacoes) {
+        const hoje = new Date();
+        const evolucao = [];
+        
+        for (let i = 29; i >= 0; i--) {
+            const data = new Date(hoje);
+            data.setDate(data.getDate() - i);
+            const dataStr = data.toISOString().split('T')[0];
+            
+            const cotacoesDia = cotacoes.filter(c => {
+                const dataCotacao = new Date(c.data_criacao || c.created_at);
+                return dataCotacao.toISOString().split('T')[0] === dataStr;
+            });
+            
+            evolucao.push({
+                data: dataStr,
+                total: cotacoesDia.length,
+                finalizadas: cotacoesDia.filter(c => c.status === 'finalizada').length
+            });
+        }
+        
+        return evolucao;
+    },
+
+    calcularValoresPorModalidade(cotacoes) {
+        const valores = {};
+        const contadores = {};
+        
+        cotacoes.forEach(cotacao => {
+            if (cotacao.valor_frete && cotacao.status === 'finalizada') {
+                const modalidade = cotacao.modalidade || 'brcargo_rodoviario';
+                const valor = parseFloat(cotacao.valor_frete) || 0;
+                
+                valores[modalidade] = (valores[modalidade] || 0) + valor;
+                contadores[modalidade] = (contadores[modalidade] || 0) + 1;
+            }
+        });
+        
+        return Object.entries(valores).map(([modalidade, valorTotal]) => ({
+            modalidade,
+            valorMedio: contadores[modalidade] > 0 ? valorTotal / contadores[modalidade] : 0,
+            label: this.getLabelModalidade(modalidade)
+        }));
+    },
+
+    getLabelStatus(status) {
+        const labels = {
+            'solicitada': 'Solicitadas',
+            'aceita_operador': 'Aceitas',
+            'cotacao_enviada': 'Enviadas',
+            'aceita_consultor': 'Aprovadas',
+            'finalizada': 'Finalizadas',
+            'cancelada': 'Canceladas'
+        };
+        return labels[status] || status;
+    },
+
+    getLabelModalidade(modalidade) {
+        const labels = {
+            'brcargo_rodoviario': 'Rodoviário',
+            'brcargo_maritimo': 'Marítimo',
+            'brcargo_aereo': 'Aéreo'
+        };
+        return labels[modalidade] || modalidade;
+    },
     
     // ==================== UTILITÁRIOS ====================
     

@@ -205,8 +205,10 @@ const MetricasTempoReal = {
             // Atualizar métricas
             this.atualizarIndicadores(dados);
             
-            // Atualizar gráficos se disponível
-            if (window.DashboardGraficos) {
+            // Atualizar gráficos apenas se estivermos na seção analytics
+            const analyticsSection = document.getElementById('secao-analytics-v133');
+            if (window.DashboardGraficos && analyticsSection && analyticsSection.style.display !== 'none') {
+                console.log('📊 Atualizando gráficos do dashboard (métricas tempo real)');
                 window.DashboardGraficos.atualizarDados();
             }
             
