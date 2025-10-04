@@ -1392,14 +1392,23 @@
             
             // Lista completa de seções para controlar
             const sections = ['dashboard', 'empresas', 'cadastro'];
+            console.log('🔍 Verificando seções disponíveis...');
+            
+            // Listar todas as sections no DOM para debug
+            const allSections = document.querySelectorAll('section');
+            console.log(`📋 Total de sections encontradas: ${allSections.length}`);
+            allSections.forEach((section, index) => {
+                console.log(`📄 Section ${index}: id="${section.id}", classes="${section.className}"`);
+            });
+            
             sections.forEach(id => {
                 const section = document.getElementById(id);
                 if (section) {
                     const shouldShow = id === sectionId;
                     section.style.display = shouldShow ? 'block' : 'none';
-                    console.log(`Seção ${id}: ${shouldShow ? 'mostrar' : 'ocultar'}`);
+                    console.log(`✅ Seção ${id}: ${shouldShow ? 'mostrar' : 'ocultar'}`);
                 } else {
-                    console.warn(`Seção ${id} não encontrada`);
+                    console.error(`❌ Seção ${id} não encontrada no DOM!`);
                 }
             });
             
