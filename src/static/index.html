@@ -6446,13 +6446,10 @@
             // Limpar completamente o container primeiro
             container.innerHTML = '';
             
-            // Mostrar loading
-            container.innerHTML = `
-                <div class="flex items-center justify-center py-12">
-                    <div class="loading mr-3"></div>
-                    <span class="text-gray-600">Carregando dados...</span>
-                </div>
-            `;
+            // Carregar dados do dashboard se necessário
+            if (window.DashboardGraficos && typeof DashboardGraficos.carregarDadosSeNecessario === 'function') {
+                DashboardGraficos.carregarDadosSeNecessario();
+            }
             
             try {
                 switch (analyticsAtivo) {

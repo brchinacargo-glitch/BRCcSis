@@ -4,6 +4,8 @@
 const DashboardGraficos = {
     // Estado
     dadosCarregados: false,
+    carregandoDados: false,
+    inicializado: false,
     graficosRenderizados: {},
     
     // Configurações
@@ -19,9 +21,22 @@ const DashboardGraficos = {
     // ==================== INICIALIZAÇÃO ====================
     
     init() {
+        // Evitar inicialização múltipla
+        if (this.inicializado) {
+            console.log('⚠️ Dashboard já foi inicializado');
+            return;
+        }
+        
+        this.inicializado = true;
         this.criarContainersGraficos();
-        this.carregarDados();
         this.setupEventListeners();
+        
+        // Carregar dados apenas se estivermos na seção analytics
+        const analyticsSection = document.getElementById('secao-analytics-v133');
+        if (analyticsSection && analyticsSection.style.display !== 'none') {
+            this.carregarDados();
+        }
+        
         console.log('✅ Dashboard com Gráficos inicializado');
     },
     
@@ -198,86 +213,52 @@ const DashboardGraficos = {
     // ==================== CARREGAMENTO DE DADOS ====================
     
     async carregarDados() {
+        // Evitar carregamento múltiplo
+        if (this.carregandoDados) {
+            console.log('⏳ Dados já estão sendo carregados, aguardando...');
+            return;
+        }
+        
+        this.carregandoDados = true;
+        
         try {
-            // Tentar carregar dados da API
+            console.log('📊 Carregando dados reais do dashboard...');
+            
+            // Tentar carregar dados reais da API
             let dados = null;
             
             if (window.API && typeof API.getDashboardData === 'function') {
-                const response = await API.getDashboardData();
-                dados = response.data || response;
-            }
-            
-            // Fallback para dados simulados
-            if (!dados) {
-                dados = this.gerarDadosSimulados();
+                dados = await API.getDashboardData();
+                
+                if (dados) {
+                    console.log('✅ Dados reais carregados com sucesso');
+                } else {
+                    console.warn('⚠️ API não retornou dados, sistema funcionará sem gráficos');
+                    this.carregandoDados = false;
+                    return;
+                }
+            } else {
+                console.warn('⚠️ API não disponível, sistema funcionará sem gráficos');
+                this.carregandoDados = false;
+                return;
             }
             
             this.dados = dados;
             this.dadosCarregados = true;
             
-            // Renderizar métricas e gráficos
+            // Renderizar métricas e gráficos apenas uma vez
             this.atualizarMetricas(this.dados);
             this.renderizarTodosGraficos();
             
         } catch (error) {
-            console.error('Erro ao carregar dados do dashboard:', error);
-            this.dados = this.gerarDadosSimulados();
-            this.dadosCarregados = true;
-            this.atualizarMetricas(this.dados);
-            this.renderizarTodosGraficos();
+            console.error('❌ Erro ao carregar dados do dashboard:', error);
+            console.warn('⚠️ Sistema funcionará sem gráficos');
+        } finally {
+            this.carregandoDados = false;
         }
     },
     
-    gerarDadosSimulados() {
-        const hoje = new Date();
-        const dados = {
-            metricas: {
-                total: 156,
-                finalizadas: 89,
-                pendentes: 34,
-                taxaConversao: 67.3
-            },
-            porStatus: [
-                { status: 'solicitada', count: 23, label: 'Solicitadas' },
-                { status: 'aceita_operador', count: 34, label: 'Aceitas' },
-                { status: 'cotacao_enviada', count: 45, label: 'Enviadas' },
-                { status: 'aceita_consultor', count: 32, label: 'Aprovadas' },
-                { status: 'finalizada', count: 22, label: 'Finalizadas' }
-            ],
-            porModalidade: [
-                { modalidade: 'brcargo_rodoviario', count: 78, label: 'Rodoviário' },
-                { modalidade: 'brcargo_maritimo', count: 45, label: 'Marítimo' },
-                { modalidade: 'frete_aereo', count: 33, label: 'Aéreo' }
-            ],
-            evolucao: [],
-            porOperador: [
-                { operador: 'João Silva', count: 45, finalizadas: 32 },
-                { operador: 'Maria Santos', count: 38, finalizadas: 28 },
-                { operador: 'Pedro Costa', count: 42, finalizadas: 29 },
-                { operador: 'Ana Oliveira', count: 31, finalizadas: 22 }
-            ],
-            valoresMedios: [
-                { modalidade: 'Rodoviário', valor: 2850.50 },
-                { modalidade: 'Marítimo', valor: 8750.25 },
-                { modalidade: 'Aéreo', valor: 12500.75 }
-            ]
-        };
-        
-        // Gerar dados de evolução dos últimos 30 dias
-        for (let i = 29; i >= 0; i--) {
-            const data = new Date(hoje);
-            data.setDate(data.getDate() - i);
-            
-            dados.evolucao.push({
-                data: data.toISOString().split('T')[0],
-                solicitadas: Math.floor(Math.random() * 8) + 2,
-                finalizadas: Math.floor(Math.random() * 6) + 1,
-                total: Math.floor(Math.random() * 12) + 5
-            });
-        }
-        
-        return dados;
-    },
+    // Função removida - agora usa apenas dados reais da API
     
     // ==================== MÉTRICAS ====================
     
@@ -294,10 +275,10 @@ const DashboardGraficos = {
         const pendentesElement = document.getElementById('cotacoes-pendentes');
         const taxaElement = document.getElementById('taxa-conversao');
         
-        if (totalElement) totalElement.textContent = dados.total || 0;
-        if (finalizadasElement) finalizadasElement.textContent = dados.finalizadas || 0;
-        if (pendentesElement) pendentesElement.textContent = dados.pendentes || 0;
-        if (taxaElement) taxaElement.textContent = `${dados.taxaConversao || 0}%`;
+        if (totalElement) totalElement.textContent = dados.metricas?.total || 0;
+        if (finalizadasElement) finalizadasElement.textContent = dados.metricas?.finalizadas || 0;
+        if (pendentesElement) pendentesElement.textContent = dados.metricas?.pendentes || 0;
+        if (taxaElement) taxaElement.textContent = `${dados.metricas?.taxaConversao || 0}%`;
     },
     
     // ==================== RENDERIZAÇÃO DE GRÁFICOS ====================
@@ -604,6 +585,16 @@ const DashboardGraficos = {
     
     atualizarDados() {
         this.carregarDados();
+    },
+
+    // ==================== CARREGAMENTO MANUAL ====================
+    
+    carregarDadosSeNecessario() {
+        // Carregar dados apenas se ainda não foram carregados
+        if (!this.dadosCarregados && !this.carregandoDados) {
+            console.log('📊 Carregando dados do dashboard pela primeira vez...');
+            this.carregarDados();
+        }
     },
     
     // ==================== DESTRUIÇÃO ====================

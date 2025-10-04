@@ -95,23 +95,11 @@ const API = {
         });
         return await response.json();
     },
-    
     async downloadTemplateExcel() {
         const response = await fetch(`${this.baseURL}/empresas/template/excel`);
         return await response.blob();
     },
     
-    // ==================== DASHBOARD ====================
-    
-    async getDashboardStats() {
-        const response = await fetch(`${this.baseURL}/v133/dashboard/stats`);
-        return await response.json();
-    },
-    
-    async getDashboardCharts() {
-        const response = await fetch(`${this.baseURL}/v133/dashboard/charts`);
-        return await response.json();
-    },
     
     // ==================== COTAÇÕES ====================
     
