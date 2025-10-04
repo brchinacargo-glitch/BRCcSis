@@ -6,6 +6,7 @@ const DashboardGraficos = {
     dadosCarregados: false,
     carregandoDados: false,
     inicializado: false,
+    renderizando: false,
     graficosRenderizados: {},
     
     // Configurações
@@ -246,6 +247,9 @@ const DashboardGraficos = {
             this.dados = dados;
             this.dadosCarregados = true;
             
+            // Limpar gráficos existentes antes de renderizar novos
+            this.limparTodosGraficos();
+            
             // Renderizar métricas e gráficos apenas uma vez
             this.atualizarMetricas(this.dados);
             this.renderizarTodosGraficos();
@@ -284,11 +288,25 @@ const DashboardGraficos = {
     // ==================== RENDERIZAÇÃO DE GRÁFICOS ====================
     
     renderizarTodosGraficos(dados) {
-        this.renderizarGraficoStatus();
-        this.renderizarGraficoModalidade();
-        this.renderizarGraficoEvolucao();
-        this.renderizarGraficoOperadores();
-        this.renderizarGraficoValores();
+        // Evitar renderização se já estamos renderizando
+        if (this.renderizando) {
+            console.log('⚠️ Renderização já em andamento, pulando...');
+            return;
+        }
+        
+        this.renderizando = true;
+        
+        try {
+            this.renderizarGraficoStatus();
+            this.renderizarGraficoModalidade();
+            this.renderizarGraficoEvolucao();
+            this.renderizarGraficoOperadores();
+            this.renderizarGraficoValores();
+            
+            console.log('✅ Todos os gráficos renderizados com sucesso');
+        } finally {
+            this.renderizando = false;
+        }
     },
     
     renderizarGraficoStatus() {
@@ -596,6 +614,45 @@ const DashboardGraficos = {
             this.carregarDados();
         }
     },
+
+    // ==================== LIMPEZA DE GRÁFICOS ====================
+    
+    limparTodosGraficos() {
+        console.log('🧹 Limpando todos os gráficos existentes...');
+        
+        // Destruir todos os gráficos Chart.js
+        Object.values(this.graficosRenderizados).forEach(grafico => {
+            if (grafico && typeof grafico.destroy === 'function') {
+                try {
+                    grafico.destroy();
+                } catch (error) {
+                    console.warn('Erro ao destruir gráfico:', error);
+                }
+            }
+        });
+        
+        // Limpar o objeto de gráficos
+        this.graficosRenderizados = {};
+        
+        // Limpar canvas elements
+        const canvasIds = ['grafico-status', 'grafico-modalidade', 'grafico-evolucao', 'grafico-operadores', 'grafico-valores'];
+        canvasIds.forEach(id => {
+            const canvas = document.getElementById(id);
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                // Resetar dimensões
+                canvas.width = 400;
+                canvas.height = 200;
+                canvas.style.width = '';
+                canvas.style.height = '';
+            }
+        });
+        
+        console.log('✅ Todos os gráficos limpos');
+    },
     
     // ==================== DESTRUIÇÃO ====================
     
@@ -610,20 +667,33 @@ const DashboardGraficos = {
 };
 
 // Inicializar quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    // Verificar se Chart.js está disponível
-    if (typeof Chart !== 'undefined') {
-        DashboardGraficos.init();
+setTimeout(() => {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => DashboardGraficos.init());
     } else {
-        console.warn('Chart.js não encontrado. Carregando via CDN...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-        script.onload = () => {
-            DashboardGraficos.init();
-        };
-        document.head.appendChild(script);
+        DashboardGraficos.init();
     }
-});
+}, 100);
 
 // Exportar para uso global
 window.DashboardGraficos = DashboardGraficos;
+
+// Função global para limpar gráficos (pode ser chamada no console)
+window.limparGraficosInfinitos = function() {
+    console.log('🚨 LIMPANDO GRÁFICOS INFINITOS...');
+    
+    if (window.DashboardGraficos) {
+        DashboardGraficos.limparTodosGraficos();
+        DashboardGraficos.renderizando = false;
+        DashboardGraficos.carregandoDados = false;
+    }
+    
+    // Parar métricas em tempo real
+    if (window.MetricasTempoReal && MetricasTempoReal.intervalId) {
+        clearInterval(MetricasTempoReal.intervalId);
+        MetricasTempoReal.intervalId = null;
+        console.log('⏹️ Métricas em tempo real paradas');
+    }
+    
+    console.log('✅ Gráficos infinitos limpos! Recarregue a página para reiniciar.');
+};

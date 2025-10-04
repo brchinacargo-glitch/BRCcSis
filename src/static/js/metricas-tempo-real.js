@@ -134,17 +134,24 @@ const MetricasTempoReal = {
     // ==================== MONITORAMENTO ====================
     
     iniciarMonitoramento() {
-        if (!this.configuracoes.habilitado) return;
+        // TEMPORARIAMENTE DESABILITADO para evitar gráficos infinitos
+        console.log('⚠️ Monitoramento em tempo real temporariamente desabilitado');
+        return;
+        
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
         
         // Primeira atualização imediata
         this.atualizarMetricas();
         
-        // Configurar intervalos
-        this.intervalos.metricas = setInterval(() => {
+        // Configurar intervalo
+        this.intervalId = setInterval(() => {
             this.atualizarMetricas();
         }, this.configuracoes.intervaloAtualizacao);
         
-        this.intervalos.notificacoes = setInterval(() => {
+        // Configurar intervalo para verificar alertas
+        setInterval(() => {
             this.verificarAlertas();
         }, this.configuracoes.intervaloNotificacoes);
         
