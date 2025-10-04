@@ -514,6 +514,11 @@ const ModalCotacaoMelhorado = {
             
             console.log('Dados da cotação:', dados);
             
+            // Verificar se API está disponível
+            if (typeof API === 'undefined' || !API.createCotacao) {
+                throw new Error('API não está disponível. Verifique se o script api.js foi carregado.');
+            }
+            
             // Enviar via API real
             const response = await API.createCotacao(dados);
             
@@ -612,7 +617,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Aguardar um pouco para garantir que outros scripts carregaram
     setTimeout(() => {
         ModalCotacaoMelhorado.init();
-    }, 500);
+    }, 1000);
+});
+
+// Também inicializar quando o modal for aberto
+document.addEventListener('click', (e) => {
+    if (e.target && (e.target.id === 'btn-nova-cotacao' || e.target.id === 'btn-solicitar-cotacao')) {
+        // Aguardar modal aparecer e inicializar
+        setTimeout(() => {
+            ModalCotacaoMelhorado.init();
+        }, 100);
+    }
 });
 
 // Exportar para uso global
