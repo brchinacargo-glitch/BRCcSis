@@ -1,0 +1,765 @@
+<!-- Modal de Nova Cotação - INTEGRADO COM BACKEND -->
+<div id="modal-cotacao" class="modal">
+    <div class="modal-content bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[95vh] overflow-y-auto">
+        <div class="modal-header bg-gradient-to-r from-orange-600 to-red-600 text-white p-6 rounded-t-lg">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-plus-circle mr-3"></i>
+                    Nova Cotação
+                </h2>
+                <button id="fechar-modal-cotacao" class="text-white hover:text-gray-200 text-3xl font-bold">&times;</button>
+            </div>
+        </div>
+
+        <div class="modal-body p-6">
+            <form id="form-nova-cotacao" class="space-y-6">
+                
+                <!-- Informações do Cliente -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-building mr-2 text-orange-600"></i>
+                        Informações do Cliente
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Cliente *</label>
+                            <input type="text" name="cliente_nome" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Digite o nome do cliente">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CNPJ *</label>
+                            <input type="text" name="cliente_cnpj" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="00.000.000/0000-00">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Número do Cliente *</label>
+                            <input type="text" name="numero_cliente" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Código do cliente">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contato</label>
+                            <input type="text" name="cliente_contato"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Nome do contato">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" name="cliente_email"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="contato@empresa.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                            <input type="text" name="cliente_telefone"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="(11) 99999-9999">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modalidade de Transporte -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-truck mr-2 text-orange-600"></i>
+                        Modalidade de Transporte
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+                            <input type="radio" name="empresa_transporte" value="brcargo_rodoviario" class="mr-3" required>
+                            <div class="flex items-center">
+                                <i class="fas fa-truck text-orange-600 mr-2"></i>
+                                <span class="font-medium">Rodoviário</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+                            <input type="radio" name="empresa_transporte" value="brcargo_maritimo" class="mr-3" required>
+                            <div class="flex items-center">
+                                <i class="fas fa-ship text-orange-600 mr-2"></i>
+                                <span class="font-medium">Marítimo</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50 transition-colors">
+                            <input type="radio" name="empresa_transporte" value="frete_aereo" class="mr-3" required>
+                            <div class="flex items-center">
+                                <i class="fas fa-plane text-orange-600 mr-2"></i>
+                                <span class="font-medium">Aéreo</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Campos Específicos por Modalidade -->
+                
+                <!-- RODOVIÁRIO -->
+                <div id="campos-rodoviario" class="modalidade-campos" style="display: none;">
+                    
+                    <!-- Origem -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
+                            Origem
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CEP *</label>
+                                <input type="text" name="origem_cep"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="00000-000">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Endereço *</label>
+                                <input type="text" name="origem_endereco"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Rua, número">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cidade *</label>
+                                <input type="text" name="origem_cidade"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nome da cidade">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado *</label>
+                                <select name="origem_estado" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Selecione o estado</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destino -->
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-flag-checkered mr-2 text-green-600"></i>
+                            Destino
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CEP *</label>
+                                <input type="text" name="destino_cep"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                       placeholder="00000-000">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Endereço *</label>
+                                <input type="text" name="destino_endereco"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                       placeholder="Rua, número">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cidade *</label>
+                                <input type="text" name="destino_cidade"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                       placeholder="Nome da cidade">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado *</label>
+                                <select name="destino_estado" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="">Selecione o estado</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MARÍTIMO -->
+                <div id="campos-maritimo" class="modalidade-campos" style="display: none;">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-anchor mr-2 text-blue-600"></i>
+                            Informações Marítimas
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Porto de Origem *</label>
+                                <input type="text" name="porto_origem"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nome do porto de origem">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Porto de Destino *</label>
+                                <input type="text" name="porto_destino"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nome do porto de destino">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Net Weight (kg) *</label>
+                                <input type="text" name="net_weight"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="0,00" inputmode="decimal">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Gross Weight (kg) *</label>
+                                <input type="text" name="gross_weight"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="0,00" inputmode="decimal">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Incoterm *</label>
+                                <select name="incoterm" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Selecione o Incoterm</option>
+                                    <option value="FOB">FOB - Free On Board</option>
+                                    <option value="CIF">CIF - Cost, Insurance and Freight</option>
+                                    <option value="CFR">CFR - Cost and Freight</option>
+                                    <option value="EXW">EXW - Ex Works</option>
+                                    <option value="FCA">FCA - Free Carrier</option>
+                                    <option value="CPT">CPT - Carriage Paid To</option>
+                                    <option value="CIP">CIP - Carriage and Insurance Paid To</option>
+                                    <option value="DAP">DAP - Delivered at Place</option>
+                                    <option value="DPU">DPU - Delivered at Place Unloaded</option>
+                                    <option value="DDP">DDP - Delivered Duty Paid</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Carga *</label>
+                                <select name="tipo_carga_maritima" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="FCL">FCL - Full Container Load</option>
+                                    <option value="LCL">LCL - Less than Container Load</option>
+                                    <option value="BULK">Bulk - Carga a Granel</option>
+                                    <option value="BREAKBULK">Break Bulk - Carga Geral</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AÉREO -->
+                <div id="campos-aereo" class="modalidade-campos" style="display: none;">
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-plane mr-2 text-purple-600"></i>
+                            Informações Aéreas
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Aeroporto de Origem *</label>
+                                <input type="text" name="aeroporto_origem"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                       placeholder="Código IATA (ex: GRU)">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Aeroporto de Destino *</label>
+                                <input type="text" name="aeroporto_destino"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                       placeholder="Código IATA (ex: MIA)">
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Serviço *</label>
+                                <select name="tipo_servico_aereo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="">Selecione o tipo de serviço</option>
+                                    <option value="EXPRESS">Express</option>
+                                    <option value="STANDARD">Standard</option>
+                                    <option value="ECONOMY">Economy</option>
+                                    <option value="CHARTER">Charter</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações da Carga (Comum para Rodoviário e Aéreo) -->
+                <div id="campos-carga-comum" class="bg-yellow-50 p-4 rounded-lg" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-boxes mr-2 text-yellow-600"></i>
+                        Informações da Carga
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Peso (kg) *</label>
+                            <input type="text" name="carga_peso_kg"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="0,00" inputmode="decimal">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cubagem (m³) *</label>
+                            <input type="text" name="carga_cubagem"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="0,000" inputmode="decimal">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Mercadoria (R$) *</label>
+                            <input type="text" name="carga_valor_mercadoria"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="0,00" inputmode="decimal">
+                        </div>
+                        
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descrição da Carga *</label>
+                            <textarea name="carga_descricao" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                      placeholder="Descreva detalhadamente a mercadoria..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações da Carga Marítima -->
+                <div id="campos-carga-maritima" class="bg-yellow-50 p-4 rounded-lg" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-boxes mr-2 text-yellow-600"></i>
+                        Informações da Carga Marítima
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cubagem (m³) *</label>
+                            <input type="text" name="cubagem"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="0,000" inputmode="decimal">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Mercadoria (R$) *</label>
+                            <input type="text" name="carga_valor_mercadoria"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="0,00" inputmode="decimal">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-comment-alt mr-2 text-gray-600"></i>
+                        Observações
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Observações Adicionais</label>
+                        <textarea name="observacoes" rows="4"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                  placeholder="Informações adicionais sobre a cotação..."></textarea>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="modal-footer bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
+            <button type="button" id="cancelar-cotacao" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Cancelar
+            </button>
+            <button type="submit" form="form-nova-cotacao" id="salvar-cotacao" 
+                    class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Salvar Cotação
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-50px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+.modalidade-campos {
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 1rem;
+        max-height: 95vh;
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// JavaScript integrado para o modal de cotação
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Modal de Cotação Integrado - Carregado');
+    
+    // Elementos do modal
+    const modal = document.getElementById('modal-cotacao');
+    const form = document.getElementById('form-nova-cotacao');
+    const fecharBtn = document.getElementById('fechar-modal-cotacao');
+    const cancelarBtn = document.getElementById('cancelar-cotacao');
+    const salvarBtn = document.getElementById('salvar-cotacao');
+    
+    // Campos de modalidade
+    const modalidadeRadios = document.querySelectorAll('input[name="empresa_transporte"]');
+    const camposRodoviario = document.getElementById('campos-rodoviario');
+    const camposMaritimo = document.getElementById('campos-maritimo');
+    const camposAereo = document.getElementById('campos-aereo');
+    const camposCargaComum = document.getElementById('campos-carga-comum');
+    const camposCargaMaritima = document.getElementById('campos-carga-maritima');
+    
+    // Event Listeners
+    fecharBtn.addEventListener('click', fecharModal);
+    cancelarBtn.addEventListener('click', fecharModal);
+    
+    // Mudança de modalidade
+    modalidadeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            mostrarCamposModalidade(this.value);
+        });
+    });
+    
+    // Submit do formulário
+    form.addEventListener('submit', handleFormSubmit);
+    
+    // Formatação de campos
+    setupFieldFormatting();
+    
+    function mostrarCamposModalidade(modalidade) {
+        // Esconder todos os campos
+        camposRodoviario.style.display = 'none';
+        camposMaritimo.style.display = 'none';
+        camposAereo.style.display = 'none';
+        camposCargaComum.style.display = 'none';
+        camposCargaMaritima.style.display = 'none';
+        
+        // Mostrar campos específicos
+        switch(modalidade) {
+            case 'brcargo_rodoviario':
+                camposRodoviario.style.display = 'block';
+                camposCargaComum.style.display = 'block';
+                break;
+            case 'brcargo_maritimo':
+                camposMaritimo.style.display = 'block';
+                camposCargaMaritima.style.display = 'block';
+                break;
+            case 'frete_aereo':
+                camposAereo.style.display = 'block';
+                camposCargaComum.style.display = 'block';
+                break;
+        }
+    }
+    
+    function setupFieldFormatting() {
+        // Formatação de CNPJ
+        const cnpjField = document.querySelector('input[name="cliente_cnpj"]');
+        if (cnpjField) {
+            cnpjField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+                value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                value = value.replace(/(\d{4})(\d)/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+        
+        // Formatação de CEP
+        const cepFields = document.querySelectorAll('input[name="origem_cep"], input[name="destino_cep"]');
+        cepFields.forEach(field => {
+            field.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            });
+        });
+        
+        // Formatação de telefone
+        const telefoneField = document.querySelector('input[name="cliente_telefone"]');
+        if (telefoneField) {
+            telefoneField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+        
+        // Formatação de campos numéricos
+        const numericFields = document.querySelectorAll('input[name="carga_peso_kg"], input[name="carga_cubagem"], input[name="carga_valor_mercadoria"], input[name="net_weight"], input[name="gross_weight"], input[name="cubagem"]');
+        numericFields.forEach(field => {
+            field.addEventListener('input', function(e) {
+                formatNumericField(e.target);
+            });
+        });
+    }
+    
+    function formatNumericField(input) {
+        let valor = input.value.replace(/[^\d.,]/g, "");
+        if (!valor) {
+            input.value = "";
+            return;
+        }
+        
+        let valorNumerico = parseFloat(valor.replace(/\./g, "").replace(",", "."));
+        if (isNaN(valorNumerico)) {
+            input.value = "";
+            return;
+        }
+        
+        let casasDecimais = input.name.includes('cubagem') ? 3 : 2;
+        const formatado = new Intl.NumberFormat("pt-BR", {
+            minimumFractionDigits: casasDecimais,
+            maximumFractionDigits: casasDecimais
+        }).format(valorNumerico);
+        
+        input.value = formatado;
+    }
+    
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Validação básica
+        if (!data.cliente_nome || !data.cliente_cnpj || !data.numero_cliente) {
+            showMessage('Por favor, preencha todos os campos obrigatórios do cliente', 'error');
+            return;
+        }
+        
+        if (!data.empresa_transporte) {
+            showMessage('Por favor, selecione uma modalidade de transporte', 'error');
+            return;
+        }
+        
+        // Validações específicas por modalidade
+        const modalidade = data.empresa_transporte;
+        if (modalidade === 'brcargo_rodoviario') {
+            if (!data.origem_cep || !data.origem_endereco || !data.origem_cidade || !data.origem_estado ||
+                !data.destino_cep || !data.destino_endereco || !data.destino_cidade || !data.destino_estado ||
+                !data.carga_descricao || !data.carga_peso_kg || !data.carga_valor_mercadoria || !data.carga_cubagem) {
+                showMessage('Por favor, preencha todos os campos obrigatórios para transporte rodoviário', 'error');
+                return;
+            }
+        } else if (modalidade === 'brcargo_maritimo') {
+            if (!data.porto_origem || !data.porto_destino || !data.net_weight || !data.gross_weight ||
+                !data.cubagem || !data.incoterm || !data.tipo_carga_maritima || !data.carga_valor_mercadoria) {
+                showMessage('Por favor, preencha todos os campos obrigatórios para transporte marítimo', 'error');
+                return;
+            }
+        } else if (modalidade === 'frete_aereo') {
+            if (!data.aeroporto_origem || !data.aeroporto_destino || !data.tipo_servico_aereo ||
+                !data.carga_descricao || !data.carga_peso_kg || !data.carga_valor_mercadoria || !data.carga_cubagem) {
+                showMessage('Por favor, preencha todos os campos obrigatórios para transporte aéreo', 'error');
+                return;
+            }
+        }
+        
+        // Mostrar loading
+        salvarBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Salvando...';
+        salvarBtn.disabled = true;
+        
+        try {
+            // Converter valores numéricos para formato correto
+            const numericFields = ['carga_peso_kg', 'carga_cubagem', 'carga_valor_mercadoria', 'net_weight', 'gross_weight', 'cubagem'];
+            numericFields.forEach(field => {
+                if (data[field]) {
+                    data[field] = convertToNumber(data[field]);
+                }
+            });
+            
+            // Enviar para o backend
+            const response = await fetch('/api/cotacoes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                showMessage('Cotação criada com sucesso!', 'success');
+                fecharModal();
+                form.reset();
+                
+                // Recarregar lista de cotações se existir
+                if (typeof Cotacoes !== 'undefined' && Cotacoes.load) {
+                    Cotacoes.load();
+                } else if (typeof loadCotacoes === 'function') {
+                    loadCotacoes();
+                }
+                
+            } else {
+                showMessage(result.message || 'Erro ao criar cotação', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao enviar cotação:', error);
+            showMessage('Erro ao conectar com o servidor', 'error');
+        } finally {
+            // Restaurar botão
+            salvarBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Salvar Cotação';
+            salvarBtn.disabled = false;
+        }
+    }
+    
+    function convertToNumber(value) {
+        if (!value) return null;
+        return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+    }
+    
+    function showMessage(message, type) {
+        if (typeof Utils !== 'undefined') {
+            if (type === 'success') {
+                Utils.showSuccess(message);
+            } else {
+                Utils.showError(message);
+            }
+        } else {
+            alert(message);
+        }
+    }
+    
+    function fecharModal() {
+        modal.classList.remove('show');
+        form.reset();
+        
+        // Esconder todos os campos de modalidade
+        camposRodoviario.style.display = 'none';
+        camposMaritimo.style.display = 'none';
+        camposAereo.style.display = 'none';
+        camposCargaComum.style.display = 'none';
+        camposCargaMaritima.style.display = 'none';
+    }
+    
+    // Função global para abrir o modal
+    window.showNewCotacaoModal = function() {
+        modal.classList.add('show');
+    };
+    
+    // Fechar modal ao clicar fora
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            fecharModal();
+        }
+    });
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            fecharModal();
+        }
+    });
+    
+    console.log('✅ Modal de Cotação Integrado - Inicializado com sucesso');
+});
+</script>
