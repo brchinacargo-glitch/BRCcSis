@@ -267,6 +267,15 @@ const ModalCotacaoMelhorado = {
         
         console.log(`🔍 Validando ${camposVisiveis.length} campos obrigatórios visíveis (de ${camposObrigatorios.length} totais)`);
         
+        // Listar todos os campos obrigatórios para debug
+        console.log('📋 LISTA COMPLETA DE CAMPOS OBRIGATÓRIOS:');
+        camposObrigatorios.forEach((campo, index) => {
+            const isVisible = this.isFieldVisible(campo);
+            const valor = campo.value.trim();
+            console.log(`${index + 1}. ${campo.name}: "${valor}" (visível: ${isVisible}, required: ${campo.hasAttribute('required')})`);
+        });
+        
+        console.log('🔍 VALIDANDO CAMPOS VISÍVEIS:');
         camposVisiveis.forEach(campo => {
             const fieldValid = this.validateField(campo);
             if (!fieldValid) {
@@ -640,6 +649,10 @@ const ModalCotacaoMelhorado = {
         const camposAereo = document.getElementById('campos-aereo');
         const tipoOrigemRodoviario = document.getElementById('tipo-origem-rodoviario');
         
+        // Remover required de todos os campos específicos primeiro
+        this.removeRequiredFromSection(camposMaritimo);
+        this.removeRequiredFromSection(camposAereo);
+        
         // Ocultar todas as seções específicas
         if (camposMaritimo) camposMaritimo.style.display = 'none';
         if (camposAereo) camposAereo.style.display = 'none';
@@ -648,10 +661,16 @@ const ModalCotacaoMelhorado = {
         // Mostrar seção específica da modalidade selecionada
         switch (modalidade) {
             case 'brcargo_maritimo':
-                if (camposMaritimo) camposMaritimo.style.display = 'block';
+                if (camposMaritimo) {
+                    camposMaritimo.style.display = 'block';
+                    this.addRequiredToSection(camposMaritimo);
+                }
                 break;
             case 'frete_aereo':
-                if (camposAereo) camposAereo.style.display = 'block';
+                if (camposAereo) {
+                    camposAereo.style.display = 'block';
+                    this.addRequiredToSection(camposAereo);
+                }
                 break;
             case 'brcargo_rodoviario':
                 if (tipoOrigemRodoviario) tipoOrigemRodoviario.style.display = 'block';
@@ -661,6 +680,42 @@ const ModalCotacaoMelhorado = {
         }
         
         console.log(`🚛 Modalidade alterada para: ${modalidade}`);
+    },
+    
+    removeRequiredFromSection(section) {
+        if (!section) return;
+        
+        const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+        inputs.forEach(input => {
+            input.removeAttribute('required');
+            console.log(`🔓 Removido required de: ${input.name}`);
+        });
+    },
+    
+    addRequiredToSection(section) {
+        if (!section) return;
+        
+        // Lista de campos que devem ser obrigatórios em cada seção
+        const requiredFields = {
+            'campos-maritimo': [
+                'net_weight', 'gross_weight', 'cubagem', 'incoterm', 
+                'tipo_carga_maritima', 'porto_origem', 'porto_destino'
+            ],
+            'campos-aereo': [
+                // Adicionar campos obrigatórios do aéreo se necessário
+            ]
+        };
+        
+        const sectionId = section.id;
+        const fieldsToRequire = requiredFields[sectionId] || [];
+        
+        fieldsToRequire.forEach(fieldName => {
+            const input = section.querySelector(`[name="${fieldName}"]`);
+            if (input) {
+                input.setAttribute('required', 'required');
+                console.log(`🔒 Adicionado required a: ${fieldName}`);
+            }
+        });
     },
     
     setupOrigemToggle() {
