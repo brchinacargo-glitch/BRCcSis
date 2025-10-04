@@ -216,14 +216,14 @@ const DashboardGraficos = {
             this.dadosCarregados = true;
             
             // Renderizar métricas e gráficos
-            this.atualizarMetricas();
+            this.atualizarMetricas(this.dados);
             this.renderizarTodosGraficos();
             
         } catch (error) {
             console.error('Erro ao carregar dados do dashboard:', error);
             this.dados = this.gerarDadosSimulados();
             this.dadosCarregados = true;
-            this.atualizarMetricas();
+            this.atualizarMetricas(this.dados);
             this.renderizarTodosGraficos();
         }
     },
@@ -282,6 +282,12 @@ const DashboardGraficos = {
     // ==================== MÉTRICAS ====================
     
     atualizarMetricas(dados) {
+        // Verificar se dados existem
+        if (!dados) {
+            console.warn('Dados não disponíveis para atualizar métricas');
+            return;
+        }
+        
         // Atualizar cards de métricas com verificação de segurança
         const totalElement = document.getElementById('total-cotacoes');
         const finalizadasElement = document.getElementById('cotacoes-finalizadas');

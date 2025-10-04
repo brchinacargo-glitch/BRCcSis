@@ -1421,6 +1421,13 @@
         // Carregar lista de empresas
         async function loadEmpresas(page = 1) {
             try {
+                // Verificar se a seção de empresas está visível
+                const empresasSection = document.getElementById('empresas');
+                if (!empresasSection || empresasSection.style.display === 'none') {
+                    console.log('Seção de empresas não está visível, pulando carregamento');
+                    return;
+                }
+                
                 console.log('Carregando empresas, página:', page);
                 const params = new URLSearchParams({
                     page: page,
