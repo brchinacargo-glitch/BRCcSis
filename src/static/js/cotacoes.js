@@ -5,6 +5,7 @@ const Cotacoes = {
     // Estado
     currentTab: 'todas',
     cotacoes: [],
+    filtrosAtivos: {},
     
     // ==================== INICIALIZAÇÃO ====================
     
@@ -65,24 +66,135 @@ const Cotacoes = {
         
         Utils.clearContent(container);
         
-        // Filtrar cotações por tab
-        let cotacoesFiltradas = this.cotacoes;
-        if (this.currentTab !== 'todas') {
-            cotacoesFiltradas = this.cotacoes.filter(c => c.modalidade === this.currentTab);
-        }
+        // Aplicar filtros
+        let cotacoesFiltradas = this.aplicarTodosFiltros();
         
         if (cotacoesFiltradas.length === 0) {
             const noResults = Utils.createElement('div', {
                 className: 'p-8 text-center text-gray-500'
-            }, 'Nenhuma cotação encontrada');
+            }, 'Nenhuma cotação encontrada com os filtros aplicados');
             container.appendChild(noResults);
             return;
         }
+        
+        // Mostrar contador de resultados
+        this.mostrarContadorResultados(cotacoesFiltradas.length, this.cotacoes.length);
         
         cotacoesFiltradas.forEach(cotacao => {
             const card = this.createCotacaoCard(cotacao);
             container.appendChild(card);
         });
+    },
+    
+    /**
+     * Aplica todos os filtros (tabs + filtros avançados)
+     */
+    aplicarTodosFiltros() {
+        let cotacoesFiltradas = this.cotacoes;
+        
+        // Filtrar por tab
+        if (this.currentTab !== 'todas') {
+            cotacoesFiltradas = cotacoesFiltradas.filter(c => c.modalidade === this.currentTab);
+        }
+        
+        // Aplicar filtros avançados
+        if (Object.keys(this.filtrosAtivos).length > 0) {
+            cotacoesFiltradas = cotacoesFiltradas.filter(cotacao => {
+                return this.cotacaoPassaFiltros(cotacao);
+            });
+        }
+        
+        return cotacoesFiltradas;
+    },
+    
+    /**
+     * Verifica se cotação passa pelos filtros
+     */
+    cotacaoPassaFiltros(cotacao) {
+        const filtros = this.filtrosAtivos;
+        
+        // Filtro por status
+        if (filtros.status && cotacao.status !== filtros.status) {
+            return false;
+        }
+        
+        // Filtro por modalidade (além da tab)
+        if (filtros.modalidade && cotacao.modalidade !== filtros.modalidade) {
+            return false;
+        }
+        
+        // Filtro por operador
+        if (filtros.operador && cotacao.operador_id != filtros.operador) {
+            return false;
+        }
+        
+        // Filtro por cliente
+        if (filtros.cliente) {
+            const cliente = filtros.cliente.toLowerCase();
+            const nomeCliente = (cotacao.cliente_nome || '').toLowerCase();
+            const cnpjCliente = (cotacao.cliente_cnpj || '').toLowerCase();
+            
+            if (!nomeCliente.includes(cliente) && !cnpjCliente.includes(cliente)) {
+                return false;
+            }
+        }
+        
+        // Filtro por data
+        if (filtros.dataInicio) {
+            const dataInicio = new Date(filtros.dataInicio);
+            const dataCotacao = new Date(cotacao.data_criacao);
+            if (dataCotacao < dataInicio) {
+                return false;
+            }
+        }
+        
+        if (filtros.dataFim) {
+            const dataFim = new Date(filtros.dataFim);
+            dataFim.setHours(23, 59, 59);
+            const dataCotacao = new Date(cotacao.data_criacao);
+            if (dataCotacao > dataFim) {
+                return false;
+            }
+        }
+        
+        // Filtro por valor
+        if (filtros.valorMin && cotacao.valor_frete) {
+            const valorFrete = parseFloat(cotacao.valor_frete) || 0;
+            if (valorFrete < filtros.valorMin) {
+                return false;
+            }
+        }
+        
+        if (filtros.valorMax && cotacao.valor_frete) {
+            const valorFrete = parseFloat(cotacao.valor_frete) || 0;
+            if (valorFrete > filtros.valorMax) {
+                return false;
+            }
+        }
+        
+        return true;
+    },
+    
+    /**
+     * Aplica filtros externos (chamado pelo sistema de filtros)
+     */
+    aplicarFiltros(filtros) {
+        this.filtrosAtivos = filtros;
+        this.render();
+    },
+    
+    /**
+     * Mostra contador de resultados
+     */
+    mostrarContadorResultados(filtradas, total) {
+        const contador = document.getElementById('contador-cotacoes');
+        if (contador) {
+            if (filtradas === total) {
+                contador.textContent = `${total} cotação${total !== 1 ? 'ões' : ''}`;
+            } else {
+                contador.textContent = `${filtradas} de ${total} cotação${total !== 1 ? 'ões' : ''}`;
+            }
+        }
     },
     
     /**

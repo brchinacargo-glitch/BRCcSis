@@ -588,20 +588,30 @@ const CotacaoDetalhes = {
     },
     
     responderCotacao(id) {
-        // Abrir modal de resposta existente
-        if (window.ModalRespostaCotacao) {
+        // Abrir modal de resposta melhorado
+        if (window.ModalRespostaMelhorado) {
+            window.ModalRespostaMelhorado.abrir(this.cotacaoAtual);
+        } else if (window.ModalRespostaCotacao) {
+            // Fallback para modal antigo
             window.ModalRespostaCotacao.abrir(this.cotacaoAtual);
         }
     },
     
     reatribuirCotacao(id) {
-        // Implementar modal de reatribuição
-        alert('Funcionalidade de reatribuição será implementada em breve');
+        // Abrir modal de reatribuição
+        if (window.SistemaMensagens) {
+            window.SistemaMensagens.abrirModalReatribuicao(id);
+        } else {
+            alert('Sistema de mensagens não disponível');
+        }
     },
     
     editarResposta(id) {
-        // Abrir modal de resposta em modo edição
-        if (window.ModalRespostaCotacao) {
+        // Abrir modal de resposta melhorado em modo edição
+        if (window.ModalRespostaMelhorado) {
+            window.ModalRespostaMelhorado.abrir(this.cotacaoAtual, true);
+        } else if (window.ModalRespostaCotacao) {
+            // Fallback para modal antigo
             window.ModalRespostaCotacao.abrir(this.cotacaoAtual, true);
         }
     },
