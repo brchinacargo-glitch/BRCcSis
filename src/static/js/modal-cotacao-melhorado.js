@@ -512,20 +512,30 @@ const ModalCotacaoMelhorado = {
             const formData = new FormData(form);
             const dados = this.processFormData(formData);
             
-            // Simular envio (substituir pela chamada real da API)
             console.log('Dados da cotação:', dados);
             
-            // Simular delay de rede
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Enviar via API real
+            const response = await API.createCotacao(dados);
             
-            // Sucesso
-            this.showNotification('Cotação solicitada com sucesso!', 'success');
-            this.closeModal();
-            form.reset();
+            if (response.success) {
+                this.showNotification('Cotação solicitada com sucesso!', 'success');
+                this.closeModal();
+                form.reset();
+                
+                // Recarregar lista de cotações se estiver na seção de cotações
+                if (window.CotacoesManager && typeof window.CotacoesManager.carregarCotacoes === 'function') {
+                    window.CotacoesManager.carregarCotacoes();
+                }
+            } else {
+                throw new Error(response.message || 'Erro ao processar cotação');
+            }
             
         } catch (error) {
             console.error('Erro ao enviar cotação:', error);
-            this.showNotification('Erro ao enviar cotação. Tente novamente.', 'error');
+            this.showNotification(
+                error.message || 'Erro ao enviar cotação. Tente novamente.', 
+                'error'
+            );
         } finally {
             // Restaurar botão
             submitBtn.disabled = false;
