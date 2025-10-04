@@ -286,6 +286,11 @@ const ModalCotacaoMelhorado = {
                 console.log('❌ Validação marítima falhou');
                 isValid = false;
             }
+        } else if (modalidade === 'brcargo_rodoviario') {
+            if (!this.validateRodoviarioFields()) {
+                console.log('❌ Validação rodoviária falhou');
+                isValid = false;
+            }
         }
         
         console.log(`📋 Validação final: ${isValid ? 'APROVADA' : 'REJEITADA'}`);
@@ -301,11 +306,18 @@ const ModalCotacaoMelhorado = {
     validateField(campo) {
         const valor = campo.value.trim();
         const isRequired = campo.hasAttribute('required');
+        const isVisible = this.isFieldVisible(campo);
         
-        console.log(`🔍 Validando campo: ${campo.name}, valor: "${valor}", obrigatório: ${isRequired}`);
+        console.log(`🔍 Validando campo: ${campo.name}, valor: "${valor}", obrigatório: ${isRequired}, visível: ${isVisible}`);
         
         // Limpar erro anterior
         this.clearFieldError(campo);
+        
+        // Se campo não está visível, não validar
+        if (!isVisible) {
+            console.log(`👁️ Campo oculto ignorado: ${campo.name}`);
+            return true;
+        }
         
         // Verificar se campo obrigatório está vazio
         if (isRequired && valor === '') {
@@ -418,6 +430,19 @@ const ModalCotacaoMelhorado = {
         return true;
     },
     
+    isFieldVisible(campo) {
+        // Verificar se o campo e seus pais estão visíveis
+        let elemento = campo;
+        while (elemento && elemento !== document.body) {
+            const style = window.getComputedStyle(elemento);
+            if (style.display === 'none' || style.visibility === 'hidden') {
+                return false;
+            }
+            elemento = elemento.parentElement;
+        }
+        return true;
+    },
+    
     validateMaritimoFields() {
         const form = document.getElementById('form-cotacao');
         const modalidade = form.querySelector('input[name="empresa_transporte"]:checked')?.value;
@@ -444,6 +469,71 @@ const ModalCotacaoMelhorado = {
             }
         });
         
+        return isValid;
+    },
+    
+    validateRodoviarioFields() {
+        const form = document.getElementById('form-cotacao');
+        const modalidade = form.querySelector('input[name="empresa_transporte"]:checked')?.value;
+        
+        if (modalidade !== 'brcargo_rodoviario') return true;
+        
+        console.log('🚛 Validando campos específicos do rodoviário...');
+        
+        let isValid = true;
+        
+        // Verificar tipo de origem selecionado
+        const tipoOrigem = form.querySelector('input[name="tipo_origem"]:checked')?.value || 'endereco';
+        console.log(`📍 Tipo de origem: ${tipoOrigem}`);
+        
+        if (tipoOrigem === 'endereco') {
+            // Validar campos de endereço de origem
+            const camposEnderecoOrigem = [
+                'origem_cep',
+                'origem_endereco', 
+                'origem_cidade',
+                'origem_estado'
+            ];
+            
+            camposEnderecoOrigem.forEach(fieldName => {
+                const campo = form.querySelector(`[name="${fieldName}"]`);
+                if (campo && this.isFieldVisible(campo)) {
+                    if (!this.validateField(campo)) {
+                        console.log(`❌ Campo de endereço inválido: ${fieldName}`);
+                        isValid = false;
+                    }
+                }
+            });
+            
+        } else if (tipoOrigem === 'porto') {
+            // Validar campo de porto de origem
+            const campoPorto = form.querySelector('[name="origem_porto"]');
+            if (campoPorto && this.isFieldVisible(campoPorto)) {
+                if (!this.validateField(campoPorto)) {
+                    console.log('❌ Campo de porto inválido: origem_porto');
+                    isValid = false;
+                }
+            }
+        }
+        
+        // Validar campos obrigatórios específicos do rodoviário
+        const camposRodoviario = [
+            'carga_peso_kg',
+            'carga_valor_mercadoria',
+            'carga_cubagem'
+        ];
+        
+        camposRodoviario.forEach(fieldName => {
+            const campo = form.querySelector(`[name="${fieldName}"]`);
+            if (campo && this.isFieldVisible(campo)) {
+                if (!this.validateField(campo)) {
+                    console.log(`❌ Campo rodoviário inválido: ${fieldName}`);
+                    isValid = false;
+                }
+            }
+        });
+        
+        console.log(`🚛 Validação rodoviária: ${isValid ? 'APROVADA' : 'REJEITADA'}`);
         return isValid;
     },
     
