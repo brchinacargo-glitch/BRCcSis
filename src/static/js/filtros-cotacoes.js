@@ -331,7 +331,7 @@ const FiltrosCotacoes = {
                 const response = await API.getOperadores();
                 
                 if (response.success) {
-                    this.operadores = response.data || [];
+                    this.operadores = response.operadores || [];
                     console.log(`${this.operadores.length} operadores carregados`);
                 } else {
                     console.error('Erro ao carregar operadores:', response.message);

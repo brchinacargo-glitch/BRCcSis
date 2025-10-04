@@ -540,7 +540,7 @@ const SistemaMensagens = {
         try {
             if (window.API && typeof API.getOperadores === 'function') {
                 const response = await API.getOperadores();
-                this.operadores = response.data || [];
+                this.operadores = response.operadores || [];
             } else {
                 // Operadores padrão
                 this.operadores = [

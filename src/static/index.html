@@ -1085,10 +1085,14 @@
         // Função para mostrar seção de cotações
         function mostrarSecaoCotacoes() {
             console.log('Mostrando seção de cotações...');
-            // Ocultar outras seções
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('empresas').style.display = 'none';
-            document.getElementById('cadastro').style.display = 'none';
+            // Ocultar outras seções com verificação de segurança
+            const dashboard = document.getElementById('dashboard');
+            const empresas = document.getElementById('empresas');
+            const cadastro = document.getElementById('cadastro');
+            
+            if (dashboard) dashboard.style.display = 'none';
+            if (empresas) empresas.style.display = 'none';
+            if (cadastro) cadastro.style.display = 'none';
             
             // Ocultar seção de analytics
             const secaoAnalytics = document.getElementById('analytics');
@@ -1142,7 +1146,7 @@
             });
             
             // Mostrar seção de analytics
-            const secaoAnalytics = document.getElementById('analytics');
+            const secaoAnalytics = document.getElementById('secao-analytics-v133');
             if (secaoAnalytics) {
                 secaoAnalytics.style.display = 'block';
                 secaoAnalytics.classList.remove('hidden');
