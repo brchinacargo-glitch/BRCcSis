@@ -4204,6 +4204,19 @@
                 <button id="btn-nova-cotacao" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
                     <i class="fas fa-plus mr-2"></i>Nova Cotação
                 </button>
+                
+                <!-- Botões de teste das funcionalidades -->
+                <div class="space-x-2">
+                    <button onclick="testarModalReatribuicao()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                        🔄 Testar Reatribuição
+                    </button>
+                    <button onclick="testarModalResposta()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                        📝 Testar Resposta
+                    </button>
+                    <button onclick="testarFuncionalidades()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                        🧪 Verificar Funções
+                    </button>
+                </div>
             </div>
 
 
@@ -6242,6 +6255,109 @@
             // Esta função será integrada com o sistema de histórico existente
             console.log('📝 Adicionando ao histórico:', evento);
         }
+        
+        // Função de teste para verificar se as funcionalidades estão funcionando
+        function testarFuncionalidades() {
+            console.log('🧪 Testando funcionalidades implementadas...');
+            
+            // Testar se as funções existem
+            const funcoes = [
+                'reatribuirCotacao',
+                'responderCotacao', 
+                'mostrarModalReatribuicao',
+                'mostrarModalRespostaAvancado',
+                'preencherHistorico',
+                'calcularTempoRelativo',
+                'getTimelineStyle'
+            ];
+            
+            funcoes.forEach(nomeFuncao => {
+                if (typeof window[nomeFuncao] === 'function') {
+                    console.log(`✅ Função ${nomeFuncao} está disponível`);
+                } else {
+                    console.warn(`❌ Função ${nomeFuncao} NÃO está disponível`);
+                }
+            });
+            
+            // Testar criação de modal de reatribuição
+            try {
+                const modalReat = document.getElementById('modal-reatribuicao');
+                if (!modalReat) {
+                    console.log('🔧 Testando criação do modal de reatribuição...');
+                    const novoModal = criarModalReatribuicao();
+                    if (novoModal) {
+                        console.log('✅ Modal de reatribuição criado com sucesso');
+                        // Remover modal de teste
+                        novoModal.remove();
+                    } else {
+                        console.warn('❌ Falha ao criar modal de reatribuição');
+                    }
+                } else {
+                    console.log('✅ Modal de reatribuição já existe');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao testar modal de reatribuição:', error);
+            }
+            
+            // Testar criação de modal de resposta
+            try {
+                const modalResp = document.getElementById('modal-resposta-avancado');
+                if (!modalResp) {
+                    console.log('🔧 Testando criação do modal de resposta...');
+                    const novoModal = criarModalRespostaAvancado();
+                    if (novoModal) {
+                        console.log('✅ Modal de resposta criado com sucesso');
+                        // Remover modal de teste
+                        novoModal.remove();
+                    } else {
+                        console.warn('❌ Falha ao criar modal de resposta');
+                    }
+                } else {
+                    console.log('✅ Modal de resposta já existe');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao testar modal de resposta:', error);
+            }
+            
+            console.log('🧪 Teste de funcionalidades concluído');
+        }
+        
+        // Executar teste após carregamento
+        setTimeout(testarFuncionalidades, 2000);
+        
+        // Função para testar modal de reatribuição com dados simulados
+        function testarModalReatribuicao() {
+            const cotacaoTeste = {
+                id: 999,
+                numero_cotacao: 'COT-999999',
+                status: 'aceita_operador',
+                status_display: 'Aceita pelo Operador',
+                status_color: 'bg-blue-100 text-blue-800',
+                cliente_nome: 'Empresa Teste Ltda',
+                operador_nome: 'Operador Atual',
+                data_solicitacao: new Date().toISOString()
+            };
+            
+            console.log('🧪 Testando modal de reatribuição com dados simulados...');
+            mostrarModalReatribuicao(cotacaoTeste);
+        }
+        
+        // Função para testar modal de resposta com dados simulados
+        function testarModalResposta() {
+            const cotacaoTeste = {
+                id: 999,
+                numero_cotacao: 'COT-999999',
+                cliente_nome: 'Empresa Teste Ltda',
+                empresa_transporte: 'brcargo_rodoviario',
+                data_solicitacao: new Date().toISOString(),
+                carga_descricao: 'Carga de teste',
+                carga_peso_kg: 1000,
+                carga_valor_mercadoria: 50000
+            };
+            
+            console.log('🧪 Testando modal de resposta com dados simulados...');
+            mostrarModalRespostaAvancado(cotacaoTeste);
+        }
 
         // Função para aprovar cotação
         async function aprovarCotacao(cotacaoId) {
@@ -6653,16 +6769,22 @@
                 return;
             }
             
+            // Calcular valores primeiro
+            const valorFreteNum = parseFloat(valorFrete.replace(/[^\d,]/g, '').replace(',', '.'));
+            const taxaColetaNum = parseFloat(document.getElementById('taxa-coleta').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const taxaEntregaNum = parseFloat(document.getElementById('taxa-entrega').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const valorSeguroNum = parseFloat(document.getElementById('valor-seguro').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            
             const dadosResposta = {
-                valor_frete: parseFloat(valorFrete.replace(/[^\d,]/g, '').replace(',', '.')),
+                valor_frete: valorFreteNum,
                 prazo_entrega_dias: parseInt(prazoEntrega),
-                taxa_coleta: parseFloat(document.getElementById('taxa-coleta').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0,
-                taxa_entrega: parseFloat(document.getElementById('taxa-entrega').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0,
-                valor_seguro: parseFloat(document.getElementById('valor-seguro').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0,
+                taxa_coleta: taxaColetaNum,
+                taxa_entrega: taxaEntregaNum,
+                valor_seguro: valorSeguroNum,
                 observacoes: document.getElementById('observacoes-gerais').value || 'Cotação respondida pelo operador',
                 coleta_agendada: document.getElementById('coleta-agendada').checked,
                 entrega_agendada: document.getElementById('entrega-agendada').checked,
-                valor_total: dadosResposta.valor_frete + dadosResposta.taxa_coleta + dadosResposta.taxa_entrega + dadosResposta.valor_seguro
+                valor_total: valorFreteNum + taxaColetaNum + taxaEntregaNum + valorSeguroNum
             };
             
             try {
