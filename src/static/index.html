@@ -5970,57 +5970,180 @@
                     const data = await response.json();
                     mostrarModalDetalhes(data.cotacao || data);
                 } else {
-                    // Fallback para desenvolvimento - usar dados simulados
-                    console.warn('Backend não disponível, usando dados simulados');
-                    const cotacaoSimulada = {
-                        id: cotacaoId,
-                        empresa: 'Empresa Exemplo',
-                        modalidade: 'BRCargo Rodoviário',
-                        origem: 'São Paulo, SP',
-                        destino: 'Rio de Janeiro, RJ',
-                        status: 'solicitada',
-                        data_criacao: new Date().toLocaleDateString('pt-BR'),
-                        carga_descricao: 'Carga exemplo',
-                        carga_peso_kg: '1000',
-                        observacoes: 'Cotação de exemplo para demonstração'
-                    };
+                    // Fallback para desenvolvimento - usar dados simulados completos
+                    console.warn('Backend não disponível, usando dados simulados completos');
+                    const cotacaoSimulada = criarCotacaoSimulada(cotacaoId);
                     mostrarModalDetalhes(cotacaoSimulada);
                 }
             } catch (error) {
                 console.error('Erro ao carregar detalhes:', error);
                 
                 // Fallback para desenvolvimento
-                console.warn('Erro de rede, usando dados simulados');
-                const cotacaoSimulada = {
-                    id: cotacaoId,
-                    empresa: 'Empresa Exemplo',
-                    modalidade: 'BRCargo Rodoviário',
-                    origem: 'São Paulo, SP',
-                    destino: 'Rio de Janeiro, RJ',
-                    status: 'solicitada',
-                    data_criacao: new Date().toLocaleDateString('pt-BR'),
-                    carga_descricao: 'Carga exemplo',
-                    carga_peso_kg: '1000',
-                    observacoes: 'Cotação de exemplo para demonstração (modo desenvolvimento)'
-                };
+                console.warn('Erro de rede, usando dados simulados completos');
+                const cotacaoSimulada = criarCotacaoSimulada(cotacaoId);
                 mostrarModalDetalhes(cotacaoSimulada);
             }
+        }
+
+        // Função para criar cotação simulada com dados completos
+        function criarCotacaoSimulada(cotacaoId) {
+            const modalidades = ['brcargo_rodoviario', 'brcargo_maritimo', 'brcargo_aereo'];
+            const status = ['solicitada', 'aceita_operador', 'cotacao_enviada', 'aceita_consultor', 'finalizada'];
+            const modalidade = modalidades[Math.floor(Math.random() * modalidades.length)];
+            const statusAtual = status[Math.floor(Math.random() * status.length)];
+            
+            const cotacaoBase = {
+                id: cotacaoId,
+                numero_cotacao: `COT-${String(cotacaoId).padStart(6, '0')}`,
+                status: statusAtual,
+                status_display: getStatusDisplay(statusAtual),
+                status_color: getStatusColor(statusAtual),
+                empresa_transporte: modalidade,
+                data_solicitacao: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                consultor_nome: 'João Silva',
+                operador_nome: statusAtual !== 'solicitada' ? 'Maria Santos' : 'Aguardando operador',
+                
+                // Dados do cliente
+                cliente_nome: 'Empresa ABC Ltda',
+                cliente_cnpj: '12.345.678/0001-90',
+                cliente_contato_telefone: '(11) 9999-8888',
+                cliente_contato_email: 'contato@empresaabc.com.br',
+                numero_cliente: modalidade === 'brcargo_maritimo' ? 'CLI-2024-001' : null,
+                
+                // Dados da carga
+                carga_descricao: 'Equipamentos eletrônicos',
+                carga_peso_kg: 1500 + Math.floor(Math.random() * 8500),
+                carga_valor_mercadoria: 50000 + Math.floor(Math.random() * 450000),
+                carga_comprimento_cm: 120 + Math.floor(Math.random() * 300),
+                carga_largura_cm: 80 + Math.floor(Math.random() * 200),
+                carga_altura_cm: 100 + Math.floor(Math.random() * 250),
+                
+                // Histórico
+                historico: [
+                    {
+                        data: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                        acao: 'Cotação solicitada',
+                        usuario: 'João Silva (Consultor)',
+                        observacoes: 'Solicitação inicial da cotação'
+                    }
+                ]
+            };
+            
+            // Adicionar dados específicos por modalidade
+            if (modalidade === 'brcargo_rodoviario') {
+                cotacaoBase.origem_cep = '01310-100';
+                cotacaoBase.origem_endereco = 'Av. Paulista, 1578';
+                cotacaoBase.origem_cidade = 'São Paulo';
+                cotacaoBase.origem_estado = 'SP';
+                cotacaoBase.destino_cep = '20040-020';
+                cotacaoBase.destino_endereco = 'Av. Rio Branco, 156';
+                cotacaoBase.destino_cidade = 'Rio de Janeiro';
+                cotacaoBase.destino_estado = 'RJ';
+                cotacaoBase.cubagem = (cotacaoBase.carga_comprimento_cm * cotacaoBase.carga_largura_cm * cotacaoBase.carga_altura_cm) / 1000000;
+            } else if (modalidade === 'brcargo_maritimo') {
+                cotacaoBase.porto_origem = 'Porto de Santos (BRSSZ)';
+                cotacaoBase.porto_destino = 'Porto de Hamburgo (DEHAM)';
+                cotacaoBase.net_weight = cotacaoBase.carga_peso_kg;
+                cotacaoBase.gross_weight = cotacaoBase.carga_peso_kg + 200;
+                cotacaoBase.cubagem = Math.floor(Math.random() * 50) + 10;
+                cotacaoBase.incoterm = 'FOB';
+                cotacaoBase.tipo_carga_maritima = Math.random() > 0.5 ? 'FCL' : 'LCL';
+                
+                if (cotacaoBase.tipo_carga_maritima === 'FCL') {
+                    cotacaoBase.quantidade_containers = Math.floor(Math.random() * 3) + 1;
+                    cotacaoBase.tamanho_container = Math.random() > 0.5 ? "20'" : "40'";
+                }
+            } else if (modalidade === 'brcargo_aereo') {
+                cotacaoBase.origem_cep = '04626-020';
+                cotacaoBase.origem_endereco = 'Aeroporto de Congonhas';
+                cotacaoBase.origem_cidade = 'São Paulo';
+                cotacaoBase.origem_estado = 'SP';
+                cotacaoBase.destino_cep = '21941-900';
+                cotacaoBase.destino_endereco = 'Aeroporto Internacional Tom Jobim';
+                cotacaoBase.destino_cidade = 'Rio de Janeiro';
+                cotacaoBase.destino_estado = 'RJ';
+            }
+            
+            // Adicionar mais eventos ao histórico baseado no status
+            if (statusAtual !== 'solicitada') {
+                cotacaoBase.historico.push({
+                    data: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                    acao: 'Cotação aceita pelo operador',
+                    usuario: 'Maria Santos (Operador)',
+                    observacoes: 'Cotação aceita para processamento'
+                });
+            }
+            
+            if (['cotacao_enviada', 'aceita_consultor', 'finalizada'].includes(statusAtual)) {
+                cotacaoBase.historico.push({
+                    data: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+                    acao: 'Cotação respondida',
+                    usuario: 'Maria Santos (Operador)',
+                    observacoes: `Valor: R$ ${(Math.random() * 5000 + 1000).toFixed(2)} | Prazo: ${Math.floor(Math.random() * 10) + 3} dias`
+                });
+            }
+            
+            return cotacaoBase;
+        }
+        
+        // Funções auxiliares para status
+        function getStatusDisplay(status) {
+            const statusMap = {
+                'solicitada': 'Solicitada',
+                'aceita_operador': 'Aceita pelo Operador',
+                'cotacao_enviada': 'Cotação Enviada',
+                'aceita_consultor': 'Aceita pelo Consultor',
+                'recusada_consultor': 'Recusada pelo Consultor',
+                'negada': 'Negada',
+                'finalizada': 'Finalizada'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function getStatusColor(status) {
+            const colorMap = {
+                'solicitada': 'bg-yellow-100 text-yellow-800',
+                'aceita_operador': 'bg-blue-100 text-blue-800',
+                'cotacao_enviada': 'bg-green-100 text-green-800',
+                'aceita_consultor': 'bg-purple-100 text-purple-800',
+                'recusada_consultor': 'bg-orange-100 text-orange-800',
+                'negada': 'bg-red-100 text-red-800',
+                'finalizada': 'bg-gray-100 text-gray-800'
+            };
+            return colorMap[status] || 'bg-gray-100 text-gray-800';
         }
 
         // Função para mostrar modal de detalhes
         function mostrarModalDetalhes(cotacao) {
             console.log('📋 Mostrando detalhes da cotação:', cotacao);
+            console.log('📊 Dados da cotação:', {
+                numero: cotacao.numero_cotacao,
+                status: cotacao.status,
+                empresa: cotacao.empresa_transporte,
+                cliente: cotacao.cliente_nome,
+                operador: cotacao.operador_nome,
+                consultor: cotacao.consultor_nome
+            });
             
             // Criar o modal se não existir
             let modal = document.getElementById('modal-detalhes-cotacao');
             if (!modal) {
+                console.log('🔧 Criando modal de detalhes...');
                 modal = criarModalDetalhes();
             }
             
+            // Verificar se o modal foi criado corretamente
+            if (!modal) {
+                console.error('❌ Erro: Modal não foi criado');
+                return;
+            }
+            
             // Preencher os dados no modal
+            console.log('📝 Preenchendo dados no modal...');
             preencherModalDetalhes(modal, cotacao);
             
             // Mostrar o modal
+            console.log('👁️ Exibindo modal...');
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
@@ -6144,19 +6267,40 @@
         
         // Função para preencher os dados no modal
         function preencherModalDetalhes(modal, cotacao) {
-            // Informações básicas
-            modal.querySelector('#det-numero').textContent = cotacao.numero_cotacao || '';
-            modal.querySelector('#det-status').innerHTML = `<span class="badge ${cotacao.status_color || ''}">${cotacao.status_display || cotacao.status}</span>`;
-            modal.querySelector('#det-empresa').textContent = getEmpresaDisplay(cotacao.empresa_transporte) || '';
-            modal.querySelector('#det-data').textContent = formatarData(cotacao.data_solicitacao) || '';
-            modal.querySelector('#det-consultor').textContent = cotacao.consultor_nome || 'Não atribuído';
-            modal.querySelector('#det-operador').textContent = cotacao.operador_nome || 'Aguardando operador';
+            console.log('🔧 Preenchendo modal com dados:', cotacao);
             
-            // Dados do cliente
-            modal.querySelector('#det-cliente-nome').textContent = cotacao.cliente_nome || '';
-            modal.querySelector('#det-cliente-cnpj').textContent = cotacao.cliente_cnpj || '';
-            modal.querySelector('#det-cliente-telefone').textContent = cotacao.cliente_contato_telefone || '';
-            modal.querySelector('#det-cliente-email').textContent = cotacao.cliente_contato_email || '';
+            try {
+                // Informações básicas
+                console.log('📝 Preenchendo informações básicas...');
+                const numeroElement = modal.querySelector('#det-numero');
+                const statusElement = modal.querySelector('#det-status');
+                const empresaElement = modal.querySelector('#det-empresa');
+                const dataElement = modal.querySelector('#det-data');
+                const consultorElement = modal.querySelector('#det-consultor');
+                const operadorElement = modal.querySelector('#det-operador');
+                
+                if (numeroElement) numeroElement.textContent = cotacao.numero_cotacao || 'N/A';
+                if (statusElement) statusElement.innerHTML = `<span class="badge ${cotacao.status_color || ''}">${cotacao.status_display || cotacao.status || 'N/A'}</span>`;
+                if (empresaElement) empresaElement.textContent = getEmpresaDisplay(cotacao.empresa_transporte) || 'N/A';
+                if (dataElement) dataElement.textContent = formatarData(cotacao.data_solicitacao) || 'N/A';
+                if (consultorElement) consultorElement.textContent = cotacao.consultor_nome || 'Não atribuído';
+                if (operadorElement) operadorElement.textContent = cotacao.operador_nome || 'Aguardando operador';
+                
+                console.log('✅ Informações básicas preenchidas');
+                
+                // Dados do cliente
+                console.log('📝 Preenchendo dados do cliente...');
+                const clienteNomeElement = modal.querySelector('#det-cliente-nome');
+                const clienteCnpjElement = modal.querySelector('#det-cliente-cnpj');
+                const clienteTelefoneElement = modal.querySelector('#det-cliente-telefone');
+                const clienteEmailElement = modal.querySelector('#det-cliente-email');
+                
+                if (clienteNomeElement) clienteNomeElement.textContent = cotacao.cliente_nome || 'N/A';
+                if (clienteCnpjElement) clienteCnpjElement.textContent = cotacao.cliente_cnpj || 'N/A';
+                if (clienteTelefoneElement) clienteTelefoneElement.textContent = cotacao.cliente_contato_telefone || 'N/A';
+                if (clienteEmailElement) clienteEmailElement.textContent = cotacao.cliente_contato_email || 'N/A';
+                
+                console.log('✅ Dados do cliente preenchidos');
             
             // Número do cliente (para todas as modalidades quando disponível)
             if (cotacao.numero_cliente) {
@@ -6239,13 +6383,32 @@
             // Histórico
             preencherHistorico(modal, cotacao.historico || []);
             
-            // Ações do operador (mostrar apenas se for operador e cotação estiver disponível)
-            // TODO: Implementar verificação de perfil do usuário
-            if (cotacao.status === 'solicitada') {
-                modal.querySelector('#det-acoes-operador').style.display = 'block';
-                modal.querySelector('#btn-aceitar-cotacao').setAttribute('data-cotacao-id', cotacao.id);
-            } else {
-                modal.querySelector('#det-acoes-operador').style.display = 'none';
+                // Ações do operador (mostrar apenas se for operador e cotação estiver disponível)
+                // TODO: Implementar verificação de perfil do usuário
+                if (cotacao.status === 'solicitada') {
+                    const acoesElement = modal.querySelector('#det-acoes-operador');
+                    const btnAceitarElement = modal.querySelector('#btn-aceitar-cotacao');
+                    if (acoesElement) acoesElement.style.display = 'block';
+                    if (btnAceitarElement) btnAceitarElement.setAttribute('data-cotacao-id', cotacao.id);
+                } else {
+                    const acoesElement = modal.querySelector('#det-acoes-operador');
+                    if (acoesElement) acoesElement.style.display = 'none';
+                }
+                
+                console.log('✅ Modal preenchido com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao preencher modal:', error);
+                // Mostrar mensagem de erro no modal
+                const modalBody = modal.querySelector('.modal-body');
+                if (modalBody) {
+                    modalBody.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <h3 style="color: #dc3545;">Erro ao carregar detalhes</h3>
+                            <p>Ocorreu um erro ao carregar os detalhes da cotação.</p>
+                            <p style="font-size: 14px; color: #666;">ID da Cotação: ${cotacao.id || 'N/A'}</p>
+                        </div>
+                    `;
+                }
             }
         }
         
