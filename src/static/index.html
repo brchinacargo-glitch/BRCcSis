@@ -5664,6 +5664,18 @@
                 if (response.ok) {
                     const data = await response.json();
                     mostrarMensagem('Cotação aceita com sucesso!', 'success');
+                    
+                    // Atualizar dados locais
+                    const cotacaoAtualizada = {
+                        id: cotacaoId,
+                        status: 'aceita_operador',
+                        status_display: 'Aceita pelo Operador',
+                        status_color: 'bg-blue-100 text-blue-800',
+                        operador_nome: 'Operador Atual', // Pode ser obtido do contexto do usuário
+                        data_aceite: new Date().toISOString()
+                    };
+                    atualizarCotacaoNosCarregados(cotacaoAtualizada);
+                    
                     carregarCotacoes(); // Recarregar lista
                     carregarEstatisticasCotacoes(); // Atualizar estatísticas
                 } else {
@@ -5671,15 +5683,16 @@
                     console.warn('Backend não disponível, simulando aceitação');
                     mostrarMensagem('Cotação aceita com sucesso! (modo desenvolvimento)', 'success');
                     
-                    // Simular mudança de status localmente
-                    const cotacaoElement = document.querySelector(`[data-cotacao-id="${cotacaoId}"]`).closest('.cotacao-card');
-                    if (cotacaoElement) {
-                        const statusBadge = cotacaoElement.querySelector('.status-badge');
-                        if (statusBadge) {
-                            statusBadge.textContent = 'Aceita pelo Operador';
-                            statusBadge.className = 'status-badge bg-blue-100 text-blue-800';
-                        }
-                    }
+                    // Atualizar dados locais mesmo no fallback
+                    const cotacaoAtualizada = {
+                        id: cotacaoId,
+                        status: 'aceita_operador',
+                        status_display: 'Aceita pelo Operador',
+                        status_color: 'bg-blue-100 text-blue-800',
+                        operador_nome: 'Operador Atual',
+                        data_aceite: new Date().toISOString()
+                    };
+                    atualizarCotacaoNosCarregados(cotacaoAtualizada);
                 }
             } catch (error) {
                 console.error('Erro ao aceitar cotação:', error);
@@ -5963,128 +5976,287 @@
         // Função para ver detalhes da cotação
         async function verDetalhesCotacao(cotacaoId) {
             try {
-                console.log('Carregando detalhes da cotação:', cotacaoId);
+                console.log('🔍 Carregando detalhes da cotação:', cotacaoId);
+                
+                // Primeiro, tentar buscar dos dados já carregados no sistema
+                const cotacaoExistente = buscarCotacaoNosCarregados(cotacaoId);
+                if (cotacaoExistente) {
+                    console.log('✅ Cotação encontrada nos dados carregados');
+                    mostrarModalDetalhes(cotacaoExistente);
+                    return;
+                }
+                
+                // Se não encontrou, buscar na API
+                console.log('🌐 Buscando na API...');
                 const response = await fetch(`/api/v133/cotacoes/${cotacaoId}`);
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('✅ Dados recebidos da API:', data);
                     mostrarModalDetalhes(data.cotacao || data);
                 } else {
-                    // Fallback para desenvolvimento - usar dados simulados completos
-                    console.warn('Backend não disponível, usando dados simulados completos');
-                    const cotacaoSimulada = criarCotacaoSimulada(cotacaoId);
-                    mostrarModalDetalhes(cotacaoSimulada);
+                    console.error('❌ Erro na API:', response.status, response.statusText);
+                    mostrarErroCarregamento(cotacaoId, `Erro ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
-                console.error('Erro ao carregar detalhes:', error);
+                console.error('❌ Erro ao carregar detalhes:', error);
+                mostrarErroCarregamento(cotacaoId, error.message);
+            }
+        }
+        
+        // Função para buscar cotação nos dados já carregados
+        function buscarCotacaoNosCarregados(cotacaoId) {
+            console.log('🔍 Buscando cotação nos dados carregados, ID:', cotacaoId);
+            
+            // 1. Verificar na variável global cotacoesData (dados mais recentes)
+            if (typeof cotacoesData !== 'undefined' && Array.isArray(cotacoesData)) {
+                const cotacao = cotacoesData.find(c => c.id == cotacaoId);
+                if (cotacao) {
+                    console.log('✅ Cotação encontrada em cotacoesData:', cotacao);
+                    return cotacao;
+                }
+            }
+            
+            // 2. Verificar no array global window.cotacoesData (backup)
+            if (window.cotacoesData && Array.isArray(window.cotacoesData)) {
+                const cotacao = window.cotacoesData.find(c => c.id == cotacaoId);
+                if (cotacao) {
+                    console.log('✅ Cotação encontrada no window.cotacoesData:', cotacao);
+                    return cotacao;
+                }
+            }
+            
+            // 3. Verificar se existe uma função API global
+            if (typeof API !== 'undefined' && API.getCotacoes) {
+                try {
+                    const cotacoes = API.getCotacoes();
+                    if (cotacoes && Array.isArray(cotacoes)) {
+                        const cotacao = cotacoes.find(c => c.id == cotacaoId);
+                        if (cotacao) {
+                            console.log('✅ Cotação encontrada via API.getCotacoes:', cotacao);
+                            return cotacao;
+                        }
+                    }
+                } catch (error) {
+                    console.log('⚠️ Erro ao acessar API.getCotacoes:', error);
+                }
+            }
+            
+            // 4. Como último recurso, extrair dados do card visível
+            const cotacaoCard = document.querySelector(`[data-cotacao-id="${cotacaoId}"]`);
+            if (cotacaoCard) {
+                console.log('🎴 Extraindo dados do card visível como último recurso');
+                return extrairDadosDoCard(cotacaoCard, cotacaoId);
+            }
+            
+            console.log('❌ Cotação não encontrada em nenhuma fonte de dados');
+            return null;
+        }
+        
+        // Função para extrair dados do card visível
+        function extrairDadosDoCard(card, cotacaoId) {
+            const cotacaoContainer = card.closest('.cotacao-card') || card.closest('.bg-white');
+            if (!cotacaoContainer) return null;
+            
+            try {
+                // Extrair dados básicos do card
+                const numeroElement = cotacaoContainer.querySelector('h3');
+                const statusElement = cotacaoContainer.querySelector('.status-badge');
+                const empresaElement = cotacaoContainer.querySelector('[class*="text-blue"], [class*="text-green"], [class*="text-purple"]');
+                const dataElement = cotacaoContainer.querySelector('.text-gray-500');
+                const operadorElement = cotacaoContainer.querySelector('strong:contains("Operador:")');
                 
-                // Fallback para desenvolvimento
-                console.warn('Erro de rede, usando dados simulados completos');
-                const cotacaoSimulada = criarCotacaoSimulada(cotacaoId);
-                mostrarModalDetalhes(cotacaoSimulada);
+                const cotacao = {
+                    id: cotacaoId,
+                    numero_cotacao: numeroElement ? numeroElement.textContent.trim() : `COT-${String(cotacaoId).padStart(6, '0')}`,
+                    status: statusElement ? statusElement.textContent.trim().toLowerCase().replace(/\s+/g, '_') : 'solicitada',
+                    status_display: statusElement ? statusElement.textContent.trim() : 'Solicitada',
+                    status_color: statusElement ? statusElement.className : 'bg-yellow-100 text-yellow-800',
+                    empresa_transporte: extrairModalidadeDoCard(cotacaoContainer),
+                    data_solicitacao: dataElement ? extrairDataDoTexto(dataElement.textContent) : new Date().toISOString(),
+                    consultor_nome: 'Usuário Atual',
+                    operador_nome: operadorElement ? operadorElement.nextSibling?.textContent?.trim() : null,
+                    
+                    // Dados básicos que precisam ser buscados
+                    cliente_nome: 'Dados não disponíveis no card',
+                    cliente_cnpj: 'Consulte o sistema completo',
+                    cliente_contato_telefone: 'N/A',
+                    cliente_contato_email: 'N/A',
+                    carga_descricao: 'Informações detalhadas disponíveis no sistema',
+                    carga_peso_kg: 'N/A',
+                    carga_valor_mercadoria: 'N/A',
+                    
+                    // Indicar que são dados parciais
+                    _dados_parciais: true,
+                    _fonte: 'card_visivel'
+                };
+                
+                console.log('📊 Dados extraídos do card:', cotacao);
+                return cotacao;
+            } catch (error) {
+                console.error('❌ Erro ao extrair dados do card:', error);
+                return null;
+            }
+        }
+        
+        // Função para extrair modalidade do card
+        function extrairModalidadeDoCard(container) {
+            const texto = container.textContent.toLowerCase();
+            if (texto.includes('rodoviário') || texto.includes('rodoviario')) return 'brcargo_rodoviario';
+            if (texto.includes('marítimo') || texto.includes('maritimo')) return 'brcargo_maritimo';
+            if (texto.includes('aéreo') || texto.includes('aereo')) return 'brcargo_aereo';
+            return 'brcargo_rodoviario'; // padrão
+        }
+        
+        // Função para extrair data do texto
+        function extrairDataDoTexto(texto) {
+            // Procurar por padrões de data no texto
+            const dataMatch = texto.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+            if (dataMatch) {
+                const [dia, mes, ano] = dataMatch[1].split('/');
+                return new Date(ano, mes - 1, dia).toISOString();
+            }
+            
+            // Se não encontrou, usar data atual
+            return new Date().toISOString();
+        }
+        
+        // Função para mostrar erro de carregamento
+        function mostrarErroCarregamento(cotacaoId, mensagemErro) {
+            const modal = document.getElementById('modal-detalhes-cotacao') || criarModalDetalhes();
+            const modalBody = modal.querySelector('.modal-body');
+            
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; color: #dc3545; margin-bottom: 20px;">⚠️</div>
+                    <h3 style="color: #dc3545; margin-bottom: 15px;">Erro ao Carregar Detalhes</h3>
+                    <p style="margin-bottom: 10px;">Não foi possível carregar os detalhes da cotação.</p>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                        <strong>ID:</strong> ${cotacaoId}<br>
+                        <strong>Erro:</strong> ${mensagemErro}
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <button onclick="verDetalhesCotacao(${cotacaoId})" class="btn btn-primary" style="margin-right: 10px;">
+                            🔄 Tentar Novamente
+                        </button>
+                        <button onclick="fecharModalDetalhes()" class="btn btn-secondary">
+                            ❌ Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para adicionar aviso de dados parciais
+        function adicionarAvisoDadosParciais(modal, cotacao) {
+            const modalBody = modal.querySelector('.modal-body');
+            const avisoHTML = `
+                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 20px; margin-right: 10px;">⚠️</span>
+                        <strong style="color: #856404;">Dados Parciais</strong>
+                    </div>
+                    <p style="margin: 0; color: #856404; font-size: 14px;">
+                        Alguns dados detalhados não estão disponíveis. 
+                        ${cotacao._fonte === 'card_visivel' ? 'Dados extraídos do card visível.' : 'Dados incompletos.'}
+                        Para informações completas, certifique-se de que o backend esteja funcionando.
+                    </p>
+                    <div style="margin-top: 10px;">
+                        <button onclick="tentarCarregarDadosCompletos(${cotacao.id})" class="btn btn-sm btn-warning">
+                            🔄 Tentar Carregar Dados Completos
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modalBody.insertAdjacentHTML('afterbegin', avisoHTML);
+        }
+        
+        // Função para tentar carregar dados completos
+        async function tentarCarregarDadosCompletos(cotacaoId) {
+            console.log('🔄 Tentando carregar dados completos para cotação:', cotacaoId);
+            
+            try {
+                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Dados completos carregados da API');
+                    
+                    // Fechar modal atual e abrir com dados completos
+                    fecharModalDetalhes();
+                    setTimeout(() => {
+                        mostrarModalDetalhes(data.cotacao || data);
+                    }, 300);
+                } else {
+                    console.error('❌ Erro ao carregar dados completos:', response.status);
+                    mostrarMensagem('Não foi possível carregar os dados completos. Verifique se o backend está funcionando.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Erro de rede ao carregar dados completos:', error);
+                mostrarMensagem('Erro de conexão. Verifique sua conexão com o servidor.', 'error');
+            }
+        }
+        
+        // Função para atualizar cotação nos dados carregados
+        function atualizarCotacaoNosCarregados(cotacaoAtualizada) {
+            console.log('🔄 Atualizando cotação nos dados carregados:', cotacaoAtualizada.id);
+            
+            // Atualizar em cotacoesData
+            if (typeof cotacoesData !== 'undefined' && Array.isArray(cotacoesData)) {
+                const index = cotacoesData.findIndex(c => c.id == cotacaoAtualizada.id);
+                if (index !== -1) {
+                    cotacoesData[index] = { ...cotacoesData[index], ...cotacaoAtualizada };
+                    console.log('✅ Cotação atualizada em cotacoesData');
+                }
+            }
+            
+            // Atualizar em window.cotacoesData
+            if (window.cotacoesData && Array.isArray(window.cotacoesData)) {
+                const index = window.cotacoesData.findIndex(c => c.id == cotacaoAtualizada.id);
+                if (index !== -1) {
+                    window.cotacoesData[index] = { ...window.cotacoesData[index], ...cotacaoAtualizada };
+                    console.log('✅ Cotação atualizada em window.cotacoesData');
+                }
+            }
+            
+            // Atualizar card visível se existir
+            const cotacaoCard = document.querySelector(`[data-cotacao-id="${cotacaoAtualizada.id}"]`);
+            if (cotacaoCard) {
+                atualizarCardVisivel(cotacaoCard, cotacaoAtualizada);
+            }
+        }
+        
+        // Função para atualizar card visível
+        function atualizarCardVisivel(card, cotacao) {
+            const cotacaoContainer = card.closest('.cotacao-card') || card.closest('.bg-white');
+            if (!cotacaoContainer) return;
+            
+            try {
+                // Atualizar status badge
+                const statusBadge = cotacaoContainer.querySelector('.status-badge');
+                if (statusBadge && cotacao.status) {
+                    statusBadge.textContent = getStatusDisplay(cotacao.status);
+                    statusBadge.className = `status-badge ${getStatusColor(cotacao.status)}`;
+                }
+                
+                // Atualizar operador se disponível
+                const operadorElement = cotacaoContainer.querySelector('strong:contains("Operador:")');
+                if (operadorElement && cotacao.operador_nome) {
+                    const nextSibling = operadorElement.nextSibling;
+                    if (nextSibling) {
+                        nextSibling.textContent = cotacao.operador_nome;
+                    }
+                }
+                
+                console.log('✅ Card visível atualizado');
+            } catch (error) {
+                console.error('❌ Erro ao atualizar card visível:', error);
             }
         }
 
-        // Função para criar cotação simulada com dados completos
-        function criarCotacaoSimulada(cotacaoId) {
-            const modalidades = ['brcargo_rodoviario', 'brcargo_maritimo', 'brcargo_aereo'];
-            const status = ['solicitada', 'aceita_operador', 'cotacao_enviada', 'aceita_consultor', 'finalizada'];
-            const modalidade = modalidades[Math.floor(Math.random() * modalidades.length)];
-            const statusAtual = status[Math.floor(Math.random() * status.length)];
-            
-            const cotacaoBase = {
-                id: cotacaoId,
-                numero_cotacao: `COT-${String(cotacaoId).padStart(6, '0')}`,
-                status: statusAtual,
-                status_display: getStatusDisplay(statusAtual),
-                status_color: getStatusColor(statusAtual),
-                empresa_transporte: modalidade,
-                data_solicitacao: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-                consultor_nome: 'João Silva',
-                operador_nome: statusAtual !== 'solicitada' ? 'Maria Santos' : 'Aguardando operador',
-                
-                // Dados do cliente
-                cliente_nome: 'Empresa ABC Ltda',
-                cliente_cnpj: '12.345.678/0001-90',
-                cliente_contato_telefone: '(11) 9999-8888',
-                cliente_contato_email: 'contato@empresaabc.com.br',
-                numero_cliente: modalidade === 'brcargo_maritimo' ? 'CLI-2024-001' : null,
-                
-                // Dados da carga
-                carga_descricao: 'Equipamentos eletrônicos',
-                carga_peso_kg: 1500 + Math.floor(Math.random() * 8500),
-                carga_valor_mercadoria: 50000 + Math.floor(Math.random() * 450000),
-                carga_comprimento_cm: 120 + Math.floor(Math.random() * 300),
-                carga_largura_cm: 80 + Math.floor(Math.random() * 200),
-                carga_altura_cm: 100 + Math.floor(Math.random() * 250),
-                
-                // Histórico
-                historico: [
-                    {
-                        data: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        acao: 'Cotação solicitada',
-                        usuario: 'João Silva (Consultor)',
-                        observacoes: 'Solicitação inicial da cotação'
-                    }
-                ]
-            };
-            
-            // Adicionar dados específicos por modalidade
-            if (modalidade === 'brcargo_rodoviario') {
-                cotacaoBase.origem_cep = '01310-100';
-                cotacaoBase.origem_endereco = 'Av. Paulista, 1578';
-                cotacaoBase.origem_cidade = 'São Paulo';
-                cotacaoBase.origem_estado = 'SP';
-                cotacaoBase.destino_cep = '20040-020';
-                cotacaoBase.destino_endereco = 'Av. Rio Branco, 156';
-                cotacaoBase.destino_cidade = 'Rio de Janeiro';
-                cotacaoBase.destino_estado = 'RJ';
-                cotacaoBase.cubagem = (cotacaoBase.carga_comprimento_cm * cotacaoBase.carga_largura_cm * cotacaoBase.carga_altura_cm) / 1000000;
-            } else if (modalidade === 'brcargo_maritimo') {
-                cotacaoBase.porto_origem = 'Porto de Santos (BRSSZ)';
-                cotacaoBase.porto_destino = 'Porto de Hamburgo (DEHAM)';
-                cotacaoBase.net_weight = cotacaoBase.carga_peso_kg;
-                cotacaoBase.gross_weight = cotacaoBase.carga_peso_kg + 200;
-                cotacaoBase.cubagem = Math.floor(Math.random() * 50) + 10;
-                cotacaoBase.incoterm = 'FOB';
-                cotacaoBase.tipo_carga_maritima = Math.random() > 0.5 ? 'FCL' : 'LCL';
-                
-                if (cotacaoBase.tipo_carga_maritima === 'FCL') {
-                    cotacaoBase.quantidade_containers = Math.floor(Math.random() * 3) + 1;
-                    cotacaoBase.tamanho_container = Math.random() > 0.5 ? "20'" : "40'";
-                }
-            } else if (modalidade === 'brcargo_aereo') {
-                cotacaoBase.origem_cep = '04626-020';
-                cotacaoBase.origem_endereco = 'Aeroporto de Congonhas';
-                cotacaoBase.origem_cidade = 'São Paulo';
-                cotacaoBase.origem_estado = 'SP';
-                cotacaoBase.destino_cep = '21941-900';
-                cotacaoBase.destino_endereco = 'Aeroporto Internacional Tom Jobim';
-                cotacaoBase.destino_cidade = 'Rio de Janeiro';
-                cotacaoBase.destino_estado = 'RJ';
-            }
-            
-            // Adicionar mais eventos ao histórico baseado no status
-            if (statusAtual !== 'solicitada') {
-                cotacaoBase.historico.push({
-                    data: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-                    acao: 'Cotação aceita pelo operador',
-                    usuario: 'Maria Santos (Operador)',
-                    observacoes: 'Cotação aceita para processamento'
-                });
-            }
-            
-            if (['cotacao_enviada', 'aceita_consultor', 'finalizada'].includes(statusAtual)) {
-                cotacaoBase.historico.push({
-                    data: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-                    acao: 'Cotação respondida',
-                    usuario: 'Maria Santos (Operador)',
-                    observacoes: `Valor: R$ ${(Math.random() * 5000 + 1000).toFixed(2)} | Prazo: ${Math.floor(Math.random() * 10) + 3} dias`
-                });
-            }
-            
-            return cotacaoBase;
-        }
         
         // Funções auxiliares para status
         function getStatusDisplay(status) {
@@ -6270,6 +6442,13 @@
             console.log('🔧 Preenchendo modal com dados:', cotacao);
             
             try {
+                // Verificar se são dados parciais
+                const dadosParciais = cotacao._dados_parciais === true;
+                if (dadosParciais) {
+                    console.log('⚠️ Dados parciais detectados - fonte:', cotacao._fonte);
+                    adicionarAvisoDadosParciais(modal, cotacao);
+                }
+                
                 // Informações básicas
                 console.log('📝 Preenchendo informações básicas...');
                 const numeroElement = modal.querySelector('#det-numero');
