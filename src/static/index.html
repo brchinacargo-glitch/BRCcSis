@@ -7393,7 +7393,7 @@
         </div>
     </div>
     
-    <!-- ==================== MODAL DE NOVA COTAÇÃO ==================== -->
+    <!-- ==================== MODAL DE NOVA COTAÇÃO MELHORADO ==================== -->
     <div id="modal-nova-cotacao" class="modal">
         <div class="modal-content bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="modal-header bg-gradient-to-r from-orange-600 to-red-600 text-white p-6 rounded-t-lg">
@@ -7402,7 +7402,7 @@
                         <i class="fas fa-plus-circle mr-3"></i>
                         Nova Cotação
                     </h2>
-                    <button class="close text-white hover:text-gray-200 text-3xl font-bold" onclick="ModalNovaCotacao.fechar()">&times;</button>
+                    <button class="close text-white hover:text-gray-200 text-3xl font-bold" onclick="hideModal()">&times;</button>
                 </div>
             </div>
 
@@ -7456,26 +7456,26 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50">
-                                <input type="radio" name="modalidade" value="brcargo_rodoviario" class="mr-3">
+                                <input type="radio" name="modalidade" value="rodoviario" class="mr-3">
                                 <div class="flex items-center">
                                     <i class="fas fa-truck text-orange-600 mr-2"></i>
-                                    <span class="font-medium">BRCargo Rodoviário</span>
+                                    <span class="font-medium">Rodoviário</span>
                                 </div>
                             </label>
                             
                             <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50">
-                                <input type="radio" name="modalidade" value="brcargo_maritimo" class="mr-3">
+                                <input type="radio" name="modalidade" value="maritimo" class="mr-3">
                                 <div class="flex items-center">
                                     <i class="fas fa-ship text-orange-600 mr-2"></i>
-                                    <span class="font-medium">BRCargo Marítimo</span>
+                                    <span class="font-medium">Marítimo</span>
                                 </div>
                             </label>
                             
                             <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-50">
-                                <input type="radio" name="modalidade" value="frete_aereo" class="mr-3">
+                                <input type="radio" name="modalidade" value="aereo" class="mr-3">
                                 <div class="flex items-center">
                                     <i class="fas fa-plane text-orange-600 mr-2"></i>
-                                    <span class="font-medium">Frete Aéreo</span>
+                                    <span class="font-medium">Aéreo</span>
                                 </div>
                             </label>
                         </div>
@@ -7490,31 +7490,17 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Cidade Origem *</label>
-                                <input type="text" name="origem_cidade" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Origem *</label>
+                                <input type="text" name="origem" required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Ex: São Paulo">
+                                       placeholder="Cidade/Estado de origem">
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado Origem *</label>
-                                <input type="text" name="origem_estado" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Destino *</label>
+                                <input type="text" name="destino" required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Ex: SP">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Cidade Destino *</label>
-                                <input type="text" name="destino_cidade" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Ex: Rio de Janeiro">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado Destino *</label>
-                                <input type="text" name="destino_estado" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                       placeholder="Ex: RJ">
+                                       placeholder="Cidade/Estado de destino">
                             </div>
                         </div>
                     </div>
@@ -7529,31 +7515,24 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Peso (kg) *</label>
-                                <input type="text" name="carga_peso_kg" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 campo-numerico"
-                                       placeholder="1.000,50" data-tipo="peso">
+                                <input type="text" name="peso" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="0,00" inputmode="decimal">
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Cubagem (m³)</label>
-                                <input type="text" name="carga_cubagem"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 campo-numerico"
-                                       placeholder="10,500" data-tipo="cubagem">
+                                <input type="text" name="cubagem"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="0,000" inputmode="decimal">
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Mercadoria (R$) *</label>
-                                <input type="text" name="carga_valor_mercadoria" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 campo-numerico"
-                                       placeholder="R$ 10.000,00" data-tipo="monetario">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Mercadoria (R$)</label>
+                                <input type="text" name="valor_mercadoria"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="0,00" inputmode="decimal">
                             </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Descrição da Carga</label>
-                            <textarea name="carga_descricao" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                      placeholder="Descreva o tipo de carga a ser transportada..."></textarea>
                         </div>
                     </div>
 
@@ -7561,7 +7540,7 @@
             </div>
 
             <div class="modal-footer bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
-                <button type="button" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400" onclick="ModalNovaCotacao.fechar()">
+                <button type="button" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400" onclick="hideModal()">
                     Cancelar
                 </button>
                 <button type="submit" form="form-nova-cotacao" id="btn-salvar-cotacao" 
@@ -7572,6 +7551,54 @@
             </div>
         </div>
     </div>
+
+    <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        backdrop-filter: blur(2px);
+    }
+
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { 
+            opacity: 0; 
+            transform: translateY(-50px) scale(0.95); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            margin: 1rem;
+            max-height: 95vh;
+        }
+    }
+    </style>
     
     <!-- ==================== SCRIPTS CORRIGIDOS ==================== -->
     <!-- IMPORTANTE: Estes scripts DEVEM ser carregados nesta ordem -->
