@@ -7616,13 +7616,15 @@
                 }
                 
                 // Atualizar operador se disponível
-                const operadorElement = cotacaoContainer.querySelector('strong:contains("Operador:")');
-                if (operadorElement && cotacao.operador_nome) {
-                    const nextSibling = operadorElement.nextSibling;
-                    if (nextSibling) {
-                        nextSibling.textContent = cotacao.operador_nome;
+                const strongElements = cotacaoContainer.querySelectorAll('strong');
+                strongElements.forEach(strong => {
+                    if (strong.textContent.includes('Operador:') && cotacao.operador_nome) {
+                        const nextSibling = strong.nextSibling;
+                        if (nextSibling) {
+                            nextSibling.textContent = ` ${cotacao.operador_nome}`;
+                        }
                     }
-                }
+                });
                 
                 console.log('✅ Card visível atualizado');
             } catch (error) {
