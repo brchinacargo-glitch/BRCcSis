@@ -6020,18 +6020,22 @@
             const cotacaoId = modal.getAttribute('data-cotacao-id');
             
             try {
-                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/conversas/${operadorId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    conversaAtual = data.mensagens || [];
-                    renderizarMensagens();
+                console.log('💬 Carregando conversa existente:', { cotacaoId, operadorId });
+                
+                const resultado = await API.getConversas(cotacaoId, operadorId);
+                
+                if (resultado.success && resultado.mensagens) {
+                    conversaAtual = resultado.mensagens;
+                    console.log('✅ Conversa carregada:', conversaAtual.length, 'mensagens');
                 } else {
                     // Não há conversa anterior
                     conversaAtual = [];
-                    renderizarMensagens();
+                    console.log('ℹ️ Nenhuma conversa anterior encontrada');
                 }
+                
+                renderizarMensagens();
             } catch (error) {
-                console.log('ℹ️ Nenhuma conversa anterior encontrada');
+                console.warn('⚠️ Erro ao carregar conversa:', error);
                 conversaAtual = [];
                 renderizarMensagens();
             }
@@ -6168,15 +6172,17 @@
             const cotacaoId = modal.getAttribute('data-cotacao-id');
             
             try {
-                await fetch(`/api/v133/cotacoes/${cotacaoId}/conversas/${operadorSelecionadoId}/mensagens`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(mensagem)
-                });
+                console.log('💬 Salvando mensagem na API:', { cotacaoId, operadorSelecionadoId, mensagem });
+                
+                const resultado = await API.salvarMensagem(cotacaoId, operadorSelecionadoId, mensagem.texto);
+                
+                if (resultado.success) {
+                    console.log('✅ Mensagem salva na API:', resultado);
+                } else {
+                    console.warn('⚠️ Erro ao salvar mensagem na API:', resultado);
+                }
             } catch (error) {
-                console.log('ℹ️ Mensagem não salva na API (modo desenvolvimento)');
+                console.warn('⚠️ Erro ao salvar mensagem na API:', error);
             }
         }
         
@@ -6193,20 +6199,15 @@
             try {
                 console.log('✅ Confirmando reatribuição para operador:', operadorSelecionadoNome);
                 
-                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/reatribuir`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        novo_operador_id: operadorSelecionadoId,
-                        novo_operador_nome: operadorSelecionadoNome,
-                        observacoes: `Reatribuída via chat. Conversa salva no histórico.`,
-                        conversa: conversaAtual
-                    })
-                });
+                const dadosReatribuicao = {
+                    motivo: `Reatribuída via chat. Conversa salva no histórico.`,
+                    observacoes: `${conversaAtual.length} mensagens trocadas durante a reatribuição.`,
+                    mensagens: conversaAtual
+                };
                 
-                if (response.ok || !response.ok) { // Aceitar tanto sucesso quanto fallback
+                const resultado = await API.reatribuirCotacao(cotacaoId, operadorSelecionadoId, dadosReatribuicao);
+                
+                if (resultado.success) {
                     // Atualizar dados locais
                     const cotacaoAtualizada = {
                         id: cotacaoId,
@@ -6224,15 +6225,28 @@
                         timestamp: new Date().toISOString()
                     });
                     
-                    mostrarMensagem(`Cotação reatribuída para ${operadorSelecionadoNome} com sucesso!`, 'success');
+                    mostrarMensagem(`✅ Cotação reatribuída para ${operadorSelecionadoNome} com sucesso!`, 'success');
+                    
+                    // Disparar evento de notificação
+                    document.dispatchEvent(new CustomEvent('reatribuicao-realizada', {
+                        detail: {
+                            cotacao: { id: cotacaoId, numero_cotacao: `COT-${cotacaoId}` },
+                            operador: operadorSelecionadoNome
+                        }
+                    }));
+                    
                     fecharModalReatribuicao();
                     carregarCotacoes(); // Recarregar lista
+                    
+                    console.log('✅ Reatribuição confirmada:', resultado);
+                } else {
+                    mostrarMensagem('❌ Erro ao reatribuir cotação', 'error');
+                    console.error('Erro ao reatribuir:', resultado);
                 }
                 
             } catch (error) {
                 console.error('❌ Erro ao confirmar reatribuição:', error);
-                mostrarMensagem('Reatribuição realizada (modo desenvolvimento)', 'success');
-                fecharModalReatribuicao();
+                mostrarMensagem('❌ Erro ao reatribuir cotação', 'error');
             }
         }
         
@@ -6324,6 +6338,311 @@
         
         // Executar teste após carregamento
         setTimeout(testarFuncionalidades, 2000);
+        
+        // ==================== SISTEMA DE NOTIFICAÇÕES ====================
+        
+        // Sistema de notificações em tempo real
+        const SistemaNotificacoes = {
+            notificacoes: [],
+            container: null,
+            
+            init() {
+                this.criarContainer();
+                this.configurarEventos();
+                console.log('🔔 Sistema de notificações inicializado');
+            },
+            
+            criarContainer() {
+                // Criar container de notificações se não existir
+                if (!document.getElementById('container-notificacoes')) {
+                    const container = document.createElement('div');
+                    container.id = 'container-notificacoes';
+                    container.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 9999;
+                        max-width: 400px;
+                        pointer-events: none;
+                    `;
+                    document.body.appendChild(container);
+                    this.container = container;
+                }
+            },
+            
+            mostrar(titulo, mensagem, tipo = 'info', duracao = 5000) {
+                const id = Date.now();
+                const notificacao = this.criarNotificacao(id, titulo, mensagem, tipo);
+                
+                this.container.appendChild(notificacao);
+                this.notificacoes.push({ id, elemento: notificacao });
+                
+                // Animação de entrada
+                setTimeout(() => {
+                    notificacao.style.transform = 'translateX(0)';
+                    notificacao.style.opacity = '1';
+                }, 100);
+                
+                // Auto-remover após duração
+                setTimeout(() => {
+                    this.remover(id);
+                }, duracao);
+                
+                return id;
+            },
+            
+            criarNotificacao(id, titulo, mensagem, tipo) {
+                const cores = {
+                    success: { bg: '#10b981', icon: '✅' },
+                    error: { bg: '#ef4444', icon: '❌' },
+                    warning: { bg: '#f59e0b', icon: '⚠️' },
+                    info: { bg: '#3b82f6', icon: 'ℹ️' }
+                };
+                
+                const config = cores[tipo] || cores.info;
+                
+                const notificacao = document.createElement('div');
+                notificacao.id = `notificacao-${id}`;
+                notificacao.style.cssText = `
+                    background: white;
+                    border-left: 4px solid ${config.bg};
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    margin-bottom: 10px;
+                    padding: 16px;
+                    transform: translateX(100%);
+                    opacity: 0;
+                    transition: all 0.3s ease;
+                    pointer-events: auto;
+                    position: relative;
+                `;
+                
+                notificacao.innerHTML = `
+                    <div style="display: flex; align-items: start; gap: 12px;">
+                        <div style="font-size: 18px;">${config.icon}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #1f2937; margin-bottom: 4px;">${titulo}</div>
+                            <div style="color: #6b7280; font-size: 14px;">${mensagem}</div>
+                        </div>
+                        <button onclick="SistemaNotificacoes.remover(${id})" style="
+                            background: none;
+                            border: none;
+                            color: #9ca3af;
+                            cursor: pointer;
+                            font-size: 18px;
+                            padding: 0;
+                            width: 20px;
+                            height: 20px;
+                        ">×</button>
+                    </div>
+                `;
+                
+                return notificacao;
+            },
+            
+            remover(id) {
+                const notificacao = this.notificacoes.find(n => n.id === id);
+                if (notificacao) {
+                    // Animação de saída
+                    notificacao.elemento.style.transform = 'translateX(100%)';
+                    notificacao.elemento.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (notificacao.elemento.parentNode) {
+                            notificacao.elemento.parentNode.removeChild(notificacao.elemento);
+                        }
+                        this.notificacoes = this.notificacoes.filter(n => n.id !== id);
+                    }, 300);
+                }
+            },
+            
+            configurarEventos() {
+                // Escutar eventos personalizados do sistema
+                document.addEventListener('cotacao-atualizada', (e) => {
+                    const { cotacao, acao } = e.detail;
+                    this.mostrar(
+                        'Cotação Atualizada',
+                        `${acao}: ${cotacao.numero_cotacao || 'COT-' + cotacao.id}`,
+                        'success'
+                    );
+                });
+                
+                document.addEventListener('reatribuicao-realizada', (e) => {
+                    const { cotacao, operador } = e.detail;
+                    this.mostrar(
+                        'Reatribuição Realizada',
+                        `Cotação ${cotacao.numero_cotacao || 'COT-' + cotacao.id} reatribuída para ${operador}`,
+                        'info'
+                    );
+                });
+                
+                document.addEventListener('resposta-enviada', (e) => {
+                    const { cotacao, valor } = e.detail;
+                    this.mostrar(
+                        'Resposta Enviada',
+                        `Cotação ${cotacao.numero_cotacao || 'COT-' + cotacao.id} respondida com valor R$ ${valor}`,
+                        'success'
+                    );
+                });
+            }
+        };
+        
+        // Inicializar sistema de notificações
+        document.addEventListener('DOMContentLoaded', () => {
+            SistemaNotificacoes.init();
+        });
+        
+        // ==================== SISTEMA DE VALIDAÇÃO ====================
+        
+        const SistemaValidacao = {
+            regras: {
+                required: (valor) => valor && valor.trim() !== '',
+                email: (valor) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor),
+                numeric: (valor) => !isNaN(parseFloat(valor)) && isFinite(valor),
+                positive: (valor) => parseFloat(valor) > 0,
+                minLength: (valor, min) => valor && valor.length >= min,
+                maxLength: (valor, max) => valor && valor.length <= max,
+                cnpj: (valor) => this.validarCNPJ(valor),
+                cep: (valor) => /^\d{5}-?\d{3}$/.test(valor),
+                phone: (valor) => /^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(valor)
+            },
+            
+            validarCampo(elemento, regras) {
+                const valor = elemento.value;
+                const erros = [];
+                
+                for (const regra of regras) {
+                    const [nomeRegra, parametro] = regra.split(':');
+                    const funcaoValidacao = this.regras[nomeRegra];
+                    
+                    if (funcaoValidacao) {
+                        const valido = parametro ? 
+                            funcaoValidacao(valor, parametro) : 
+                            funcaoValidacao(valor);
+                            
+                        if (!valido) {
+                            erros.push(this.getMensagemErro(nomeRegra, parametro));
+                        }
+                    }
+                }
+                
+                this.mostrarErros(elemento, erros);
+                return erros.length === 0;
+            },
+            
+            validarFormulario(formulario) {
+                const campos = formulario.querySelectorAll('[data-validacao]');
+                let formularioValido = true;
+                
+                campos.forEach(campo => {
+                    const regras = campo.dataset.validacao.split('|');
+                    const campoValido = this.validarCampo(campo, regras);
+                    if (!campoValido) formularioValido = false;
+                });
+                
+                return formularioValido;
+            },
+            
+            mostrarErros(elemento, erros) {
+                // Remover erros anteriores
+                const erroAnterior = elemento.parentNode.querySelector('.erro-validacao');
+                if (erroAnterior) erroAnterior.remove();
+                
+                // Atualizar estilo do campo
+                if (erros.length > 0) {
+                    elemento.style.borderColor = '#ef4444';
+                    elemento.style.backgroundColor = '#fef2f2';
+                    
+                    // Adicionar mensagem de erro
+                    const divErro = document.createElement('div');
+                    divErro.className = 'erro-validacao';
+                    divErro.style.cssText = `
+                        color: #ef4444;
+                        font-size: 12px;
+                        margin-top: 4px;
+                        display: block;
+                    `;
+                    divErro.textContent = erros[0]; // Mostrar apenas o primeiro erro
+                    elemento.parentNode.appendChild(divErro);
+                } else {
+                    elemento.style.borderColor = '#10b981';
+                    elemento.style.backgroundColor = '#f0fdf4';
+                }
+            },
+            
+            getMensagemErro(regra, parametro) {
+                const mensagens = {
+                    required: 'Este campo é obrigatório',
+                    email: 'Digite um email válido',
+                    numeric: 'Digite apenas números',
+                    positive: 'O valor deve ser maior que zero',
+                    minLength: `Mínimo de ${parametro} caracteres`,
+                    maxLength: `Máximo de ${parametro} caracteres`,
+                    cnpj: 'CNPJ inválido',
+                    cep: 'CEP inválido (formato: 12345-678)',
+                    phone: 'Telefone inválido (formato: (11) 99999-9999)'
+                };
+                
+                return mensagens[regra] || 'Valor inválido';
+            },
+            
+            validarCNPJ(cnpj) {
+                cnpj = cnpj.replace(/[^\d]+/g, '');
+                
+                if (cnpj.length !== 14) return false;
+                
+                // Validação do algoritmo do CNPJ
+                let tamanho = cnpj.length - 2;
+                let numeros = cnpj.substring(0, tamanho);
+                let digitos = cnpj.substring(tamanho);
+                let soma = 0;
+                let pos = tamanho - 7;
+                
+                for (let i = tamanho; i >= 1; i--) {
+                    soma += numeros.charAt(tamanho - i) * pos--;
+                    if (pos < 2) pos = 9;
+                }
+                
+                let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+                if (resultado !== parseInt(digitos.charAt(0))) return false;
+                
+                tamanho = tamanho + 1;
+                numeros = cnpj.substring(0, tamanho);
+                soma = 0;
+                pos = tamanho - 7;
+                
+                for (let i = tamanho; i >= 1; i--) {
+                    soma += numeros.charAt(tamanho - i) * pos--;
+                    if (pos < 2) pos = 9;
+                }
+                
+                resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+                return resultado === parseInt(digitos.charAt(1));
+            },
+            
+            configurarValidacaoTempo() {
+                // Validação em tempo real
+                document.addEventListener('input', (e) => {
+                    if (e.target.dataset.validacao) {
+                        const regras = e.target.dataset.validacao.split('|');
+                        this.validarCampo(e.target, regras);
+                    }
+                });
+                
+                // Validação ao perder foco
+                document.addEventListener('blur', (e) => {
+                    if (e.target.dataset.validacao) {
+                        const regras = e.target.dataset.validacao.split('|');
+                        this.validarCampo(e.target, regras);
+                    }
+                }, true);
+            }
+        };
+        
+        // Inicializar validação em tempo real
+        document.addEventListener('DOMContentLoaded', () => {
+            SistemaValidacao.configurarValidacaoTempo();
+        });
         
         // Função para testar modal de reatribuição com dados simulados
         function testarModalReatribuicao() {
@@ -6734,24 +7053,26 @@
                 taxa_entrega: document.getElementById('taxa-entrega').value,
                 valor_seguro: document.getElementById('valor-seguro').value,
                 observacoes: document.getElementById('observacoes-gerais').value,
-                coleta_agendada: document.getElementById('coleta-agendada').checked,
-                entrega_agendada: document.getElementById('entrega-agendada').checked
+                empresa_prestadora: document.getElementById('empresa-prestadora') ? document.getElementById('empresa-prestadora').value : '',
+                coleta_agendada: document.getElementById('coleta-agendada') ? document.getElementById('coleta-agendada').checked : false,
+                entrega_agendada: document.getElementById('entrega-agendada') ? document.getElementById('entrega-agendada').checked : false
             };
             
             try {
-                await fetch(`/api/v133/cotacoes/${cotacaoId}/rascunho`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dadosRascunho)
-                });
+                console.log('💾 Salvando rascunho da cotação:', cotacaoId, dadosRascunho);
                 
-                mostrarMensagem('Rascunho salvo com sucesso!', 'success');
+                const resultado = await API.salvarRascunho(cotacaoId, dadosRascunho);
+                
+                if (resultado.success) {
+                    mostrarMensagem('💾 Rascunho salvo com sucesso!', 'success');
+                    console.log('✅ Rascunho salvo:', resultado);
+                } else {
+                    mostrarMensagem('❌ Erro ao salvar rascunho', 'error');
+                    console.error('Erro ao salvar rascunho:', resultado);
+                }
             } catch (error) {
-                console.log('ℹ️ Rascunho salvo localmente (modo desenvolvimento)');
-                localStorage.setItem(`rascunho_cotacao_${cotacaoId}`, JSON.stringify(dadosRascunho));
-                mostrarMensagem('Rascunho salvo localmente!', 'success');
+                console.error('Erro ao salvar rascunho:', error);
+                mostrarMensagem('❌ Erro ao salvar rascunho', 'error');
             }
         }
         
@@ -6790,15 +7111,9 @@
             try {
                 console.log('📤 Enviando resposta da cotação:', dadosResposta);
                 
-                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/responder`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dadosResposta)
-                });
+                const resultado = await API.enviarRespostaCotacao(cotacaoId, dadosResposta);
                 
-                if (response.ok || !response.ok) { // Aceitar tanto sucesso quanto fallback
+                if (resultado.success) {
                     // Atualizar dados locais
                     const cotacaoAtualizada = {
                         id: cotacaoId,
@@ -6811,16 +7126,29 @@
                     };
                     atualizarCotacaoNosCarregados(cotacaoAtualizada);
                     
-                    mostrarMensagem('Cotação respondida com sucesso!', 'success');
+                    mostrarMensagem('✅ Cotação respondida com sucesso!', 'success');
+                    
+                    // Disparar evento de notificação
+                    document.dispatchEvent(new CustomEvent('resposta-enviada', {
+                        detail: {
+                            cotacao: { id: cotacaoId, numero_cotacao: `COT-${cotacaoId}` },
+                            valor: dadosResposta.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+                        }
+                    }));
+                    
                     fecharModalResposta();
                     carregarCotacoes(); // Recarregar lista
                     carregarEstatisticasCotacoes(); // Atualizar estatísticas
+                    
+                    console.log('✅ Resposta enviada:', resultado);
+                } else {
+                    mostrarMensagem('❌ Erro ao enviar resposta', 'error');
+                    console.error('Erro ao enviar resposta:', resultado);
                 }
                 
             } catch (error) {
                 console.error('❌ Erro ao enviar resposta:', error);
-                mostrarMensagem('Cotação respondida com sucesso! (modo desenvolvimento)', 'success');
-                fecharModalResposta();
+                mostrarMensagem('❌ Erro ao enviar resposta', 'error');
             }
         }
         

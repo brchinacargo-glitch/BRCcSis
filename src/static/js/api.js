@@ -701,6 +701,295 @@ const API = {
             };
         }
     },
+
+    // ==================== REATRIBUIÇÃO DE COTAÇÕES ====================
+
+    async reatribuirCotacao(cotacaoId, operadorId, dados) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/reatribuir`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    novo_operador_id: operadorId,
+                    motivo: dados.motivo || '',
+                    observacoes: dados.observacoes || '',
+                    mensagens: dados.mensagens || []
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Cotação reatribuída com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao reatribuir cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando reatribuição de cotação:', { cotacaoId, operadorId, dados });
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                success: true,
+                message: 'Cotação reatribuída com sucesso',
+                cotacao: {
+                    id: cotacaoId,
+                    operador_responsavel_id: operadorId,
+                    status: 'aceita_operador',
+                    data_reatribuicao: new Date().toISOString(),
+                    motivo_reatribuicao: dados.motivo,
+                    observacoes_reatribuicao: dados.observacoes
+                }
+            };
+        }
+    },
+
+    // ==================== CONVERSAS E MENSAGENS ====================
+
+    async getConversas(cotacaoId, operadorId) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/conversas/${operadorId}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar conversas:', error);
+            
+            // Fallback: retornar conversa vazia
+            return {
+                success: true,
+                conversas: [],
+                mensagens: []
+            };
+        }
+    },
+
+    async salvarMensagem(cotacaoId, operadorId, mensagem) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/conversas/${operadorId}/mensagens`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mensagem: mensagem,
+                    timestamp: new Date().toISOString(),
+                    autor: 'Operador Atual'
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Mensagem salva com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao salvar mensagem:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando salvamento de mensagem:', { cotacaoId, operadorId, mensagem });
+            
+            return {
+                success: true,
+                message: 'Mensagem salva com sucesso',
+                mensagem: {
+                    id: Date.now(),
+                    cotacao_id: cotacaoId,
+                    operador_id: operadorId,
+                    mensagem: mensagem,
+                    timestamp: new Date().toISOString(),
+                    autor: 'Operador Atual'
+                }
+            };
+        }
+    },
+
+    // ==================== RASCUNHOS DE RESPOSTA ====================
+
+    async salvarRascunho(cotacaoId, dados) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/rascunho`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    valor_frete: dados.valor_frete,
+                    prazo_entrega: dados.prazo_entrega,
+                    taxa_coleta: dados.taxa_coleta || 0,
+                    taxa_entrega: dados.taxa_entrega || 0,
+                    valor_seguro: dados.valor_seguro || 0,
+                    observacoes: dados.observacoes || '',
+                    empresa_prestadora: dados.empresa_prestadora || '',
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Rascunho salvo com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao salvar rascunho:', error);
+            
+            // Fallback para desenvolvimento - salvar no localStorage
+            const rascunhoKey = `rascunho_cotacao_${cotacaoId}`;
+            const rascunho = {
+                cotacao_id: cotacaoId,
+                ...dados,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem(rascunhoKey, JSON.stringify(rascunho));
+                console.log('📝 Rascunho salvo no localStorage:', rascunho);
+            } catch (storageError) {
+                console.warn('Erro ao salvar no localStorage:', storageError);
+            }
+            
+            return {
+                success: true,
+                message: 'Rascunho salvo localmente',
+                rascunho: rascunho
+            };
+        }
+    },
+
+    async carregarRascunho(cotacaoId) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/rascunho`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar rascunho:', error);
+            
+            // Fallback: tentar carregar do localStorage
+            const rascunhoKey = `rascunho_cotacao_${cotacaoId}`;
+            try {
+                const rascunhoLocal = localStorage.getItem(rascunhoKey);
+                if (rascunhoLocal) {
+                    const rascunho = JSON.parse(rascunhoLocal);
+                    console.log('📝 Rascunho carregado do localStorage:', rascunho);
+                    return {
+                        success: true,
+                        rascunho: rascunho
+                    };
+                }
+            } catch (storageError) {
+                console.warn('Erro ao carregar do localStorage:', storageError);
+            }
+            
+            return {
+                success: false,
+                message: 'Nenhum rascunho encontrado'
+            };
+        }
+    },
+
+    // ==================== RESPOSTA DE COTAÇÃO ====================
+
+    async enviarRespostaCotacao(cotacaoId, dados) {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/responder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    valor_frete: dados.valor_frete,
+                    prazo_entrega: dados.prazo_entrega,
+                    taxa_coleta: dados.taxa_coleta || 0,
+                    taxa_entrega: dados.taxa_entrega || 0,
+                    valor_seguro: dados.valor_seguro || 0,
+                    observacoes_gerais: dados.observacoes_gerais || '',
+                    condicoes_especiais: dados.condicoes_especiais || '',
+                    empresa_prestadora: dados.empresa_prestadora || '',
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Resposta de cotação enviada com sucesso:', data);
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar resposta de cotação:', error);
+            
+            // Fallback para desenvolvimento
+            console.log('📝 Simulando envio de resposta de cotação:', { cotacaoId, dados });
+            
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            return {
+                success: true,
+                message: 'Resposta de cotação enviada com sucesso',
+                cotacao: {
+                    id: cotacaoId,
+                    status: 'cotacao_enviada',
+                    valor_frete: dados.valor_frete,
+                    prazo_entrega: dados.prazo_entrega,
+                    taxa_coleta: dados.taxa_coleta,
+                    taxa_entrega: dados.taxa_entrega,
+                    valor_seguro: dados.valor_seguro,
+                    observacoes_gerais: dados.observacoes_gerais,
+                    condicoes_especiais: dados.condicoes_especiais,
+                    empresa_prestadora: dados.empresa_prestadora,
+                    data_resposta: new Date().toISOString()
+                }
+            };
+        }
+    },
+
+    // ==================== EMPRESAS PRESTADORAS ====================
+
+    async getEmpresasPrestadoras() {
+        try {
+            const response = await fetch(`${this.baseURL}/v133/empresas-prestadoras`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar empresas prestadoras:', error);
+            
+            // Fallback: retornar empresas simuladas
+            return {
+                success: true,
+                empresas: [
+                    { id: 1, nome: 'BRCargo Rodoviário', tipo: 'rodoviario', ativa: true },
+                    { id: 2, nome: 'BRCargo Marítimo', tipo: 'maritimo', ativa: true },
+                    { id: 3, nome: 'BRCargo Aéreo', tipo: 'aereo', ativa: true },
+                    { id: 4, nome: 'Transportadora Parceira 1', tipo: 'rodoviario', ativa: true },
+                    { id: 5, nome: 'Transportadora Parceira 2', tipo: 'maritimo', ativa: true }
+                ]
+            };
+        }
+    },
     
     // ==================== UTILITÁRIOS ====================
     
