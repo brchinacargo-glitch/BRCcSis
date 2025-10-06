@@ -4216,6 +4216,12 @@
                     <button onclick="testarFuncionalidades()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
                         🧪 Verificar Funções
                     </button>
+                    <button onclick="forcarCriacaoModals()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                        🔧 Forçar Criação
+                    </button>
+                    <button onclick="diagnosticarSistema()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                        🔍 Diagnosticar
+                    </button>
                 </div>
             </div>
 
@@ -6676,6 +6682,178 @@
             
             console.log('🧪 Testando modal de resposta com dados simulados...');
             mostrarModalRespostaAvancado(cotacaoTeste);
+        }
+        
+        // Função para forçar criação dos modais
+        function forcarCriacaoModals() {
+            console.log('🔧 Forçando criação dos modais...');
+            
+            try {
+                // Verificar se modais existem
+                const modalReat = document.getElementById('modal-reatribuicao');
+                const modalResp = document.getElementById('modal-resposta-avancado');
+                
+                console.log('Modal reatribuição existe:', !!modalReat);
+                console.log('Modal resposta existe:', !!modalResp);
+                
+                // Forçar criação do modal de reatribuição se não existir
+                if (!modalReat) {
+                    console.log('🔧 Criando modal de reatribuição...');
+                    const novoModalReat = criarModalReatribuicao();
+                    if (novoModalReat) {
+                        document.body.appendChild(novoModalReat);
+                        console.log('✅ Modal de reatribuição criado e adicionado ao DOM');
+                    } else {
+                        console.error('❌ Falha ao criar modal de reatribuição');
+                    }
+                }
+                
+                // Forçar criação do modal de resposta se não existir
+                if (!modalResp) {
+                    console.log('🔧 Criando modal de resposta...');
+                    const novoModalResp = criarModalRespostaAvancado();
+                    if (novoModalResp) {
+                        document.body.appendChild(novoModalResp);
+                        console.log('✅ Modal de resposta criado e adicionado ao DOM');
+                    } else {
+                        console.error('❌ Falha ao criar modal de resposta');
+                    }
+                }
+                
+                // Verificar novamente
+                const modalReatFinal = document.getElementById('modal-reatribuicao');
+                const modalRespFinal = document.getElementById('modal-resposta-avancado');
+                
+                console.log('✅ Status final:');
+                console.log('- Modal reatribuição:', !!modalReatFinal);
+                console.log('- Modal resposta:', !!modalRespFinal);
+                
+                if (modalReatFinal && modalRespFinal) {
+                    alert('✅ Modais criados com sucesso! Agora você pode testar as funcionalidades.');
+                } else {
+                    alert('❌ Erro ao criar modais. Verifique o console para detalhes.');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao forçar criação dos modais:', error);
+                alert('❌ Erro: ' + error.message);
+            }
+        }
+        
+        // Função para diagnosticar o sistema completo
+        function diagnosticarSistema() {
+            console.log('🔍 DIAGNÓSTICO COMPLETO DO SISTEMA');
+            console.log('=====================================');
+            
+            const diagnostico = {
+                modals: {},
+                funcoes: {},
+                cotacoes: {},
+                botoes: {},
+                apis: {}
+            };
+            
+            // 1. Verificar modais
+            console.log('📋 1. VERIFICANDO MODAIS...');
+            diagnostico.modals.reatribuicao = !!document.getElementById('modal-reatribuicao');
+            diagnostico.modals.resposta = !!document.getElementById('modal-resposta-avancado');
+            console.log('- Modal reatribuição:', diagnostico.modals.reatribuicao);
+            console.log('- Modal resposta:', diagnostico.modals.resposta);
+            
+            // 2. Verificar funções principais
+            console.log('📋 2. VERIFICANDO FUNÇÕES...');
+            const funcoes = [
+                'reatribuirCotacao',
+                'responderCotacao',
+                'mostrarModalReatribuicao',
+                'mostrarModalRespostaAvancado',
+                'criarModalReatribuicao',
+                'criarModalRespostaAvancado',
+                'testarModalReatribuicao',
+                'testarModalResposta'
+            ];
+            
+            funcoes.forEach(nomeFuncao => {
+                const existe = typeof window[nomeFuncao] === 'function';
+                diagnostico.funcoes[nomeFuncao] = existe;
+                console.log(`- ${nomeFuncao}:`, existe ? '✅' : '❌');
+            });
+            
+            // 3. Verificar cotações na tela
+            console.log('📋 3. VERIFICANDO COTAÇÕES...');
+            const listaCotacoes = document.getElementById('lista-cotacoes');
+            if (listaCotacoes) {
+                const cotacoes = listaCotacoes.querySelectorAll('.cotacao-card, [data-cotacao-id]');
+                diagnostico.cotacoes.total = cotacoes.length;
+                console.log(`- Total de cotações na tela: ${cotacoes.length}`);
+                
+                if (cotacoes.length > 0) {
+                    console.log('- Primeira cotação:', cotacoes[0]);
+                    
+                    // Verificar botões na primeira cotação
+                    const botoes = cotacoes[0].querySelectorAll('button[data-acao]');
+                    diagnostico.botoes.total = botoes.length;
+                    console.log(`- Botões na primeira cotação: ${botoes.length}`);
+                    
+                    botoes.forEach((botao, index) => {
+                        const acao = botao.dataset.acao;
+                        console.log(`  - Botão ${index + 1}: ${acao}`);
+                    });
+                }
+            } else {
+                console.log('❌ Lista de cotações não encontrada');
+                diagnostico.cotacoes.total = 0;
+            }
+            
+            // 4. Verificar API
+            console.log('📋 4. VERIFICANDO API...');
+            diagnostico.apis.disponivel = typeof window.API === 'object';
+            console.log('- API disponível:', diagnostico.apis.disponivel);
+            
+            if (window.API) {
+                const metodosAPI = [
+                    'reatribuirCotacao',
+                    'salvarMensagem',
+                    'salvarRascunho',
+                    'enviarRespostaCotacao'
+                ];
+                
+                metodosAPI.forEach(metodo => {
+                    const existe = typeof window.API[metodo] === 'function';
+                    diagnostico.apis[metodo] = existe;
+                    console.log(`- API.${metodo}:`, existe ? '✅' : '❌');
+                });
+            }
+            
+            // 5. Verificar dados globais
+            console.log('📋 5. VERIFICANDO DADOS GLOBAIS...');
+            console.log('- window.cotacoesData:', !!window.cotacoesData);
+            console.log('- window.userInfo:', !!window.userInfo);
+            
+            // 6. Resumo final
+            console.log('📋 6. RESUMO DO DIAGNÓSTICO');
+            console.log('============================');
+            
+            const problemas = [];
+            
+            if (!diagnostico.modals.reatribuicao) problemas.push('Modal de reatribuição não existe');
+            if (!diagnostico.modals.resposta) problemas.push('Modal de resposta não existe');
+            if (!diagnostico.funcoes.reatribuirCotacao) problemas.push('Função reatribuirCotacao não existe');
+            if (!diagnostico.funcoes.responderCotacao) problemas.push('Função responderCotacao não existe');
+            if (!diagnostico.apis.disponivel) problemas.push('API não está disponível');
+            if (diagnostico.cotacoes.total === 0) problemas.push('Nenhuma cotação encontrada na tela');
+            
+            if (problemas.length === 0) {
+                console.log('✅ SISTEMA FUNCIONANDO CORRETAMENTE!');
+                alert('✅ Sistema funcionando! Todas as funcionalidades estão disponíveis.');
+            } else {
+                console.log('❌ PROBLEMAS ENCONTRADOS:');
+                problemas.forEach(problema => console.log(`- ${problema}`));
+                alert(`❌ ${problemas.length} problema(s) encontrado(s). Verifique o console para detalhes.`);
+            }
+            
+            // Retornar diagnóstico para uso programático
+            return diagnostico;
         }
 
         // Função para aprovar cotação
