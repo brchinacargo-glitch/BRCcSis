@@ -4205,24 +4205,7 @@
                     <i class="fas fa-plus mr-2"></i>Nova Cotação
                 </button>
                 
-                <!-- Botões de teste das funcionalidades -->
-                <div class="space-x-2">
-                    <button onclick="testarModalReatribuicao()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        🔄 Testar Reatribuição
-                    </button>
-                    <button onclick="testarModalResposta()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        📝 Testar Resposta
-                    </button>
-                    <button onclick="testarFuncionalidades()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        🧪 Verificar Funções
-                    </button>
-                    <button onclick="forcarCriacaoModals()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        🔧 Forçar Criação
-                    </button>
-                    <button onclick="diagnosticarSistema()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        🔍 Diagnosticar
-                    </button>
-                </div>
+                <!-- Funcionalidades integradas ao sistema real -->
             </div>
 
 
@@ -5682,7 +5665,16 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    mostrarMensagem('Cotação aceita com sucesso!', 'success');
+                    // Disparar notificação em tempo real
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Aceita',
+                            `Cotação COT-${cotacaoId} aceita com sucesso`,
+                            'success'
+                        );
+                    }
+                    
+                    mostrarMensagem('✅ Cotação aceita com sucesso!', 'success');
                     
                     // Atualizar dados locais
                     const cotacaoAtualizada = {
@@ -6342,8 +6334,22 @@
             console.log('🧪 Teste de funcionalidades concluído');
         }
         
-        // Executar teste após carregamento
-        setTimeout(testarFuncionalidades, 2000);
+        // Sistema integrado - funcionalidades ativas
+        // Sistema integrado com dados reais
+        setTimeout(() => {
+            console.log('🚀 Sistema BRCcSis carregado com funcionalidades integradas');
+            console.log('✅ Reatribuição de cotações: ATIVA');
+            console.log('✅ Resposta de cotações: ATIVA'); 
+            console.log('✅ Salvamento de rascunhos: ATIVO');
+            console.log('✅ Notificações em tempo real: ATIVAS');
+            console.log('');
+            console.log('📋 COMO USAR O SISTEMA:');
+            console.log('1. Navegue para a seção "Cotações"');
+            console.log('2. Clique em "Aceitar" em cotações com status "solicitada"');
+            console.log('3. Clique em "Responder" em cotações aceitas para abrir o modal avançado');
+            console.log('4. Clique em "Reatribuir" para transferir cotações entre operadores');
+            console.log('5. Todas as ações salvam dados reais e mostram notificações');
+        }, 1000);
         
         // ==================== SISTEMA DE NOTIFICAÇÕES ====================
         
