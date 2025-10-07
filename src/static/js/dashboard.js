@@ -371,12 +371,18 @@ const Dashboard = {
                 scales: {
                     y: {
                         beginAtZero: true
+                    }
+                }
+            }
+        });
+        } catch (error) {
+            console.error('Erro ao criar gráfico crescimento:', error);
         }
     },
     
     /**
      * Renderiza gráfico de certificações
-{{ ... }}
+     */
     renderChartCertificacoes() {
         const ctx = document.getElementById('chart-certificacoes');
         if (!ctx) return;

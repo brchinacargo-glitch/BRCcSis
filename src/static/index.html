@@ -246,10 +246,10 @@
                     </div>
                 </div>
                 <nav class="hidden md:flex space-x-6">
-                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-dashboard">Dashboard</a>
-                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-empresas">Empresas</a>
-                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-cotacoes">Cotações</a>
-                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-analytics">Analytics</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="dashboard">Dashboard</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="empresas">Empresas</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="cotacoes">Cotações</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="secao-analytics-v133">Analytics</a>
                     <a href="#" class="hover:text-green-200 transition-colors" id="nav-cadastro">Cadastrar</a>
                     <button id="btn-logout" class="hover:text-green-200 transition-colors">
                         <i class="fas fa-sign-out-alt mr-1"></i>Sair
@@ -273,24 +273,36 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                 <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-calculator text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total de Cotações</p>
+                        <p class="text-2xl font-bold text-gray-900" id="total-cotacoes">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pendentes</p>
+                        <p class="text-2xl font-bold text-gray-900" id="cotacoes-pendentes">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-100 text-green-600">
-                        <i class="fas fa-building text-2xl"></i>
+                        <i class="fas fa-check-circle text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total de Empresas</p>
-                        <p class="text-2xl font-bold text-gray-900" id="total-empresas">-</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-red-100 text-red-600">
-                        <i class="fas fa-certificate text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Certificadas</p>
-                        <p class="text-2xl font-bold text-gray-900" id="empresas-certificadas">-</p>
+                        <p class="text-sm font-medium text-gray-600">Finalizadas</p>
+                        <p class="text-2xl font-bold text-gray-900" id="cotacoes-finalizadas">0</p>
                     </div>
                 </div>
             </div>
@@ -298,23 +310,11 @@
             <div class="bg-white rounded-lg shadow-md p-6 card-hover">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-100 text-green-600">
-                        <i class="fas fa-warehouse text-2xl"></i>
+                        <i class="fas fa-dollar-sign text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Com Armazém</p>
-                        <p class="text-2xl font-bold text-gray-900" id="empresas-armazem">-</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-red-100 text-red-600">
-                        <i class="fas fa-globe text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Abrangência Nacional</p>
-                        <p class="text-2xl font-bold text-gray-900" id="empresas-nacional">-</p>
+                        <p class="text-sm font-medium text-gray-600">Valor Total</p>
+                        <p class="text-2xl font-bold text-gray-900" id="valor-total">R$ 0</p>
                     </div>
                 </div>
             </div>
@@ -361,22 +361,22 @@
 
         <!-- Analytics Dashboard -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Gráfico de Empresas por Região -->
+            <!-- Gráfico de Cotações por Mês -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">Empresas por Região</h3>
-                    <i class="fas fa-map-marked-alt text-gray-400"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Cotações por Mês</h3>
+                    <i class="fas fa-chart-line text-gray-400"></i>
                 </div>
-                <canvas id="chart-empresas-regiao" width="400" height="300" style="width: 100%; height: 300px;"></canvas>
+                <canvas id="chart-cotacoes-mes" width="400" height="300" style="width: 100%; height: 300px;"></canvas>
             </div>
 
-            <!-- Gráfico de Tipos de Carga -->
+            <!-- Gráfico de Status das Cotações -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">Tipos de Carga</h3>
-                    <i class="fas fa-boxes text-gray-400"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Status das Cotações</h3>
+                    <i class="fas fa-chart-pie text-gray-400"></i>
                 </div>
-                <canvas id="chart-tipos-carga" width="400" height="300" style="width: 100%; height: 300px;"></canvas>
+                <canvas id="chart-status-cotacoes" width="400" height="300" style="width: 100%; height: 300px;"></canvas>
             </div>
         </div>
 
@@ -11998,23 +11998,15 @@
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Dashboard com gráficos -->
-    <script src="js/dashboard-graficos.js"></script>
-    
-    <!-- Sistema de histórico visual -->
-    <script src="js/historico-visual.js"></script>
-    
-    <!-- Sistema de mensagens e reatribuição -->
-    <script src="js/sistema-mensagens.js"></script>
-    
-    <!-- Métricas em tempo real -->
-    <script src="js/metricas-tempo-real.js"></script>
-    
-    <!-- Sistema de testes integrados -->
-    <script src="js/sistema-testes.js"></script>
+    <!-- Módulos conflitantes desabilitados temporariamente -->
+    <!-- <script src="js/dashboard-graficos.js"></script> -->
+    <!-- <script src="js/historico-visual.js"></script> -->
+    <!-- <script src="js/sistema-mensagens.js"></script> -->
+    <!-- <script src="js/metricas-tempo-real.js"></script> -->
+    <!-- <script src="js/sistema-testes.js"></script> -->
     
     <!-- Sistema de otimização de performance -->
-    <script src="js/otimizacao-performance.js"></script>
+    <!-- <script src="js/otimizacao-performance.js"></script> -->
     
     <!-- Sistema de aceitar/negar cotações -->
     <script src="js/aceitar-negar-cotacoes.js"></script>
@@ -12025,12 +12017,15 @@
     <!-- Sistema principal de inicialização -->
     <script src="js/main.js"></script>
     
-    <!-- Sistema de correções -->
-    <script src="js/error-handler.js"></script>
-    <script src="js/api-fallback.js"></script>
-    <script src="js/fix-sistema.js"></script>
-    <script src="js/fix-final.js"></script>
-    <script src="js/system-status.js"></script>
+    <!-- Sistema de correção unificado -->
+    <script src="js/system-fix.js"></script>
+    
+    <!-- Sistemas antigos desabilitados temporariamente -->
+    <!-- <script src="js/error-handler.js"></script> -->
+    <!-- <script src="js/api-fallback.js"></script> -->
+    <!-- <script src="js/fix-sistema.js"></script> -->
+    <!-- <script src="js/fix-final.js"></script> -->
+    <!-- <script src="js/system-status.js"></script> -->
     
 </body>
 </html>
