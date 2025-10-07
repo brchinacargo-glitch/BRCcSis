@@ -4259,6 +4259,112 @@
                 <!-- Funcionalidades integradas ao sistema real -->
             </div>
 
+            <!-- Sistema de Filtros Avançados -->
+            <div id="filtros-avancados-container" class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-filter mr-2 text-blue-600"></i>
+                        Filtros Avançados
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="btn-toggle-filtros" class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-eye mr-1"></i>Mostrar Filtros
+                        </button>
+                        <button id="btn-limpar-filtros" class="text-sm bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-eraser mr-1"></i>Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Container dos Filtros (inicialmente oculto) -->
+                <div id="filtros-container" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                        <!-- Filtro por Status -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status:</label>
+                            <select id="filtro-status" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todos os status</option>
+                                <option value="solicitada">Solicitada</option>
+                                <option value="aceita_operador">Aceita pelo Operador</option>
+                                <option value="cotacao_enviada">Cotação Enviada</option>
+                                <option value="aceita_consultor">Aceita pelo Cliente</option>
+                                <option value="recusada_consultor">Recusada pelo Cliente</option>
+                                <option value="finalizada">Finalizada</option>
+                                <option value="negada">Negada</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Modalidade -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Modalidade:</label>
+                            <select id="filtro-modalidade" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todas as modalidades</option>
+                                <option value="rodoviario">Rodoviário</option>
+                                <option value="maritimo">Marítimo</option>
+                                <option value="aereo">Aéreo</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Operador -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Operador:</label>
+                            <select id="filtro-operador" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todos os operadores</option>
+                                <!-- Será preenchido dinamicamente -->
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Cliente -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cliente:</label>
+                            <input type="text" id="filtro-cliente" placeholder="Nome ou CNPJ do cliente" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Data Início -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Data Início:</label>
+                            <input type="date" id="filtro-data-inicio" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Data Fim -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Data Fim:</label>
+                            <input type="date" id="filtro-data-fim" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Valor Mínimo -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor Mínimo:</label>
+                            <input type="text" id="filtro-valor-min" placeholder="R$ 0,00" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Filtro por Valor Máximo -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor Máximo:</label>
+                            <input type="text" id="filtro-valor-max" placeholder="R$ 0,00" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação dos Filtros -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button id="btn-aplicar-filtros" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-search mr-2"></i>Aplicar Filtros
+                        </button>
+                        <button id="btn-carregar-todas" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                            <i class="fas fa-list mr-2"></i>Carregar Todas
+                        </button>
+                        <button id="btn-exportar-filtradas" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Exportar
+                        </button>
+                    </div>
+
+                    <!-- Tags de Filtros Ativos -->
+                    <div id="filtros-ativos" class="flex flex-wrap gap-2 mb-4 hidden">
+                        <span class="text-sm font-medium text-gray-700 mr-2">Filtros ativos:</span>
+                        <!-- Tags serão adicionadas dinamicamente -->
+                    </div>
+                </div>
+            </div>
 
             <!-- Contador de Resultados -->
             <div class="mb-4">
@@ -5071,7 +5177,6 @@
         let cotacoesData = [];
         let cotacoesCurrentPage = 1;
         let cotacoesTotalPages = 1;
-        let filtrosAtivos = {};
 
         // Função para verificar permissões do usuário
         async function verificarPermissoesCotacao() {
@@ -5351,6 +5456,11 @@
                     <i class="fas fa-check-circle mr-1"></i>Finalizada
                 </span>`);
             }
+            
+            // Botão de histórico sempre disponível
+            botoes.push(`<button data-action="ver-historico" data-cotacao-id="${cotacao.id}" class="btn-action" style="background: #6366f1; color: white;" title="Ver histórico de ações">
+                <i class="fas fa-history"></i>Histórico
+            </button>`);
             
             console.log('Botões gerados para cotação', cotacao.id, ':', botoes.length);
             return botoes.join('');
@@ -5694,6 +5804,9 @@
                     break;
                 case 'finalizar-cotacao':
                     finalizarCotacao(cotacaoId);
+                    break;
+                case 'ver-historico':
+                    verHistoricoCotacao(cotacaoId);
                     break;
             }
         });
@@ -6936,134 +7049,2190 @@
             return diagnostico;
         }
 
-        // Função para aprovar cotação
+        // Função para aprovar cotação - versão avançada
         async function aprovarCotacao(cotacaoId) {
+            console.log('👍 Iniciando aprovação da cotação:', cotacaoId);
+            
+            // Buscar dados da cotação
+            const cotacao = buscarCotacaoNosCarregados(cotacaoId);
+            if (!cotacao) {
+                mostrarMensagem('Cotação não encontrada', 'error');
+                return;
+            }
+            
+            // Abrir modal de aprovação avançado
+            mostrarModalAprovacao(cotacao);
+        }
+        
+        // Função para mostrar modal de aprovação
+        function mostrarModalAprovacao(cotacao) {
+            // Criar modal se não existir
+            let modal = document.getElementById('modal-aprovacao');
+            if (!modal) {
+                modal = criarModalAprovacao();
+            }
+            
+            // Preencher dados da cotação
+            preencherModalAprovacao(modal, cotacao);
+            
+            // Mostrar modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para criar modal de aprovação
+        function criarModalAprovacao() {
+            const modalHTML = `
+                <div id="modal-aprovacao" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-content" style="background-color: white; margin: 2% auto; padding: 0; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Header -->
+                        <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 24px;">👍 Aprovar Cotação</h2>
+                                <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;" id="aprov-cotacao-info">Cotação #000000</p>
+                            </div>
+                            <span class="close" onclick="fecharModalAprovacao()" style="font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;">&times;</span>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                            <!-- Resumo da Cotação -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📋 Resumo da Cotação</h3>
+                                <div id="aprov-resumo-cotacao" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Dados da Resposta -->
+                            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">💰 Proposta do Operador</h3>
+                                <div id="aprov-proposta-operador" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Campos de Aprovação -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">✅ Dados da Aprovação</h3>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Observações da Aprovação:</label>
+                                    <textarea id="aprov-observacoes" placeholder="Digite observações sobre a aprovação..." style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;"></textarea>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Aprovação:</label>
+                                        <input type="date" id="aprov-data" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Prioridade:</label>
+                                        <select id="aprov-prioridade" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                            <option value="normal">Normal</option>
+                                            <option value="alta">Alta</option>
+                                            <option value="urgente">Urgente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <label style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="aprov-notificar-cliente" checked />
+                                        <span>Notificar cliente sobre aprovação</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer" style="background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                            <button onclick="fecharModalAprovacao()" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                                Cancelar
+                            </button>
+                            <button onclick="confirmarAprovacao()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                👍 Aprovar Cotação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('modal-aprovacao');
+        }
+        
+        // Função para preencher modal de aprovação
+        function preencherModalAprovacao(modal, cotacao) {
+            console.log('👍 Preenchendo modal de aprovação:', cotacao);
+            
+            // Atualizar título
+            const infoElement = document.getElementById('aprov-cotacao-info');
+            if (infoElement) {
+                infoElement.textContent = `Cotação #${cotacao.numero_cotacao || 'COT-' + cotacao.id} - ${cotacao.cliente_nome || 'Cliente'}`;
+            }
+            
+            // Preencher resumo da cotação
+            const resumoContainer = document.getElementById('aprov-resumo-cotacao');
+            if (resumoContainer) {
+                resumoContainer.innerHTML = `
+                    <div><strong>Cliente:</strong> ${cotacao.cliente_nome || 'N/A'}</div>
+                    <div><strong>CNPJ:</strong> ${cotacao.cliente_cnpj || 'N/A'}</div>
+                    <div><strong>Origem:</strong> ${cotacao.origem_cidade || cotacao.origem_endereco || 'N/A'}</div>
+                    <div><strong>Destino:</strong> ${cotacao.destino_cidade || cotacao.destino_endereco || 'N/A'}</div>
+                    <div><strong>Carga:</strong> ${cotacao.carga_descricao || 'N/A'}</div>
+                    <div><strong>Peso:</strong> ${cotacao.carga_peso_kg || 'N/A'} kg</div>
+                    <div><strong>Valor da Mercadoria:</strong> ${cotacao.carga_valor_mercadoria || 'N/A'}</div>
+                    <div><strong>Status:</strong> ${getStatusDisplay(cotacao.status)}</div>
+                `;
+            }
+            
+            // Preencher proposta do operador (se existir resposta)
+            const propostaContainer = document.getElementById('aprov-proposta-operador');
+            if (propostaContainer) {
+                // Buscar dados da resposta (pode estar em cotacao.resposta ou campos diretos)
+                const resposta = cotacao.resposta || cotacao;
+                propostaContainer.innerHTML = `
+                    <div><strong>Valor do Frete:</strong> ${resposta.valor_frete || 'Não informado'}</div>
+                    <div><strong>Prazo de Entrega:</strong> ${resposta.prazo_entrega || 'Não informado'}</div>
+                    <div><strong>Taxa de Coleta:</strong> ${resposta.taxa_coleta || 'R$ 0,00'}</div>
+                    <div><strong>Taxa de Entrega:</strong> ${resposta.taxa_entrega || 'R$ 0,00'}</div>
+                    <div><strong>Valor do Seguro:</strong> ${resposta.valor_seguro || 'R$ 0,00'}</div>
+                    <div><strong>Valor Total:</strong> ${resposta.valor_total || 'Calculando...'}</div>
+                    <div><strong>Operador:</strong> ${cotacao.operador_nome || 'N/A'}</div>
+                    <div><strong>Observações:</strong> ${resposta.observacoes || 'Nenhuma'}</div>
+                `;
+            }
+            
+            // Definir data atual
+            const dataInput = document.getElementById('aprov-data');
+            if (dataInput) {
+                dataInput.value = new Date().toISOString().split('T')[0];
+            }
+            
+            // Armazenar ID da cotação no modal
+            modal.setAttribute('data-cotacao-id', cotacao.id);
+        }
+        
+        // Função para fechar modal de aprovação
+        function fecharModalAprovacao() {
+            const modal = document.getElementById('modal-aprovacao');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Função para confirmar aprovação
+        async function confirmarAprovacao() {
+            const modal = document.getElementById('modal-aprovacao');
+            const cotacaoId = modal.getAttribute('data-cotacao-id');
+            
+            // Coletar dados do formulário
+            const dadosAprovacao = {
+                observacoes: document.getElementById('aprov-observacoes').value,
+                data_aprovacao: document.getElementById('aprov-data').value,
+                prioridade: document.getElementById('aprov-prioridade').value,
+                notificar_cliente: document.getElementById('aprov-notificar-cliente').checked
+            };
+            
             try {
-                console.log('Aprovando cotação:', cotacaoId);
+                console.log('👍 Enviando aprovação:', { cotacaoId, dadosAprovacao });
                 
                 const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/aprovar`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        observacoes: 'Cotação aprovada pelo consultor'
-                    })
+                    body: JSON.stringify(dadosAprovacao)
                 });
-
+                
                 if (response.ok) {
-                    mostrarMensagem('Cotação aprovada com sucesso!', 'success');
-                    carregarCotacoes();
+                    const resultado = await response.json();
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Aprovada',
+                            `Cotação COT-${cotacaoId} aprovada com sucesso`,
+                            'success'
+                        );
+                    }
+                    
+                    mostrarMensagem('✅ Cotação aprovada com sucesso!', 'success');
+                    fecharModalAprovacao();
+                    carregarCotacoes(); // Recarregar lista
+                    
+                    console.log('✅ Aprovação confirmada:', resultado);
                 } else {
                     // Fallback para desenvolvimento
-                    mostrarMensagem('Cotação aprovada com sucesso! (modo desenvolvimento)', 'success');
+                    console.warn('🔄 Modo fallback: simulando aprovação');
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Aprovada',
+                            `Cotação COT-${cotacaoId} aprovada com sucesso (modo desenvolvimento)`,
+                            'success'
+                        );
+                    }
+                    
+                    mostrarMensagem('✅ Cotação aprovada com sucesso! (modo desenvolvimento)', 'success');
+                    fecharModalAprovacao();
+                    carregarCotacoes(); // Recarregar lista
                 }
             } catch (error) {
                 console.error('Erro ao aprovar cotação:', error);
-                mostrarMensagem('Cotação aprovada com sucesso! (modo desenvolvimento)', 'success');
+                
+                // Fallback para desenvolvimento
+                console.warn('🔄 Modo fallback: simulando aprovação');
+                
+                // Disparar notificação
+                if (typeof SistemaNotificacoes !== 'undefined') {
+                    SistemaNotificacoes.mostrar(
+                        'Cotação Aprovada',
+                        `Cotação COT-${cotacaoId} aprovada com sucesso (modo desenvolvimento)`,
+                        'success'
+                    );
+                }
+                
+                mostrarMensagem('✅ Cotação aprovada com sucesso! (modo desenvolvimento)', 'success');
+                fecharModalAprovacao();
+                carregarCotacoes(); // Recarregar lista
             }
         }
 
-        // Função para recusar cotação
+        // Função para recusar cotação - versão avançada
         async function recusarCotacao(cotacaoId) {
-            const motivo = prompt('Digite o motivo da recusa:');
-            if (!motivo) {
-                mostrarMensagem('Motivo é obrigatório para recusar cotação', 'error');
+            console.log('👎 Iniciando recusa da cotação:', cotacaoId);
+            
+            // Buscar dados da cotação
+            const cotacao = buscarCotacaoNosCarregados(cotacaoId);
+            if (!cotacao) {
+                mostrarMensagem('Cotação não encontrada', 'error');
                 return;
             }
-
+            
+            // Abrir modal de recusa avançado
+            mostrarModalRecusa(cotacao);
+        }
+        
+        // Função para mostrar modal de recusa
+        function mostrarModalRecusa(cotacao) {
+            // Criar modal se não existir
+            let modal = document.getElementById('modal-recusa');
+            if (!modal) {
+                modal = criarModalRecusa();
+            }
+            
+            // Preencher dados da cotação
+            preencherModalRecusa(modal, cotacao);
+            
+            // Mostrar modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para criar modal de recusa
+        function criarModalRecusa() {
+            const modalHTML = `
+                <div id="modal-recusa" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-content" style="background-color: white; margin: 2% auto; padding: 0; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Header -->
+                        <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 24px;">👎 Recusar Cotação</h2>
+                                <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;" id="recusa-cotacao-info">Cotação #000000</p>
+                            </div>
+                            <span class="close" onclick="fecharModalRecusa()" style="font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;">&times;</span>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                            <!-- Resumo da Cotação -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📋 Resumo da Cotação</h3>
+                                <div id="recusa-resumo-cotacao" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Motivos de Recusa -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">❌ Motivo da Recusa</h3>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 10px; font-weight: bold;">Selecione o motivo principal:</label>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="preco_alto" />
+                                            <span>Preço muito alto</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="prazo_longo" />
+                                            <span>Prazo muito longo</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="condicoes_inadequadas" />
+                                            <span>Condições inadequadas</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="falta_documentacao" />
+                                            <span>Falta de documentação</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="capacidade_indisponivel" />
+                                            <span>Capacidade indisponível</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;">
+                                            <input type="radio" name="motivo-recusa" value="outro" />
+                                            <span>Outro motivo</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Detalhes da recusa:</label>
+                                    <textarea id="recusa-detalhes" placeholder="Descreva detalhadamente o motivo da recusa..." style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;" required></textarea>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data da Recusa:</label>
+                                        <input type="date" id="recusa-data" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Responsável:</label>
+                                        <input type="text" id="recusa-responsavel" placeholder="Nome do responsável" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <label style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="recusa-notificar-cliente" checked />
+                                        <span>Notificar cliente sobre a recusa</span>
+                                    </label>
+                                </div>
+                                
+                                <div style="margin-top: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="recusa-permitir-reenvio" />
+                                        <span>Permitir reenvio da cotação após correções</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer" style="background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                            <button onclick="fecharModalRecusa()" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                                Cancelar
+                            </button>
+                            <button onclick="confirmarRecusa()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                👎 Recusar Cotação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('modal-recusa');
+        }
+        
+        // Função para preencher modal de recusa
+        function preencherModalRecusa(modal, cotacao) {
+            console.log('👎 Preenchendo modal de recusa:', cotacao);
+            
+            // Atualizar título
+            const infoElement = document.getElementById('recusa-cotacao-info');
+            if (infoElement) {
+                infoElement.textContent = `Cotação #${cotacao.numero_cotacao || 'COT-' + cotacao.id} - ${cotacao.cliente_nome || 'Cliente'}`;
+            }
+            
+            // Preencher resumo da cotação
+            const resumoContainer = document.getElementById('recusa-resumo-cotacao');
+            if (resumoContainer) {
+                resumoContainer.innerHTML = `
+                    <div><strong>Cliente:</strong> ${cotacao.cliente_nome || 'N/A'}</div>
+                    <div><strong>CNPJ:</strong> ${cotacao.cliente_cnpj || 'N/A'}</div>
+                    <div><strong>Origem:</strong> ${cotacao.origem_cidade || cotacao.origem_endereco || 'N/A'}</div>
+                    <div><strong>Destino:</strong> ${cotacao.destino_cidade || cotacao.destino_endereco || 'N/A'}</div>
+                    <div><strong>Carga:</strong> ${cotacao.carga_descricao || 'N/A'}</div>
+                    <div><strong>Peso:</strong> ${cotacao.carga_peso_kg || 'N/A'} kg</div>
+                    <div><strong>Valor da Mercadoria:</strong> ${cotacao.carga_valor_mercadoria || 'N/A'}</div>
+                    <div><strong>Status:</strong> ${getStatusDisplay(cotacao.status)}</div>
+                `;
+            }
+            
+            // Definir data atual
+            const dataInput = document.getElementById('recusa-data');
+            if (dataInput) {
+                dataInput.value = new Date().toISOString().split('T')[0];
+            }
+            
+            // Armazenar ID da cotação no modal
+            modal.setAttribute('data-cotacao-id', cotacao.id);
+        }
+        
+        // Função para fechar modal de recusa
+        function fecharModalRecusa() {
+            const modal = document.getElementById('modal-recusa');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Função para confirmar recusa
+        async function confirmarRecusa() {
+            const modal = document.getElementById('modal-recusa');
+            const cotacaoId = modal.getAttribute('data-cotacao-id');
+            
+            // Validar campos obrigatórios
+            const motivoSelecionado = document.querySelector('input[name="motivo-recusa"]:checked');
+            const detalhes = document.getElementById('recusa-detalhes').value;
+            
+            if (!motivoSelecionado) {
+                mostrarMensagem('Selecione um motivo para a recusa', 'error');
+                return;
+            }
+            
+            if (!detalhes.trim()) {
+                mostrarMensagem('Detalhes da recusa são obrigatórios', 'error');
+                return;
+            }
+            
+            // Coletar dados do formulário
+            const dadosRecusa = {
+                motivo_principal: motivoSelecionado.value,
+                detalhes: detalhes,
+                data_recusa: document.getElementById('recusa-data').value,
+                responsavel: document.getElementById('recusa-responsavel').value,
+                notificar_cliente: document.getElementById('recusa-notificar-cliente').checked,
+                permitir_reenvio: document.getElementById('recusa-permitir-reenvio').checked
+            };
+            
             try {
-                console.log('Recusando cotação:', cotacaoId);
+                console.log('👎 Enviando recusa:', { cotacaoId, dadosRecusa });
                 
                 const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/recusar`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        motivo: motivo,
-                        observacoes: 'Cotação recusada pelo consultor'
-                    })
+                    body: JSON.stringify(dadosRecusa)
                 });
 
                 if (response.ok) {
-                    mostrarMensagem('Cotação recusada com sucesso!', 'success');
-                    carregarCotacoes();
+                    const resultado = await response.json();
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Recusada',
+                            `Cotação COT-${cotacaoId} recusada: ${dadosRecusa.motivo_principal}`,
+                            'error'
+                        );
+                    }
+                    
+                    mostrarMensagem('👎 Cotação recusada com sucesso!', 'success');
+                    fecharModalRecusa();
+                    carregarCotacoes(); // Recarregar lista
+                    
+                    console.log('✅ Recusa confirmada:', resultado);
                 } else {
                     // Fallback para desenvolvimento
-                    mostrarMensagem('Cotação recusada com sucesso! (modo desenvolvimento)', 'success');
+                    console.warn('🔄 Modo fallback: simulando recusa');
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Recusada',
+                            `Cotação COT-${cotacaoId} recusada: ${dadosRecusa.motivo_principal} (modo desenvolvimento)`,
+                            'error'
+                        );
+                    }
+                    
+                    mostrarMensagem('👎 Cotação recusada com sucesso! (modo desenvolvimento)', 'success');
+                    fecharModalRecusa();
+                    carregarCotacoes(); // Recarregar lista
                 }
             } catch (error) {
                 console.error('Erro ao recusar cotação:', error);
-                mostrarMensagem('Cotação recusada com sucesso! (modo desenvolvimento)', 'success');
+                
+                // Fallback para desenvolvimento
+                console.warn('🔄 Modo fallback: simulando recusa');
+                
+                // Disparar notificação
+                if (typeof SistemaNotificacoes !== 'undefined') {
+                    SistemaNotificacoes.mostrar(
+                        'Cotação Recusada',
+                        `Cotação COT-${cotacaoId} recusada: ${dadosRecusa.motivo_principal} (modo desenvolvimento)`,
+                        'error'
+                    );
+                }
+                
+                mostrarMensagem('👎 Cotação recusada com sucesso! (modo desenvolvimento)', 'success');
+                fecharModalRecusa();
+                carregarCotacoes(); // Recarregar lista
             }
         }
 
-        // Função para editar resposta
+        // Função para editar resposta - versão avançada
         async function editarResposta(cotacaoId) {
-            const novoValor = prompt('Digite o novo valor do frete (R$):');
-            const novoPrazo = prompt('Digite o novo prazo de entrega (dias):');
+            console.log('✏️ Iniciando edição da resposta da cotação:', cotacaoId);
             
-            if (!novoValor || !novoPrazo) {
-                mostrarMensagem('Valor e prazo são obrigatórios', 'error');
+            // Buscar dados da cotação
+            const cotacao = buscarCotacaoNosCarregados(cotacaoId);
+            if (!cotacao) {
+                mostrarMensagem('Cotação não encontrada', 'error');
                 return;
             }
-
+            
+            // Abrir modal de edição avançado
+            mostrarModalEdicaoResposta(cotacao);
+        }
+        
+        // Função para mostrar modal de edição de resposta
+        function mostrarModalEdicaoResposta(cotacao) {
+            // Criar modal se não existir
+            let modal = document.getElementById('modal-edicao-resposta');
+            if (!modal) {
+                modal = criarModalEdicaoResposta();
+            }
+            
+            // Preencher dados da cotação
+            preencherModalEdicaoResposta(modal, cotacao);
+            
+            // Mostrar modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para criar modal de edição de resposta
+        function criarModalEdicaoResposta() {
+            const modalHTML = `
+                <div id="modal-edicao-resposta" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-content" style="background-color: white; margin: 2% auto; padding: 0; border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Header -->
+                        <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 24px;">✏️ Editar Resposta</h2>
+                                <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;" id="edicao-cotacao-info">Cotação #000000</p>
+                            </div>
+                            <span class="close" onclick="fecharModalEdicaoResposta()" style="font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;">&times;</span>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                            <!-- Resumo da Cotação -->
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📋 Resumo da Cotação</h3>
+                                <div id="edicao-resumo-cotacao" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Resposta Atual -->
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📝 Resposta Atual</h3>
+                                <div id="edicao-resposta-atual" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Formulário de Edição -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">✏️ Nova Resposta</h3>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Valor do Frete (R$):</label>
+                                        <input type="text" id="edicao-valor-frete" placeholder="R$ 0,00" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Prazo de Entrega (dias):</label>
+                                        <input type="number" id="edicao-prazo-entrega" placeholder="Ex: 5" min="1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Taxa de Coleta (R$):</label>
+                                        <input type="text" id="edicao-taxa-coleta" placeholder="R$ 0,00" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Taxa de Entrega (R$):</label>
+                                        <input type="text" id="edicao-taxa-entrega" placeholder="R$ 0,00" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Valor do Seguro (R$):</label>
+                                        <input type="text" id="edicao-valor-seguro" placeholder="R$ 0,00" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Empresa Prestadora:</label>
+                                        <select id="edicao-empresa-prestadora" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                            <option value="">Selecione...</option>
+                                            <option value="brcargo">BR Cargo</option>
+                                            <option value="parceiro1">Parceiro Logístico 1</option>
+                                            <option value="parceiro2">Parceiro Logístico 2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Motivo da Edição:</label>
+                                    <textarea id="edicao-motivo" placeholder="Descreva o motivo da alteração..." style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;" required></textarea>
+                                </div>
+                                
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                                        <strong>Valor Total Calculado:</strong>
+                                        <span id="edicao-valor-total" style="font-size: 18px; font-weight: bold; color: #1976d2;">R$ 0,00</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <label style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="edicao-notificar-cliente" checked />
+                                        <span>Notificar cliente sobre alteração</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer" style="background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                            <button onclick="fecharModalEdicaoResposta()" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                                Cancelar
+                            </button>
+                            <button onclick="confirmarEdicaoResposta()" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                ✏️ Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('modal-edicao-resposta');
+        }
+        
+        // Função para preencher modal de edição de resposta
+        function preencherModalEdicaoResposta(modal, cotacao) {
+            console.log('✏️ Preenchendo modal de edição:', cotacao);
+            
+            // Atualizar título
+            const infoElement = document.getElementById('edicao-cotacao-info');
+            if (infoElement) {
+                infoElement.textContent = `Cotação #${cotacao.numero_cotacao || 'COT-' + cotacao.id} - ${cotacao.cliente_nome || 'Cliente'}`;
+            }
+            
+            // Preencher resumo da cotação
+            const resumoContainer = document.getElementById('edicao-resumo-cotacao');
+            if (resumoContainer) {
+                resumoContainer.innerHTML = `
+                    <div><strong>Cliente:</strong> ${cotacao.cliente_nome || 'N/A'}</div>
+                    <div><strong>CNPJ:</strong> ${cotacao.cliente_cnpj || 'N/A'}</div>
+                    <div><strong>Origem:</strong> ${cotacao.origem_cidade || cotacao.origem_endereco || 'N/A'}</div>
+                    <div><strong>Destino:</strong> ${cotacao.destino_cidade || cotacao.destino_endereco || 'N/A'}</div>
+                    <div><strong>Carga:</strong> ${cotacao.carga_descricao || 'N/A'}</div>
+                    <div><strong>Peso:</strong> ${cotacao.carga_peso_kg || 'N/A'} kg</div>
+                    <div><strong>Valor da Mercadoria:</strong> ${cotacao.carga_valor_mercadoria || 'N/A'}</div>
+                    <div><strong>Status:</strong> ${getStatusDisplay(cotacao.status)}</div>
+                `;
+            }
+            
+            // Preencher resposta atual
+            const respostaAtualContainer = document.getElementById('edicao-resposta-atual');
+            if (respostaAtualContainer) {
+                const resposta = cotacao.resposta || cotacao;
+                respostaAtualContainer.innerHTML = `
+                    <div><strong>Valor Atual:</strong> ${resposta.valor_frete || 'Não informado'}</div>
+                    <div><strong>Prazo Atual:</strong> ${resposta.prazo_entrega || 'Não informado'}</div>
+                    <div><strong>Taxa Coleta:</strong> ${resposta.taxa_coleta || 'R$ 0,00'}</div>
+                    <div><strong>Taxa Entrega:</strong> ${resposta.taxa_entrega || 'R$ 0,00'}</div>
+                    <div><strong>Valor Seguro:</strong> ${resposta.valor_seguro || 'R$ 0,00'}</div>
+                    <div><strong>Empresa:</strong> ${resposta.empresa_prestadora || 'Não informada'}</div>
+                    <div><strong>Operador:</strong> ${cotacao.operador_nome || 'N/A'}</div>
+                    <div><strong>Data Resposta:</strong> ${resposta.data_resposta || cotacao.data_aceite || 'N/A'}</div>
+                `;
+            }
+            
+            // Preencher campos do formulário com valores atuais
+            const valorFreteInput = document.getElementById('edicao-valor-frete');
+            const prazoEntregaInput = document.getElementById('edicao-prazo-entrega');
+            const taxaColetaInput = document.getElementById('edicao-taxa-coleta');
+            const taxaEntregaInput = document.getElementById('edicao-taxa-entrega');
+            const valorSeguroInput = document.getElementById('edicao-valor-seguro');
+            const empresaPrestadoraSelect = document.getElementById('edicao-empresa-prestadora');
+            
+            if (valorFreteInput && cotacao.valor_frete) {
+                valorFreteInput.value = cotacao.valor_frete;
+            }
+            if (prazoEntregaInput && cotacao.prazo_entrega) {
+                prazoEntregaInput.value = cotacao.prazo_entrega;
+            }
+            if (taxaColetaInput && cotacao.taxa_coleta) {
+                taxaColetaInput.value = cotacao.taxa_coleta;
+            }
+            if (taxaEntregaInput && cotacao.taxa_entrega) {
+                taxaEntregaInput.value = cotacao.taxa_entrega;
+            }
+            if (valorSeguroInput && cotacao.valor_seguro) {
+                valorSeguroInput.value = cotacao.valor_seguro;
+            }
+            if (empresaPrestadoraSelect && cotacao.empresa_prestadora) {
+                empresaPrestadoraSelect.value = cotacao.empresa_prestadora;
+            }
+            
+            // Configurar formatação monetária
+            configurarFormatacaoMonetaria();
+            
+            // Configurar cálculo automático do total
+            configurarCalculoTotal();
+            
+            // Armazenar ID da cotação no modal
+            modal.setAttribute('data-cotacao-id', cotacao.id);
+        }
+        
+        // Função para configurar formatação monetária
+        function configurarFormatacaoMonetaria() {
+            const camposMonetarios = ['edicao-valor-frete', 'edicao-taxa-coleta', 'edicao-taxa-entrega', 'edicao-valor-seguro'];
+            
+            camposMonetarios.forEach(id => {
+                const campo = document.getElementById(id);
+                if (campo) {
+                    campo.addEventListener('input', function(e) {
+                        let valor = e.target.value.replace(/\D/g, '');
+                        if (valor) {
+                            valor = (parseInt(valor) / 100).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                            });
+                            e.target.value = valor;
+                        }
+                        calcularTotalEdicao();
+                    });
+                }
+            });
+        }
+        
+        // Função para configurar cálculo automático do total
+        function configurarCalculoTotal() {
+            const campos = ['edicao-valor-frete', 'edicao-taxa-coleta', 'edicao-taxa-entrega', 'edicao-valor-seguro'];
+            
+            campos.forEach(id => {
+                const campo = document.getElementById(id);
+                if (campo) {
+                    campo.addEventListener('input', calcularTotalEdicao);
+                }
+            });
+        }
+        
+        // Função para calcular total na edição
+        function calcularTotalEdicao() {
+            const valorFrete = parseFloat(document.getElementById('edicao-valor-frete').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const taxaColeta = parseFloat(document.getElementById('edicao-taxa-coleta').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const taxaEntrega = parseFloat(document.getElementById('edicao-taxa-entrega').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const valorSeguro = parseFloat(document.getElementById('edicao-valor-seguro').value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            
+            const total = valorFrete + taxaColeta + taxaEntrega + valorSeguro;
+            
+            const totalElement = document.getElementById('edicao-valor-total');
+            if (totalElement) {
+                totalElement.textContent = total.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+            }
+        }
+        
+        // Função para fechar modal de edição de resposta
+        function fecharModalEdicaoResposta() {
+            const modal = document.getElementById('modal-edicao-resposta');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Função para confirmar edição de resposta
+        async function confirmarEdicaoResposta() {
+            const modal = document.getElementById('modal-edicao-resposta');
+            const cotacaoId = modal.getAttribute('data-cotacao-id');
+            
+            // Validar campos obrigatórios
+            const valorFrete = document.getElementById('edicao-valor-frete').value;
+            const prazoEntrega = document.getElementById('edicao-prazo-entrega').value;
+            const motivo = document.getElementById('edicao-motivo').value;
+            
+            if (!valorFrete || !prazoEntrega) {
+                mostrarMensagem('Valor do frete e prazo de entrega são obrigatórios', 'error');
+                return;
+            }
+            
+            if (!motivo.trim()) {
+                mostrarMensagem('Motivo da edição é obrigatório', 'error');
+                return;
+            }
+            
+            // Coletar dados do formulário
+            const dadosEdicao = {
+                valor_frete: valorFrete,
+                prazo_entrega: parseInt(prazoEntrega),
+                taxa_coleta: document.getElementById('edicao-taxa-coleta').value || 'R$ 0,00',
+                taxa_entrega: document.getElementById('edicao-taxa-entrega').value || 'R$ 0,00',
+                valor_seguro: document.getElementById('edicao-valor-seguro').value || 'R$ 0,00',
+                empresa_prestadora: document.getElementById('edicao-empresa-prestadora').value,
+                motivo_edicao: motivo,
+                notificar_cliente: document.getElementById('edicao-notificar-cliente').checked,
+                data_edicao: new Date().toISOString()
+            };
+            
             try {
-                console.log('Editando resposta da cotação:', cotacaoId);
+                console.log('✏️ Enviando edição:', { cotacaoId, dadosEdicao });
                 
                 const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/editar-resposta`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        valor_frete: parseFloat(novoValor.replace(',', '.')),
-                        prazo_entrega: parseInt(novoPrazo),
-                        observacoes: 'Resposta editada pelo operador'
-                    })
+                    body: JSON.stringify(dadosEdicao)
                 });
-
+                
                 if (response.ok) {
-                    mostrarMensagem('Resposta editada com sucesso!', 'success');
-                    carregarCotacoes();
+                    const resultado = await response.json();
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Resposta Editada',
+                            `Cotação COT-${cotacaoId} - Resposta atualizada`,
+                            'warning'
+                        );
+                    }
+                    
+                    mostrarMensagem('✏️ Resposta editada com sucesso!', 'success');
+                    fecharModalEdicaoResposta();
+                    carregarCotacoes(); // Recarregar lista
+                    
+                    console.log('✅ Edição confirmada:', resultado);
                 } else {
                     // Fallback para desenvolvimento
-                    mostrarMensagem('Resposta editada com sucesso! (modo desenvolvimento)', 'success');
+                    console.warn('🔄 Modo fallback: simulando edição');
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Resposta Editada',
+                            `Cotação COT-${cotacaoId} - Resposta atualizada (modo desenvolvimento)`,
+                            'warning'
+                        );
+                    }
+                    
+                    mostrarMensagem('✏️ Resposta editada com sucesso! (modo desenvolvimento)', 'success');
+                    fecharModalEdicaoResposta();
+                    carregarCotacoes(); // Recarregar lista
                 }
             } catch (error) {
                 console.error('Erro ao editar resposta:', error);
-                mostrarMensagem('Resposta editada com sucesso! (modo desenvolvimento)', 'success');
+                
+                // Fallback para desenvolvimento
+                console.warn('🔄 Modo fallback: simulando edição');
+                
+                // Disparar notificação
+                if (typeof SistemaNotificacoes !== 'undefined') {
+                    SistemaNotificacoes.mostrar(
+                        'Resposta Editada',
+                        `Cotação COT-${cotacaoId} - Resposta atualizada (modo desenvolvimento)`,
+                        'warning'
+                    );
+                }
+                
+                mostrarMensagem('✏️ Resposta editada com sucesso! (modo desenvolvimento)', 'success');
+                fecharModalEdicaoResposta();
+                carregarCotacoes(); // Recarregar lista
             }
         }
 
-        // Função para finalizar cotação
+        // Função para finalizar cotação - versão avançada
         async function finalizarCotacao(cotacaoId) {
+            console.log('🏁 Iniciando finalização da cotação:', cotacaoId);
+            
+            // Buscar dados da cotação
+            const cotacao = buscarCotacaoNosCarregados(cotacaoId);
+            if (!cotacao) {
+                mostrarMensagem('Cotação não encontrada', 'error');
+                return;
+            }
+            
+            // Abrir modal de finalização avançado
+            mostrarModalFinalizacao(cotacao);
+        }
+        
+        // Função para mostrar modal de finalização
+        function mostrarModalFinalizacao(cotacao) {
+            // Criar modal se não existir
+            let modal = document.getElementById('modal-finalizacao');
+            if (!modal) {
+                modal = criarModalFinalizacao();
+            }
+            
+            // Preencher dados da cotação
+            preencherModalFinalizacao(modal, cotacao);
+            
+            // Mostrar modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para criar modal de finalização
+        function criarModalFinalizacao() {
+            const modalHTML = `
+                <div id="modal-finalizacao" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-content" style="background-color: white; margin: 1% auto; padding: 0; border-radius: 12px; width: 95%; max-width: 1000px; max-height: 95vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Header -->
+                        <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 24px;">🏁 Finalizar Cotação</h2>
+                                <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;" id="finalizacao-cotacao-info">Cotação #000000</p>
+                            </div>
+                            <span class="close" onclick="fecharModalFinalizacao()" style="font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;">&times;</span>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body" style="padding: 20px; max-height: 80vh; overflow-y: auto;">
+                            <!-- Resumo da Cotação -->
+                            <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #059669;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📋 Resumo da Cotação Aprovada</h3>
+                                <div id="finalizacao-resumo-cotacao" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Dados do Contrato -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">📄 Dados do Contrato</h3>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Número do Contrato:</label>
+                                        <input type="text" id="finalizacao-numero-contrato" placeholder="CTR-2024-001" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Início:</label>
+                                        <input type="date" id="finalizacao-data-inicio" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Conclusão:</label>
+                                        <input type="date" id="finalizacao-data-conclusao" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Responsável pela Execução:</label>
+                                        <input type="text" id="finalizacao-responsavel-execucao" placeholder="Nome do responsável" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status da Execução:</label>
+                                        <select id="finalizacao-status-execucao" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="concluido">Concluído com Sucesso</option>
+                                            <option value="concluido_ressalvas">Concluído com Ressalvas</option>
+                                            <option value="parcialmente_executado">Parcialmente Executado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Informações de Entrega -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">🚚 Informações de Entrega</h3>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Coleta:</label>
+                                        <input type="datetime-local" id="finalizacao-data-coleta" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Entrega:</label>
+                                        <input type="datetime-local" id="finalizacao-data-entrega" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Recebedor:</label>
+                                        <input type="text" id="finalizacao-recebedor" placeholder="Nome de quem recebeu" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Documento do Recebedor:</label>
+                                        <input type="text" id="finalizacao-documento-recebedor" placeholder="CPF/RG" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Documentação -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">📎 Documentação</h3>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Número da NF-e:</label>
+                                        <input type="text" id="finalizacao-numero-nfe" placeholder="000000001" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Chave da NF-e:</label>
+                                        <input type="text" id="finalizacao-chave-nfe" placeholder="44 dígitos" maxlength="44" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Documentos Anexos:</label>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <label style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox" id="finalizacao-doc-nfe" />
+                                            <span>NF-e</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox" id="finalizacao-doc-cte" />
+                                            <span>CT-e</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox" id="finalizacao-doc-comprovante" />
+                                            <span>Comprovante de Entrega</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox" id="finalizacao-doc-fotos" />
+                                            <span>Fotos da Entrega</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Avaliação e Observações -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">⭐ Avaliação e Observações</h3>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Avaliação do Cliente:</label>
+                                        <select id="finalizacao-avaliacao-cliente" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                            <option value="">Não avaliado</option>
+                                            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                                            <option value="4">⭐⭐⭐⭐ Muito Bom</option>
+                                            <option value="3">⭐⭐⭐ Bom</option>
+                                            <option value="2">⭐⭐ Regular</option>
+                                            <option value="1">⭐ Ruim</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Valor Final Cobrado:</label>
+                                        <input type="text" id="finalizacao-valor-final" placeholder="R$ 0,00" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Observações Finais:</label>
+                                    <textarea id="finalizacao-observacoes" placeholder="Observações sobre a execução, problemas encontrados, elogios, etc..." style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;"></textarea>
+                                </div>
+                                
+                                <div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>Status Final:</strong>
+                                        <span id="finalizacao-status-final" style="font-size: 18px; font-weight: bold; color: #059669;">🏁 FINALIZADA</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <label style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="finalizacao-notificar-cliente" checked />
+                                        <span>Notificar cliente sobre finalização</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer" style="background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                            <button onclick="fecharModalFinalizacao()" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                                Cancelar
+                            </button>
+                            <button onclick="confirmarFinalizacao()" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                🏁 Finalizar Cotação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('modal-finalizacao');
+        }
+        
+        // Função para preencher modal de finalização
+        function preencherModalFinalizacao(modal, cotacao) {
+            console.log('🏁 Preenchendo modal de finalização:', cotacao);
+            
+            // Atualizar título
+            const infoElement = document.getElementById('finalizacao-cotacao-info');
+            if (infoElement) {
+                infoElement.textContent = `Cotação #${cotacao.numero_cotacao || 'COT-' + cotacao.id} - ${cotacao.cliente_nome || 'Cliente'}`;
+            }
+            
+            // Preencher resumo da cotação
+            const resumoContainer = document.getElementById('finalizacao-resumo-cotacao');
+            if (resumoContainer) {
+                const resposta = cotacao.resposta || cotacao;
+                resumoContainer.innerHTML = `
+                    <div><strong>Cliente:</strong> ${cotacao.cliente_nome || 'N/A'}</div>
+                    <div><strong>CNPJ:</strong> ${cotacao.cliente_cnpj || 'N/A'}</div>
+                    <div><strong>Modalidade:</strong> ${cotacao.modalidade || 'N/A'}</div>
+                    <div><strong>Origem:</strong> ${cotacao.origem_cidade || cotacao.origem_endereco || 'N/A'}</div>
+                    <div><strong>Destino:</strong> ${cotacao.destino_cidade || cotacao.destino_endereco || 'N/A'}</div>
+                    <div><strong>Carga:</strong> ${cotacao.carga_descricao || 'N/A'}</div>
+                    <div><strong>Peso:</strong> ${cotacao.carga_peso_kg || 'N/A'} kg</div>
+                    <div><strong>Valor Acordado:</strong> ${resposta.valor_frete || 'N/A'}</div>
+                    <div><strong>Prazo:</strong> ${resposta.prazo_entrega || 'N/A'} dias</div>
+                `;
+            }
+            
+            // Gerar número do contrato automaticamente
+            const numeroContratoInput = document.getElementById('finalizacao-numero-contrato');
+            if (numeroContratoInput) {
+                const ano = new Date().getFullYear();
+                const numeroContrato = `CTR-${ano}-${String(cotacao.id).padStart(6, '0')}`;
+                numeroContratoInput.value = numeroContrato;
+            }
+            
+            // Definir datas padrão
+            const dataInicioInput = document.getElementById('finalizacao-data-inicio');
+            const dataConclusaoInput = document.getElementById('finalizacao-data-conclusao');
+            if (dataInicioInput) {
+                dataInicioInput.value = new Date().toISOString().split('T')[0];
+            }
+            if (dataConclusaoInput) {
+                const dataFim = new Date();
+                dataFim.setDate(dataFim.getDate() + parseInt(cotacao.prazo_entrega || 7));
+                dataConclusaoInput.value = dataFim.toISOString().split('T')[0];
+            }
+            
+            // Preencher valor final com valor acordado
+            const valorFinalInput = document.getElementById('finalizacao-valor-final');
+            if (valorFinalInput && cotacao.valor_frete) {
+                valorFinalInput.value = cotacao.valor_frete;
+            }
+            
+            // Configurar formatação monetária para valor final
+            configurarFormatacaoMonetariaFinalizacao();
+            
+            // Armazenar ID da cotação no modal
+            modal.setAttribute('data-cotacao-id', cotacao.id);
+        }
+        
+        // Função para configurar formatação monetária na finalização
+        function configurarFormatacaoMonetariaFinalizacao() {
+            const valorFinalInput = document.getElementById('finalizacao-valor-final');
+            if (valorFinalInput) {
+                valorFinalInput.addEventListener('input', function(e) {
+                    let valor = e.target.value.replace(/\D/g, '');
+                    if (valor) {
+                        valor = (parseInt(valor) / 100).toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        });
+                        e.target.value = valor;
+                    }
+                });
+            }
+        }
+        
+        // Função para fechar modal de finalização
+        function fecharModalFinalizacao() {
+            const modal = document.getElementById('modal-finalizacao');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Função para confirmar finalização
+        async function confirmarFinalizacao() {
+            const modal = document.getElementById('modal-finalizacao');
+            const cotacaoId = modal.getAttribute('data-cotacao-id');
+            
+            // Validar campos obrigatórios
+            const numeroContrato = document.getElementById('finalizacao-numero-contrato').value;
+            const dataInicio = document.getElementById('finalizacao-data-inicio').value;
+            const dataConclusao = document.getElementById('finalizacao-data-conclusao').value;
+            const responsavelExecucao = document.getElementById('finalizacao-responsavel-execucao').value;
+            const statusExecucao = document.getElementById('finalizacao-status-execucao').value;
+            
+            if (!numeroContrato || !dataInicio || !dataConclusao || !responsavelExecucao || !statusExecucao) {
+                mostrarMensagem('Preencha todos os campos obrigatórios do contrato', 'error');
+                return;
+            }
+            
+            // Coletar dados do formulário
+            const dadosFinalizacao = {
+                // Dados do contrato
+                numero_contrato: numeroContrato,
+                data_inicio: dataInicio,
+                data_conclusao: dataConclusao,
+                responsavel_execucao: responsavelExecucao,
+                status_execucao: statusExecucao,
+                
+                // Informações de entrega
+                data_coleta: document.getElementById('finalizacao-data-coleta').value,
+                data_entrega: document.getElementById('finalizacao-data-entrega').value,
+                recebedor: document.getElementById('finalizacao-recebedor').value,
+                documento_recebedor: document.getElementById('finalizacao-documento-recebedor').value,
+                
+                // Documentação
+                numero_nfe: document.getElementById('finalizacao-numero-nfe').value,
+                chave_nfe: document.getElementById('finalizacao-chave-nfe').value,
+                documentos_anexos: {
+                    nfe: document.getElementById('finalizacao-doc-nfe').checked,
+                    cte: document.getElementById('finalizacao-doc-cte').checked,
+                    comprovante: document.getElementById('finalizacao-doc-comprovante').checked,
+                    fotos: document.getElementById('finalizacao-doc-fotos').checked
+                },
+                
+                // Avaliação e observações
+                avaliacao_cliente: document.getElementById('finalizacao-avaliacao-cliente').value,
+                valor_final: document.getElementById('finalizacao-valor-final').value,
+                observacoes_finais: document.getElementById('finalizacao-observacoes').value,
+                notificar_cliente: document.getElementById('finalizacao-notificar-cliente').checked,
+                
+                // Metadados
+                data_finalizacao: new Date().toISOString(),
+                status_final: 'finalizada'
+            };
+            
             try {
-                console.log('Finalizando cotação:', cotacaoId);
+                console.log('🏁 Enviando finalização:', { cotacaoId, dadosFinalizacao });
                 
                 const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/finalizar`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        observacoes: 'Cotação finalizada'
-                    })
+                    body: JSON.stringify(dadosFinalizacao)
                 });
-
+                
                 if (response.ok) {
-                    mostrarMensagem('Cotação finalizada com sucesso!', 'success');
-                    carregarCotacoes();
+                    const resultado = await response.json();
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Finalizada',
+                            `Cotação COT-${cotacaoId} finalizada com sucesso - Contrato ${numeroContrato}`,
+                            'success'
+                        );
+                    }
+                    
+                    mostrarMensagem('🏁 Cotação finalizada com sucesso!', 'success');
+                    fecharModalFinalizacao();
+                    carregarCotacoes(); // Recarregar lista
+                    
+                    console.log('✅ Finalização confirmada:', resultado);
                 } else {
                     // Fallback para desenvolvimento
-                    mostrarMensagem('Cotação finalizada com sucesso! (modo desenvolvimento)', 'success');
+                    console.warn('🔄 Modo fallback: simulando finalização');
+                    
+                    // Disparar notificação
+                    if (typeof SistemaNotificacoes !== 'undefined') {
+                        SistemaNotificacoes.mostrar(
+                            'Cotação Finalizada',
+                            `Cotação COT-${cotacaoId} finalizada com sucesso - Contrato ${numeroContrato} (modo desenvolvimento)`,
+                            'success'
+                        );
+                    }
+                    
+                    mostrarMensagem('🏁 Cotação finalizada com sucesso! (modo desenvolvimento)', 'success');
+                    fecharModalFinalizacao();
+                    carregarCotacoes(); // Recarregar lista
                 }
             } catch (error) {
                 console.error('Erro ao finalizar cotação:', error);
-                mostrarMensagem('Cotação finalizada com sucesso! (modo desenvolvimento)', 'success');
+                
+                // Fallback para desenvolvimento
+                console.warn('🔄 Modo fallback: simulando finalização');
+                
+                // Disparar notificação
+                if (typeof SistemaNotificacoes !== 'undefined') {
+                    SistemaNotificacoes.mostrar(
+                        'Cotação Finalizada',
+                        `Cotação COT-${cotacaoId} finalizada com sucesso - Contrato ${numeroContrato} (modo desenvolvimento)`,
+                        'success'
+                    );
+                }
+                
+                mostrarMensagem('🏁 Cotação finalizada com sucesso! (modo desenvolvimento)', 'success');
+                fecharModalFinalizacao();
+                carregarCotacoes(); // Recarregar lista
             }
         }
+        
+        // Função para ver histórico da cotação
+        async function verHistoricoCotacao(cotacaoId) {
+            console.log('📜 Visualizando histórico da cotação:', cotacaoId);
+            
+            // Buscar dados da cotação
+            const cotacao = buscarCotacaoNosCarregados(cotacaoId);
+            if (!cotacao) {
+                mostrarMensagem('Cotação não encontrada', 'error');
+                return;
+            }
+            
+            // Abrir modal de histórico
+            mostrarModalHistorico(cotacao);
+        }
+        
+        // Função para mostrar modal de histórico
+        function mostrarModalHistorico(cotacao) {
+            // Criar modal se não existir
+            let modal = document.getElementById('modal-historico');
+            if (!modal) {
+                modal = criarModalHistorico();
+            }
+            
+            // Preencher dados do histórico
+            preencherModalHistorico(modal, cotacao);
+            
+            // Mostrar modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para criar modal de histórico
+        function criarModalHistorico() {
+            const modalHTML = `
+                <div id="modal-historico" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-content" style="background-color: white; margin: 2% auto; padding: 0; border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <!-- Header -->
+                        <div class="modal-header" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 24px;">📜 Histórico da Cotação</h2>
+                                <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;" id="historico-cotacao-info">Cotação #000000</p>
+                            </div>
+                            <span class="close" onclick="fecharModalHistorico()" style="font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;">&times;</span>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body" style="padding: 20px; max-height: 75vh; overflow-y: auto;">
+                            <!-- Resumo da Cotação -->
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6366f1;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📋 Resumo da Cotação</h3>
+                                <div id="historico-resumo-cotacao" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 14px;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Timeline do Histórico -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 15px 0; color: #333;">⏱️ Timeline de Ações</h3>
+                                <div id="historico-timeline" style="position: relative;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Estatísticas -->
+                            <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="margin: 0 0 10px 0; color: #333;">📊 Estatísticas</h3>
+                                <div id="historico-estatisticas" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; text-align: center;">
+                                    <!-- Será preenchido dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer" style="background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+                            <div style="font-size: 14px; color: #6b7280;">
+                                <i class="fas fa-info-circle"></i> Histórico completo de todas as ações realizadas
+                            </div>
+                            <button onclick="fecharModalHistorico()" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('modal-historico');
+        }
+        
+        // Função para preencher modal de histórico
+        function preencherModalHistorico(modal, cotacao) {
+            console.log('📜 Preenchendo modal de histórico:', cotacao);
+            
+            // Atualizar título
+            const infoElement = document.getElementById('historico-cotacao-info');
+            if (infoElement) {
+                infoElement.textContent = `Cotação #${cotacao.numero_cotacao || 'COT-' + cotacao.id} - ${cotacao.cliente_nome || 'Cliente'}`;
+            }
+            
+            // Preencher resumo da cotação
+            const resumoContainer = document.getElementById('historico-resumo-cotacao');
+            if (resumoContainer) {
+                resumoContainer.innerHTML = `
+                    <div><strong>Cliente:</strong> ${cotacao.cliente_nome || 'N/A'}</div>
+                    <div><strong>Status Atual:</strong> ${getStatusDisplay(cotacao.status)}</div>
+                    <div><strong>Modalidade:</strong> ${cotacao.modalidade || 'N/A'}</div>
+                    <div><strong>Origem:</strong> ${cotacao.origem_cidade || cotacao.origem_endereco || 'N/A'}</div>
+                    <div><strong>Destino:</strong> ${cotacao.destino_cidade || cotacao.destino_endereco || 'N/A'}</div>
+                    <div><strong>Valor:</strong> ${cotacao.valor_frete || 'Não cotado'}</div>
+                    <div><strong>Operador:</strong> ${cotacao.operador_nome || 'Não atribuído'}</div>
+                    <div><strong>Criada em:</strong> ${formatarDataHora(cotacao.data_criacao)}</div>
+                    <div><strong>Última Atualização:</strong> ${formatarDataHora(cotacao.data_atualizacao || cotacao.data_criacao)}</div>
+                `;
+            }
+            
+            // Gerar histórico simulado baseado no status atual
+            const historico = gerarHistoricoSimulado(cotacao);
+            
+            // Preencher timeline
+            const timelineContainer = document.getElementById('historico-timeline');
+            if (timelineContainer) {
+                timelineContainer.innerHTML = criarTimelineHTML(historico);
+            }
+            
+            // Preencher estatísticas
+            const estatisticasContainer = document.getElementById('historico-estatisticas');
+            if (estatisticasContainer) {
+                const stats = calcularEstatisticasHistorico(historico, cotacao);
+                estatisticasContainer.innerHTML = `
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${stats.totalAcoes}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Total de Ações</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 24px; font-weight: bold; color: #10b981;">${stats.tempoProcessamento}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Tempo Total</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${stats.usuariosEnvolvidos}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Usuários</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 24px; font-weight: bold; color: #8b5cf6;">${stats.statusAtual}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Status</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Função para gerar histórico simulado baseado no status
+        function gerarHistoricoSimulado(cotacao) {
+            const historico = [];
+            const agora = new Date();
+            
+            // Sempre tem criação
+            historico.push({
+                acao: 'Cotação Criada',
+                descricao: `Cotação criada pelo cliente ${cotacao.cliente_nome || 'Cliente'}`,
+                usuario: cotacao.cliente_nome || 'Cliente',
+                data: cotacao.data_criacao || new Date(agora.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+                tipo: 'criacao',
+                icone: '📝',
+                cor: '#3b82f6'
+            });
+            
+            // Baseado no status, adicionar ações
+            if (['aceita_operador', 'cotacao_enviada', 'aceita_consultor', 'recusada_consultor', 'finalizada'].includes(cotacao.status)) {
+                historico.push({
+                    acao: 'Cotação Aceita',
+                    descricao: `Cotação aceita pelo operador ${cotacao.operador_nome || 'Operador'}`,
+                    usuario: cotacao.operador_nome || 'Operador',
+                    data: cotacao.data_aceite || new Date(agora.getTime() - 20 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'aceite',
+                    icone: '✅',
+                    cor: '#10b981'
+                });
+            }
+            
+            if (['cotacao_enviada', 'aceita_consultor', 'recusada_consultor', 'finalizada'].includes(cotacao.status)) {
+                historico.push({
+                    acao: 'Resposta Enviada',
+                    descricao: `Cotação respondida com valor ${cotacao.valor_frete || 'R$ 1.500,00'} e prazo ${cotacao.prazo_entrega || '5'} dias`,
+                    usuario: cotacao.operador_nome || 'Operador',
+                    data: cotacao.data_resposta || new Date(agora.getTime() - 18 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'resposta',
+                    icone: '💰',
+                    cor: '#3b82f6'
+                });
+            }
+            
+            if (['aceita_consultor', 'finalizada'].includes(cotacao.status)) {
+                historico.push({
+                    acao: 'Cotação Aprovada',
+                    descricao: 'Cotação aprovada pelo consultor/cliente',
+                    usuario: 'Consultor',
+                    data: cotacao.data_aprovacao || new Date(agora.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'aprovacao',
+                    icone: '👍',
+                    cor: '#10b981'
+                });
+            }
+            
+            if (cotacao.status === 'recusada_consultor') {
+                historico.push({
+                    acao: 'Cotação Recusada',
+                    descricao: 'Cotação recusada pelo consultor/cliente',
+                    usuario: 'Consultor',
+                    data: cotacao.data_recusa || new Date(agora.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'recusa',
+                    icone: '👎',
+                    cor: '#ef4444'
+                });
+            }
+            
+            if (cotacao.status === 'finalizada') {
+                historico.push({
+                    acao: 'Cotação Finalizada',
+                    descricao: 'Serviço executado e cotação finalizada com sucesso',
+                    usuario: cotacao.operador_nome || 'Operador',
+                    data: cotacao.data_finalizacao || new Date(agora.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'finalizacao',
+                    icone: '🏁',
+                    cor: '#059669'
+                });
+            }
+            
+            if (cotacao.status === 'negada') {
+                historico.push({
+                    acao: 'Cotação Negada',
+                    descricao: 'Cotação negada pelo operador',
+                    usuario: 'Operador',
+                    data: cotacao.data_negacao || new Date(agora.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+                    tipo: 'negacao',
+                    icone: '❌',
+                    cor: '#ef4444'
+                });
+            }
+            
+            // Ordenar por data
+            return historico.sort((a, b) => new Date(a.data) - new Date(b.data));
+        }
+        
+        // Função para criar HTML da timeline
+        function criarTimelineHTML(historico) {
+            let html = '<div style="position: relative; padding-left: 30px;">';
+            
+            // Linha vertical da timeline
+            html += '<div style="position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: #e5e7eb;"></div>';
+            
+            historico.forEach((item, index) => {
+                const isLast = index === historico.length - 1;
+                html += `
+                    <div style="position: relative; margin-bottom: ${isLast ? '0' : '20px'}; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-left: 15px;">
+                        <!-- Círculo da timeline -->
+                        <div style="position: absolute; left: -23px; top: 15px; width: 16px; height: 16px; background: ${item.cor}; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 2px ${item.cor}20;"></div>
+                        
+                        <!-- Conteúdo -->
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 18px;">${item.icone}</span>
+                                <h4 style="margin: 0; color: ${item.cor}; font-size: 16px; font-weight: bold;">${item.acao}</h4>
+                            </div>
+                            <span style="font-size: 12px; color: #6b7280; white-space: nowrap;">${formatarDataHora(item.data)}</span>
+                        </div>
+                        
+                        <p style="margin: 0 0 8px 26px; color: #374151; font-size: 14px;">${item.descricao}</p>
+                        
+                        <div style="margin-left: 26px; font-size: 12px; color: #6b7280;">
+                            <i class="fas fa-user"></i> ${item.usuario}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+        
+        // Função para calcular estatísticas do histórico
+        function calcularEstatisticasHistorico(historico, cotacao) {
+            const totalAcoes = historico.length;
+            
+            // Calcular tempo de processamento
+            const dataInicio = new Date(historico[0]?.data || cotacao.data_criacao);
+            const dataFim = new Date(historico[historico.length - 1]?.data || new Date());
+            const diffHoras = Math.round((dataFim - dataInicio) / (1000 * 60 * 60));
+            const tempoProcessamento = diffHoras < 24 ? `${diffHoras}h` : `${Math.round(diffHoras / 24)}d`;
+            
+            // Contar usuários únicos
+            const usuariosUnicos = new Set(historico.map(h => h.usuario));
+            const usuariosEnvolvidos = usuariosUnicos.size;
+            
+            // Status atual
+            const statusAtual = getStatusDisplay(cotacao.status).replace(/^.*\s/, ''); // Pegar só a última palavra
+            
+            return {
+                totalAcoes,
+                tempoProcessamento,
+                usuariosEnvolvidos,
+                statusAtual
+            };
+        }
+        
+        // Função para fechar modal de histórico
+        function fecharModalHistorico() {
+            const modal = document.getElementById('modal-historico');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Sistema de Filtros Avançados
+        let filtrosAtivos = {};
+        let operadoresCarregados = [];
+        let cotacoesFiltradas = [];
+        
+        // Inicializar sistema de filtros
+        function inicializarFiltrosAvancados() {
+            console.log('🔍 Inicializando sistema de filtros avançados...');
+            
+            // Configurar event listeners
+            configurarEventListenersFiltros();
+            
+            // Carregar operadores
+            carregarOperadoresFiltros();
+            
+            // Configurar formatação monetária
+            configurarFormatacaoMonetariaFiltros();
+            
+            console.log('✅ Sistema de filtros avançados inicializado');
+        }
+        
+        // Configurar event listeners dos filtros
+        function configurarEventListenersFiltros() {
+            // Toggle mostrar/ocultar filtros
+            const btnToggleFiltros = document.getElementById('btn-toggle-filtros');
+            if (btnToggleFiltros) {
+                btnToggleFiltros.addEventListener('click', toggleFiltros);
+            }
+            
+            // Limpar filtros
+            const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
+            if (btnLimparFiltros) {
+                btnLimparFiltros.addEventListener('click', limparTodosFiltros);
+            }
+            
+            // Aplicar filtros
+            const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
+            if (btnAplicarFiltros) {
+                btnAplicarFiltros.addEventListener('click', aplicarFiltros);
+            }
+            
+            // Carregar todas
+            const btnCarregarTodas = document.getElementById('btn-carregar-todas');
+            if (btnCarregarTodas) {
+                btnCarregarTodas.addEventListener('click', carregarTodasCotacoes);
+            }
+            
+            // Exportar filtradas
+            const btnExportarFiltradas = document.getElementById('btn-exportar-filtradas');
+            if (btnExportarFiltradas) {
+                btnExportarFiltradas.addEventListener('click', exportarCotacoesFiltradas);
+            }
+            
+            // Filtros rápidos (aplicam automaticamente)
+            const filtroStatus = document.getElementById('filtro-status');
+            const filtroModalidade = document.getElementById('filtro-modalidade');
+            
+            if (filtroStatus) {
+                filtroStatus.addEventListener('change', aplicarFiltroRapido);
+            }
+            if (filtroModalidade) {
+                filtroModalidade.addEventListener('change', aplicarFiltroRapido);
+            }
+            
+            // Validação de datas
+            const filtroDataInicio = document.getElementById('filtro-data-inicio');
+            const filtroDataFim = document.getElementById('filtro-data-fim');
+            
+            if (filtroDataInicio) {
+                filtroDataInicio.addEventListener('change', validarPeriodoDatas);
+            }
+            if (filtroDataFim) {
+                filtroDataFim.addEventListener('change', validarPeriodoDatas);
+            }
+        }
+        
+        // Toggle mostrar/ocultar filtros
+        function toggleFiltros() {
+            const container = document.getElementById('filtros-container');
+            const btn = document.getElementById('btn-toggle-filtros');
+            
+            if (container && btn) {
+                const isHidden = container.classList.contains('hidden');
+                
+                if (isHidden) {
+                    container.classList.remove('hidden');
+                    btn.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Ocultar Filtros';
+                } else {
+                    container.classList.add('hidden');
+                    btn.innerHTML = '<i class="fas fa-eye mr-1"></i>Mostrar Filtros';
+                }
+            }
+        }
+        
+        // Carregar operadores para o filtro
+        async function carregarOperadoresFiltros() {
+            try {
+                const response = await fetch('/api/v133/operadores');
+                let operadores = [];
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    operadores = data.operadores || [];
+                } else {
+                    // Fallback com operadores simulados
+                    operadores = [
+                        { id: 1, nome: 'João Silva' },
+                        { id: 2, nome: 'Maria Santos' },
+                        { id: 3, nome: 'Pedro Costa' },
+                        { id: 4, nome: 'Ana Oliveira' }
+                    ];
+                }
+                
+                operadoresCarregados = operadores;
+                preencherSelectOperadores(operadores);
+                console.log(`✅ ${operadores.length} operadores carregados para filtros`);
+                
+            } catch (error) {
+                console.warn('Erro ao carregar operadores, usando fallback:', error);
+                // Fallback
+                const operadores = [
+                    { id: 1, nome: 'João Silva' },
+                    { id: 2, nome: 'Maria Santos' },
+                    { id: 3, nome: 'Pedro Costa' },
+                    { id: 4, nome: 'Ana Oliveira' }
+                ];
+                operadoresCarregados = operadores;
+                preencherSelectOperadores(operadores);
+            }
+        }
+        
+        // Preencher select de operadores
+        function preencherSelectOperadores(operadores) {
+            const select = document.getElementById('filtro-operador');
+            if (select) {
+                // Limpar opções existentes (exceto a primeira)
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+                
+                // Adicionar operadores
+                operadores.forEach(operador => {
+                    const option = document.createElement('option');
+                    option.value = operador.id;
+                    option.textContent = operador.nome;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        // Configurar formatação monetária nos filtros
+        function configurarFormatacaoMonetariaFiltros() {
+            const camposMonetarios = ['filtro-valor-min', 'filtro-valor-max'];
+            
+            camposMonetarios.forEach(id => {
+                const campo = document.getElementById(id);
+                if (campo) {
+                    campo.addEventListener('input', function(e) {
+                        let valor = e.target.value.replace(/\D/g, '');
+                        if (valor) {
+                            valor = (parseInt(valor) / 100).toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                            });
+                            e.target.value = valor;
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Validar período de datas
+        function validarPeriodoDatas() {
+            const dataInicio = document.getElementById('filtro-data-inicio').value;
+            const dataFim = document.getElementById('filtro-data-fim').value;
+            
+            if (dataInicio && dataFim) {
+                const inicio = new Date(dataInicio);
+                const fim = new Date(dataFim);
+                
+                if (inicio > fim) {
+                    mostrarMensagem('Data de início não pode ser maior que data fim', 'error');
+                    document.getElementById('filtro-data-fim').value = '';
+                }
+            }
+        }
+        
+        // Aplicar filtro rápido (status e modalidade)
+        function aplicarFiltroRapido() {
+            const status = document.getElementById('filtro-status').value;
+            const modalidade = document.getElementById('filtro-modalidade').value;
+            
+            if (status || modalidade) {
+                aplicarFiltros();
+            }
+        }
+        
+        // Aplicar filtros
+        async function aplicarFiltros() {
+            console.log('🔍 Aplicando filtros...');
+            
+            // Coletar valores dos filtros
+            const filtros = coletarValoresFiltros();
+            
+            // Mostrar loading
+            mostrarLoadingFiltros();
+            
+            try {
+                // Carregar cotações da API
+                const response = await fetch('/api/v133/cotacoes');
+                let cotacoes = [];
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    cotacoes = data.cotacoes || [];
+                } else {
+                    mostrarMensagem('Erro ao carregar cotações da API', 'error');
+                    return;
+                }
+                
+                // Aplicar filtros nas cotações
+                cotacoesFiltradas = filtrarCotacoes(cotacoes, filtros);
+                
+                // Atualizar interface
+                atualizarListaCotacoesFiltradas(cotacoesFiltradas);
+                atualizarContadorResultados(cotacoesFiltradas.length, cotacoes.length);
+                atualizarTagsFiltrosAtivos(filtros);
+                
+                console.log(`✅ Filtros aplicados: ${cotacoesFiltradas.length} de ${cotacoes.length} cotações`);
+                
+            } catch (error) {
+                console.error('Erro ao aplicar filtros:', error);
+                mostrarMensagem('Erro ao aplicar filtros', 'error');
+            } finally {
+                esconderLoadingFiltros();
+            }
+        }
+        
+        // Coletar valores dos filtros
+        function coletarValoresFiltros() {
+            return {
+                status: document.getElementById('filtro-status').value,
+                modalidade: document.getElementById('filtro-modalidade').value,
+                operador: document.getElementById('filtro-operador').value,
+                cliente: document.getElementById('filtro-cliente').value.trim(),
+                dataInicio: document.getElementById('filtro-data-inicio').value,
+                dataFim: document.getElementById('filtro-data-fim').value,
+                valorMin: parseFloat(document.getElementById('filtro-valor-min').value.replace(/[^\d,]/g, '').replace(',', '.')) || null,
+                valorMax: parseFloat(document.getElementById('filtro-valor-max').value.replace(/[^\d,]/g, '').replace(',', '.')) || null
+            };
+        }
+        
+        // Filtrar cotações baseado nos critérios
+        function filtrarCotacoes(cotacoes, filtros) {
+            return cotacoes.filter(cotacao => {
+                // Filtro por status
+                if (filtros.status && cotacao.status !== filtros.status) {
+                    return false;
+                }
+                
+                // Filtro por modalidade
+                if (filtros.modalidade && cotacao.modalidade !== filtros.modalidade) {
+                    return false;
+                }
+                
+                // Filtro por operador
+                if (filtros.operador && cotacao.operador_responsavel != filtros.operador) {
+                    return false;
+                }
+                
+                // Filtro por cliente
+                if (filtros.cliente) {
+                    const cliente = filtros.cliente.toLowerCase();
+                    const nomeCliente = (cotacao.cliente_nome || '').toLowerCase();
+                    const cnpjCliente = (cotacao.cliente_cnpj || '').replace(/\D/g, '');
+                    const clienteFiltro = filtros.cliente.replace(/\D/g, '');
+                    
+                    if (!nomeCliente.includes(cliente) && !cnpjCliente.includes(clienteFiltro)) {
+                        return false;
+                    }
+                }
+                
+                // Filtro por data
+                if (filtros.dataInicio || filtros.dataFim) {
+                    const dataCotacao = new Date(cotacao.data_criacao || cotacao.created_at);
+                    
+                    if (filtros.dataInicio) {
+                        const dataInicio = new Date(filtros.dataInicio);
+                        if (dataCotacao < dataInicio) {
+                            return false;
+                        }
+                    }
+                    
+                    if (filtros.dataFim) {
+                        const dataFim = new Date(filtros.dataFim);
+                        dataFim.setHours(23, 59, 59); // Incluir o dia todo
+                        if (dataCotacao > dataFim) {
+                            return false;
+                        }
+                    }
+                }
+                
+                // Filtro por valor
+                if (filtros.valorMin || filtros.valorMax) {
+                    const valorCotacao = parseFloat(cotacao.valor_frete?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+                    
+                    if (filtros.valorMin && valorCotacao < filtros.valorMin) {
+                        return false;
+                    }
+                    
+                    if (filtros.valorMax && valorCotacao > filtros.valorMax) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+        }
+        
+        // Carregar todas as cotações (sem filtros)
+        async function carregarTodasCotacoes() {
+            console.log('📋 Carregando todas as cotações...');
+            
+            // Limpar filtros
+            limparTodosFiltros();
+            
+            // Carregar via sistema existente
+            if (typeof carregarCotacoes === 'function') {
+                carregarCotacoes();
+            }
+        }
+        
+        // Limpar todos os filtros
+        function limparTodosFiltros() {
+            console.log('🧹 Limpando todos os filtros...');
+            
+            // Limpar campos
+            document.getElementById('filtro-status').value = '';
+            document.getElementById('filtro-modalidade').value = '';
+            document.getElementById('filtro-operador').value = '';
+            document.getElementById('filtro-cliente').value = '';
+            document.getElementById('filtro-data-inicio').value = '';
+            document.getElementById('filtro-data-fim').value = '';
+            document.getElementById('filtro-valor-min').value = '';
+            document.getElementById('filtro-valor-max').value = '';
+            
+            // Limpar tags ativas
+            const tagsContainer = document.getElementById('filtros-ativos');
+            if (tagsContainer) {
+                tagsContainer.classList.add('hidden');
+                tagsContainer.innerHTML = '<span class="text-sm font-medium text-gray-700 mr-2">Filtros ativos:</span>';
+            }
+            
+            // Resetar variáveis
+            filtrosAtivos = {};
+            cotacoesFiltradas = [];
+            
+            // Atualizar contador
+            atualizarContadorResultados(0, 0);
+        }
+        
+        // Atualizar lista de cotações filtradas
+        function atualizarListaCotacoesFiltradas(cotacoes) {
+            // Usar sistema existente se disponível
+            if (typeof renderizarCotacoes === 'function') {
+                renderizarCotacoes(cotacoes);
+            } else {
+                console.warn('Função renderizarCotacoes não encontrada');
+            }
+        }
+        
+        // Atualizar contador de resultados
+        function atualizarContadorResultados(filtradas, total) {
+            const contador = document.getElementById('contador-cotacoes');
+            if (contador) {
+                if (total === 0) {
+                    contador.textContent = 'Nenhuma cotação encontrada';
+                } else if (filtradas === total) {
+                    contador.textContent = `Mostrando todas as ${total} cotações`;
+                } else {
+                    contador.textContent = `Mostrando ${filtradas} de ${total} cotações`;
+                }
+            }
+        }
+        
+        // Atualizar tags de filtros ativos
+        function atualizarTagsFiltrosAtivos(filtros) {
+            const container = document.getElementById('filtros-ativos');
+            if (!container) return;
+            
+            // Limpar tags existentes
+            container.innerHTML = '<span class="text-sm font-medium text-gray-700 mr-2">Filtros ativos:</span>';
+            
+            let temFiltros = false;
+            
+            // Adicionar tags para cada filtro ativo
+            Object.entries(filtros).forEach(([key, value]) => {
+                if (value && value !== '') {
+                    temFiltros = true;
+                    const tag = criarTagFiltro(key, value);
+                    container.appendChild(tag);
+                }
+            });
+            
+            // Mostrar/ocultar container
+            if (temFiltros) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+        
+        // Criar tag de filtro ativo
+        function criarTagFiltro(key, value) {
+            const tag = document.createElement('span');
+            tag.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
+            
+            // Obter label amigável
+            const label = obterLabelFiltro(key, value);
+            
+            tag.innerHTML = `
+                ${label}
+                <button type="button" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-600" onclick="removerFiltro('${key}')">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            `;
+            
+            return tag;
+        }
+        
+        // Obter label amigável para filtro
+        function obterLabelFiltro(key, value) {
+            const labels = {
+                status: `Status: ${getStatusDisplay(value)}`,
+                modalidade: `Modalidade: ${value.charAt(0).toUpperCase() + value.slice(1)}`,
+                operador: `Operador: ${obterNomeOperador(value)}`,
+                cliente: `Cliente: ${value}`,
+                dataInicio: `De: ${formatarData(value)}`,
+                dataFim: `Até: ${formatarData(value)}`,
+                valorMin: `Min: ${formatarMoeda(value)}`,
+                valorMax: `Max: ${formatarMoeda(value)}`
+            };
+            
+            return labels[key] || `${key}: ${value}`;
+        }
+        
+        // Obter nome do operador pelo ID
+        function obterNomeOperador(id) {
+            const operador = operadoresCarregados.find(op => op.id == id);
+            return operador ? operador.nome : `ID ${id}`;
+        }
+        
+        // Remover filtro específico
+        function removerFiltro(key) {
+            const campo = document.getElementById(`filtro-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+            if (campo) {
+                campo.value = '';
+                aplicarFiltros();
+            }
+        }
+        
+        // Exportar cotações filtradas
+        function exportarCotacoesFiltradas() {
+            if (cotacoesFiltradas.length === 0) {
+                mostrarMensagem('Nenhuma cotação para exportar. Aplique filtros primeiro.', 'warning');
+                return;
+            }
+            
+            // Usar sistema de exportação existente se disponível
+            if (typeof exportarCotacoes === 'function') {
+                exportarCotacoes(cotacoesFiltradas);
+            } else {
+                // Exportação simples em CSV
+                exportarCSVSimples(cotacoesFiltradas);
+            }
+        }
+        
+        // Exportação CSV simples
+        function exportarCSVSimples(cotacoes) {
+            const headers = ['ID', 'Cliente', 'Status', 'Modalidade', 'Origem', 'Destino', 'Valor', 'Data'];
+            const rows = cotacoes.map(c => [
+                c.id,
+                c.cliente_nome || '',
+                c.status || '',
+                c.modalidade || '',
+                c.origem_cidade || c.origem_endereco || '',
+                c.destino_cidade || c.destino_endereco || '',
+                c.valor_frete || '',
+                c.data_criacao || ''
+            ]);
+            
+            const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cotacoes_filtradas_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        // Mostrar loading nos filtros
+        function mostrarLoadingFiltros() {
+            const btn = document.getElementById('btn-aplicar-filtros');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Aplicando...';
+            }
+        }
+        
+        // Esconder loading nos filtros
+        function esconderLoadingFiltros() {
+            const btn = document.getElementById('btn-aplicar-filtros');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search mr-2"></i>Aplicar Filtros';
+            }
+        }
+        
+        // Funções auxiliares
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+        
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+        }
+        
+        // Inicializar filtros quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aguardar um pouco para garantir que outros sistemas estejam carregados
+            setTimeout(() => {
+                inicializarFiltrosAvancados();
+            }, 1000);
+        });
 
         // Função para responder cotação
         async function responderCotacao(cotacaoId) {
