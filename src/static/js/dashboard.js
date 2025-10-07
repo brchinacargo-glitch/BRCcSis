@@ -8,6 +8,9 @@ const Dashboard = {
     // Dados do dashboard
     stats: null,
     
+    // Flag para evitar carregamento múltiplo
+    isLoading: false,
+    
     // ==================== INICIALIZAÇÃO ====================
     
     /**
@@ -23,12 +26,25 @@ const Dashboard = {
      * Carrega dados do dashboard
      */
     async load() {
+        // Evitar carregamento múltiplo
+        if (this.isLoading) {
+            console.log('⏳ Dashboard já está carregando, pulando...');
+            return;
+        }
+        
+        this.isLoading = true;
+        
         try {
+            // Destruir todos os gráficos antes de carregar novos
+            this.destroyAllCharts();
+            
             await this.loadStats();
             await this.loadCharts();
         } catch (error) {
             console.error('Erro ao carregar dashboard:', error);
             Utils.showError('Erro ao carregar dados do dashboard');
+        } finally {
+            this.isLoading = false;
         }
     },
     
@@ -145,6 +161,21 @@ const Dashboard = {
      * @returns {object} - Dados processados
      */
     processChartData(empresas) {
+        // Verificar se empresas existe e é um array
+        if (!empresas || !Array.isArray(empresas)) {
+            console.warn('Empresas não disponível ou não é um array, usando dados padrão');
+            return {
+                regioes: {
+                    labels: ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte'],
+                    data: [45, 30, 15, 7, 3]
+                },
+                tipos_carga: {
+                    labels: ['Geral', 'Refrigerada', 'Perigosa', 'Frágil', 'Valiosa'],
+                    data: [60, 20, 10, 7, 3]
+                }
+            };
+        }
+        
         // Empresas por região
         const regioes = {};
         empresas.forEach(e => {
@@ -214,10 +245,16 @@ const Dashboard = {
         
         // Destruir gráfico existente se houver
         if (this.charts.regiao) {
-            this.charts.regiao.destroy();
+            try {
+                this.charts.regiao.destroy();
+                console.log('🧹 Gráfico região destruído');
+            } catch (error) {
+                console.warn('Erro ao destruir gráfico região:', error);
+            }
         }
         
-        this.charts.regiao = new Chart(ctx, {
+        try {
+            this.charts.regiao = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: data.labels || [],
@@ -242,6 +279,9 @@ const Dashboard = {
                 }
             }
         });
+        } catch (error) {
+            console.error('Erro ao criar gráfico região:', error);
+        }
     },
     
     /**
@@ -254,10 +294,16 @@ const Dashboard = {
         
         // Destruir gráfico existente se houver
         if (this.charts.tiposCarga) {
-            this.charts.tiposCarga.destroy();
+            try {
+                this.charts.tiposCarga.destroy();
+                console.log('🧹 Gráfico tipos carga destruído');
+            } catch (error) {
+                console.warn('Erro ao destruir gráfico tipos carga:', error);
+            }
         }
         
-        this.charts.tiposCarga = new Chart(ctx, {
+        try {
+            this.charts.tiposCarga = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: data.labels || [],
@@ -279,6 +325,9 @@ const Dashboard = {
                 }
             }
         });
+        } catch (error) {
+            console.error('Erro ao criar gráfico tipos carga:', error);
+        }
     },
     
     /**
@@ -290,14 +339,20 @@ const Dashboard = {
         
         // Destruir gráfico existente se houver
         if (this.charts.crescimento) {
-            this.charts.crescimento.destroy();
+            try {
+                this.charts.crescimento.destroy();
+                console.log('🧹 Gráfico crescimento destruído');
+            } catch (error) {
+                console.warn('Erro ao destruir gráfico crescimento:', error);
+            }
         }
         
         // Dados de exemplo (pode ser substituído por dados reais)
         const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         const dados = [10, 15, 18, 22, 28, 32, 38, 42, 48, 52, 58, 65];
         
-        this.charts.crescimento = new Chart(ctx, {
+        try {
+            this.charts.crescimento = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: meses,
@@ -316,29 +371,32 @@ const Dashboard = {
                 scales: {
                     y: {
                         beginAtZero: true
-                    }
-                }
-            }
-        });
+        }
     },
     
     /**
      * Renderiza gráfico de certificações
-     */
+{{ ... }}
     renderChartCertificacoes() {
         const ctx = document.getElementById('chart-certificacoes');
         if (!ctx) return;
         
         // Destruir gráfico existente se houver
         if (this.charts.certificacoes) {
-            this.charts.certificacoes.destroy();
+            try {
+                this.charts.certificacoes.destroy();
+                console.log('🧹 Gráfico certificações destruído');
+            } catch (error) {
+                console.warn('Erro ao destruir gráfico certificações:', error);
+            }
         }
         
         // Dados de exemplo (pode ser substituído por dados reais)
         const certificacoes = ['ISO 9001', 'ISO 14001', 'OHSAS 18001', 'OEA', 'Outras'];
         const dados = [25, 18, 12, 8, 10];
         
-        this.charts.certificacoes = new Chart(ctx, {
+        try {
+            this.charts.certificacoes = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: certificacoes,
@@ -361,6 +419,29 @@ const Dashboard = {
                 }
             }
         });
+        } catch (error) {
+            console.error('Erro ao criar gráfico certificações:', error);
+        }
+    },
+    
+    /**
+     * Destrói todos os gráficos
+     */
+    destroyAllCharts() {
+        if (!this.charts) return;
+        
+        Object.keys(this.charts).forEach(key => {
+            try {
+                if (this.charts[key]) {
+                    this.charts[key].destroy();
+                    console.log(`🧹 Gráfico ${key} destruído`);
+                }
+            } catch (error) {
+                console.warn(`Erro ao destruir gráfico ${key}:`, error);
+            }
+        });
+        
+        this.charts = {};
     },
     
     // ==================== EXPORTAÇÃO ====================

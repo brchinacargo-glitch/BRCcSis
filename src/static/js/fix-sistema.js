@@ -264,23 +264,45 @@ function corrigirProblemaChartjs() {
 // 7. Interceptar erros de Chart.js e corrigir automaticamente
 if (window.Chart) {
     const originalChart = window.Chart;
+    
+    // Criar um mapa global para rastrear gráficos por canvas ID
+    window.chartInstances = window.chartInstances || {};
+    
     window.Chart = function(ctx, config) {
-        // Se o canvas já está em uso, destruir o gráfico anterior
-        if (ctx && ctx.canvas && ctx.canvas.chartInstance) {
+        // Obter ID do canvas
+        const canvasId = ctx && ctx.canvas ? ctx.canvas.id : null;
+        
+        // Se já existe um gráfico para este canvas, destruí-lo
+        if (canvasId && window.chartInstances[canvasId]) {
             try {
-                ctx.canvas.chartInstance.destroy();
-                console.log('🔧 Gráfico anterior destruído automaticamente');
+                window.chartInstances[canvasId].destroy();
+                console.log(`🔧 Gráfico anterior destruído para canvas: ${canvasId}`);
+                delete window.chartInstances[canvasId];
             } catch (error) {
-                console.warn('Erro ao destruir gráfico anterior:', error);
+                console.warn(`Erro ao destruir gráfico anterior para ${canvasId}:`, error);
             }
         }
         
         // Criar novo gráfico
-        const chart = new originalChart(ctx, config);
-        
-        // Salvar referência para futuras limpezas
-        if (ctx && ctx.canvas) {
-            ctx.canvas.chartInstance = chart;
+        let chart;
+        try {
+            chart = new originalChart(ctx, config);
+            
+            // Salvar referência no mapa global
+            if (canvasId) {
+                window.chartInstances[canvasId] = chart;
+            }
+        } catch (error) {
+            console.error('Erro ao criar gráfico:', error);
+            // Tentar limpar e criar novamente
+            if (ctx && ctx.canvas) {
+                const newCtx = ctx.canvas.getContext('2d');
+                newCtx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                chart = new originalChart(newCtx, config);
+                if (canvasId) {
+                    window.chartInstances[canvasId] = chart;
+                }
+            }
         }
         
         return chart;
@@ -291,7 +313,7 @@ if (window.Chart) {
         window.Chart[key] = originalChart[key];
     });
     
-    console.log('🔧 Chart.js interceptado para correção automática');
+    console.log('🔧 Chart.js interceptado para correção automática com mapa de instâncias');
 }
 
 // 8. Evitar carregamento múltiplo de analytics
