@@ -8,6 +8,15 @@ const Dashboard = {
     // Dados do dashboard
     stats: null,
     
+    // ==================== INICIALIZAÇÃO ====================
+    
+    /**
+     * Inicializa o módulo Dashboard
+     */
+    init() {
+        console.log('✅ Dashboard inicializado');
+    },
+    
     // ==================== CARREGAMENTO ====================
     
     /**

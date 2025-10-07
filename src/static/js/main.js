@@ -5,12 +5,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('BRCcSis v1.3.4 - Sistema Iniciado');
     
-    // Inicializar módulos principais
-    UI.init();
-    Dashboard.init();
-    Empresas.init();
-    Cotacoes.init();
-    Analytics.init();
+    // Inicializar módulos principais com verificação de segurança
+    if (typeof UI !== 'undefined' && UI.init) UI.init();
+    if (typeof Dashboard !== 'undefined' && Dashboard.init) Dashboard.init();
+    if (typeof Empresas !== 'undefined' && Empresas.init) Empresas.init();
+    if (typeof Cotacoes !== 'undefined' && Cotacoes.init) Cotacoes.init();
+    if (typeof Analytics !== 'undefined' && Analytics.init) Analytics.init();
     
     // Inicializar sistemas de cotações
     if (typeof AceitarNegarCotacoes !== 'undefined') AceitarNegarCotacoes.init();

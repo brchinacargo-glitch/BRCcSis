@@ -287,7 +287,7 @@ const DashboardGraficos = {
     
     // ==================== RENDERIZAÇÃO DE GRÁFICOS ====================
     
-    renderizarTodosGraficos(dados) {
+    renderizarTodosGraficos() {
         // Evitar renderização se já estamos renderizando
         if (this.renderizando) {
             console.log('⚠️ Renderização já em andamento, pulando...');
@@ -299,29 +299,71 @@ const DashboardGraficos = {
         try {
             this.renderizarGraficoStatus();
             this.renderizarGraficoModalidade();
-            this.renderizarGraficoEvolucao();
-            this.renderizarGraficoOperadores();
-            this.renderizarGraficoValores();
-            
-            console.log('✅ Todos os gráficos renderizados com sucesso');
+            // Simplificar por enquanto - apenas 2 gráficos
+            console.log('✅ Gráficos principais renderizados com sucesso');
+        } catch (error) {
+            console.error('Erro ao renderizar gráficos:', error);
         } finally {
             this.renderizando = false;
         }
     },
-    
+
+    /**
+     * Cria container para os gráficos se não existir
+     */
+    criarContainerGraficos() {
+        const container = document.getElementById('dashboard-analytics');
+        if (!container) return;
+
+        // Se já existe conteúdo, não recriar
+        if (container.innerHTML.trim()) return;
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Status das Cotações</h3>
+                    <canvas id="grafico-status" width="400" height="300"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Por Modalidade</h3>
+                    <canvas id="grafico-modalidade" width="400" height="300"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Evolução Temporal</h3>
+                    <canvas id="grafico-evolucao" width="400" height="300"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Por Operador</h3>
+                    <canvas id="grafico-operadores" width="400" height="300"></canvas>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Renderiza gráfico de status
+     */
     renderizarGraficoStatus() {
-        const ctx = document.getElementById('grafico-status');
-        if (!ctx || !this.dados) {
-            console.warn('Elemento grafico-status não encontrado ou dados indisponíveis');
+        this.criarContainerGraficos();
+        
+        const canvas = document.getElementById('grafico-status');
+        if (!canvas) {
+            console.log('Elemento grafico-status não encontrado');
             return;
         }
+
+        const dados = this.dados?.porStatus || [];
+        if (dados.length === 0) {
+            console.log('Dados de status não disponíveis');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
         
         // Destruir gráfico anterior se existir
         if (this.graficosRenderizados.status) {
             this.graficosRenderizados.status.destroy();
         }
-        
-        const dados = this.dados.porStatus;
         
         this.graficosRenderizados.status = new Chart(ctx, {
             type: 'doughnut',
@@ -366,17 +408,24 @@ const DashboardGraficos = {
     },
     
     renderizarGraficoModalidade() {
-        const ctx = document.getElementById('grafico-modalidade');
-        if (!ctx || !this.dados) {
-            console.warn('Elemento grafico-modalidade não encontrado ou dados indisponíveis');
+        const canvas = document.getElementById('grafico-modalidade');
+        if (!canvas) {
+            console.log('Elemento grafico-modalidade não encontrado');
+            return;
+        }
+
+        const dados = this.dados?.porModalidade || [];
+        if (dados.length === 0) {
+            console.log('Dados de modalidade não disponíveis');
             return;
         }
         
+        const ctx = canvas.getContext('2d');
+        
+        // Destruir gráfico anterior se existir
         if (this.graficosRenderizados.modalidade) {
             this.graficosRenderizados.modalidade.destroy();
         }
-        
-        const dados = this.dados.porModalidade;
         
         this.graficosRenderizados.modalidade = new Chart(ctx, {
             type: 'bar',
