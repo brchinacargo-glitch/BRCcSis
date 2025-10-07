@@ -212,93 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
 });
 
-// 5. Adicionar método getEmpresas à API se não existir
-if (window.API && !window.API.getEmpresas) {
-    window.API.getEmpresas = async function(page = 1, filters = {}) {
-        try {
-            const params = new URLSearchParams({
-                page: page,
-                per_page: 10,
-                ...filters
-            });
-            
-            const response = await fetch(`${this.baseURL}/v133/empresas?${params}`);
-            if (response.ok) {
-                return await response.json();
-            }
-            
-            // Fallback com dados simulados
-            return {
-                success: true,
-                empresas: [
-                    {
-                        id: 1,
-                        razao_social: 'Transportadora ABC Ltda',
-                        cnpj: '12.345.678/0001-90',
-                        cidade: 'São Paulo',
-                        estado: 'SP',
-                        modalidade: 'Rodoviário'
-                    },
-                    {
-                        id: 2,
-                        razao_social: 'Logística XYZ S.A.',
-                        cnpj: '98.765.432/0001-10',
-                        cidade: 'Rio de Janeiro',
-                        estado: 'RJ',
-                        modalidade: 'Marítimo'
-                    },
-                    {
-                        id: 3,
-                        razao_social: 'Cargo Express Ltda',
-                        cnpj: '11.222.333/0001-44',
-                        cidade: 'Belo Horizonte',
-                        estado: 'MG',
-                        modalidade: 'Rodoviário'
-                    }
-                ],
-                current_page: page,
-                pages: 1,
-                total: 3,
-                per_page: 10
-            };
-        } catch (error) {
-            console.warn('Endpoint empresas não disponível, usando fallback');
-            return {
-                success: true,
-                empresas: [
-                    {
-                        id: 1,
-                        razao_social: 'Transportadora ABC Ltda',
-                        cnpj: '12.345.678/0001-90',
-                        cidade: 'São Paulo',
-                        estado: 'SP',
-                        modalidade: 'Rodoviário'
-                    },
-                    {
-                        id: 2,
-                        razao_social: 'Logística XYZ S.A.',
-                        cnpj: '98.765.432/0001-10',
-                        cidade: 'Rio de Janeiro',
-                        estado: 'RJ',
-                        modalidade: 'Marítimo'
-                    },
-                    {
-                        id: 3,
-                        razao_social: 'Cargo Express Ltda',
-                        cnpj: '11.222.333/0001-44',
-                        cidade: 'Belo Horizonte',
-                        estado: 'MG',
-                        modalidade: 'Rodoviário'
-                    }
-                ],
-                current_page: page,
-                pages: 1,
-                total: 3,
-                per_page: 10
-            };
-        }
-    };
-    console.log('✅ Método getEmpresas adicionado à API');
+// 5. Verificar se métodos da API estão disponíveis
+if (window.API) {
+    console.log('✅ API carregada com métodos:', Object.keys(window.API));
 }
 
 console.log('✅ Correções do sistema aplicadas');

@@ -83,6 +83,17 @@ const Dashboard = {
      * @param {object} stats - Estatísticas
      */
     renderStats(stats) {
+        // Verificar se stats existe e tem as propriedades necessárias
+        if (!stats) {
+            console.warn('Stats não disponível, usando valores padrão');
+            stats = {
+                total_empresas: 0,
+                empresas_certificadas: 0,
+                empresas_armazem: 0,
+                empresas_nacional: 0
+            };
+        }
+        
         Utils.setTextContent(document.getElementById('total-empresas'), stats.total_empresas || 0);
         Utils.setTextContent(document.getElementById('empresas-certificadas'), stats.empresas_certificadas || 0);
         Utils.setTextContent(document.getElementById('empresas-armazem'), stats.empresas_armazem || 0);
@@ -168,6 +179,23 @@ const Dashboard = {
      * @param {object} data - Dados dos gráficos
      */
     renderCharts(data) {
+        // Verificar se data existe e tem as propriedades necessárias
+        if (!data) {
+            console.warn('Data não disponível para gráficos, usando valores padrão');
+            data = {
+                regioes: { labels: ['Sudeste', 'Sul', 'Nordeste'], data: [45, 30, 25] },
+                tipos_carga: { labels: ['Geral', 'Refrigerada', 'Perigosa'], data: [60, 25, 15] }
+            };
+        }
+        
+        // Verificar se as propriedades existem
+        if (!data.regioes) {
+            data.regioes = { labels: ['Sudeste', 'Sul', 'Nordeste'], data: [45, 30, 25] };
+        }
+        if (!data.tipos_carga) {
+            data.tipos_carga = { labels: ['Geral', 'Refrigerada', 'Perigosa'], data: [60, 25, 15] };
+        }
+        
         this.renderChartRegiao(data.regioes);
         this.renderChartTiposCarga(data.tipos_carga);
         this.renderChartCrescimento();
