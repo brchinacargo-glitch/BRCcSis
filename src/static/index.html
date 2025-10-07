@@ -242,9 +242,9 @@
                     </div>
                 </div>
                 <nav class="hidden md:flex space-x-6">
-                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="dashboard">Dashboard</a>
-                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="empresas">Empresas</a>
-                    <a href="#" class="hover:text-green-200 transition-colors" data-nav="cotacoes">Cotações</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-dashboard" data-nav="dashboard">Dashboard</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-empresas" data-nav="empresas">Empresas</a>
+                    <a href="#" class="hover:text-green-200 transition-colors" id="nav-cotacoes" data-nav="cotacoes">Cotações</a>
                     <a href="#" class="hover:text-green-200 transition-colors" data-nav="secao-analytics-v133">Analytics</a>
                     <a href="#" class="hover:text-green-200 transition-colors" id="nav-cadastro">Cadastrar</a>
                     <button id="btn-logout" class="hover:text-green-200 transition-colors">
@@ -1503,7 +1503,10 @@
                 const response = await fetch('/api/empresas');
                 const data = await response.json();
                 
-                document.getElementById('total-empresas').textContent = data.total || 0;
+                const totalEmpresasEl = document.getElementById('total-empresas');
+                if (totalEmpresasEl) {
+                    totalEmpresasEl.textContent = data.total || 0;
+                }
                 
                 // Carregar detalhes para estatísticas específicas
                 let certificadas = 0;
@@ -1531,9 +1534,13 @@
                     }
                 }
                 
-                document.getElementById('empresas-certificadas').textContent = certificadas;
-                document.getElementById('empresas-armazem').textContent = comArmazem;
-                document.getElementById('empresas-nacional').textContent = nacional;
+                const certificadasEl = document.getElementById('empresas-certificadas');
+                const armazemEl = document.getElementById('empresas-armazem');
+                const nacionalEl = document.getElementById('empresas-nacional');
+                
+                if (certificadasEl) certificadasEl.textContent = certificadas;
+                if (armazemEl) armazemEl.textContent = comArmazem;
+                if (nacionalEl) nacionalEl.textContent = nacional;
                 
                 // Carregar gráficos do dashboard
                 carregarDadosAnalytics();
@@ -9684,7 +9691,7 @@
                 const statusElement = cotacaoContainer.querySelector('.status-badge');
                 const empresaElement = cotacaoContainer.querySelector('[class*="text-blue"], [class*="text-green"], [class*="text-purple"]');
                 const dataElement = cotacaoContainer.querySelector('.text-gray-500');
-                const operadorElement = cotacaoContainer.querySelector('strong:contains("Operador:")');
+                const operadorElement = Array.from(cotacaoContainer.querySelectorAll('strong')).find(el => el.textContent.includes('Operador:'));
                 
                 const cotacao = {
                     id: cotacaoId,
@@ -11767,10 +11774,10 @@
                 </div>
                 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="ModalRespostaCotacao.close()">
+                    <button type="button" class="btn btn-secondary" onclick="if(window.ModalRespostaMelhorado) ModalRespostaMelhorado.fecharModal('modal-resposta-cotacao')">
                         Cancelar
                     </button>
-                    <button type="button" class="btn btn-primary" onclick="ModalRespostaCotacao.submit()">
+                    <button type="button" class="btn btn-primary" onclick="if(window.ModalRespostaMelhorado) ModalRespostaMelhorado.enviarResposta()">
                         Enviar Resposta
                     </button>
                 </div>

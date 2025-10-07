@@ -83,14 +83,14 @@ const UI = {
         const secaoAnalytics = document.getElementById('secao-analytics-v133');
         if (secaoCotacoes) Utils.hide(secaoCotacoes);
         if (secaoAnalytics) Utils.hide(secaoAnalytics);
-        
         // Mostrar seção selecionada
         this.currentSection = section;
         
         switch(section) {
             case 'dashboard':
-                Utils.show('dashboard');
-                Dashboard.load();
+                if (Dashboard && typeof Dashboard.loadData === 'function') {
+                    Dashboard.loadData();
+                }
                 break;
             case 'empresas':
                 Utils.show('empresas');
@@ -103,7 +103,9 @@ const UI = {
             case 'cotacoes':
                 if (secaoCotacoes) {
                     Utils.show(secaoCotacoes);
-                    Cotacoes.load();
+                    if (Cotacoes && typeof Cotacoes.render === 'function') {
+                        Cotacoes.render();
+                    }
                 }
                 break;
             case 'analytics':
