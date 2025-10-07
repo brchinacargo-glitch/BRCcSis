@@ -18,6 +18,33 @@ const Cotacoes = {
         if (btnNova) {
             btnNova.addEventListener('click', () => this.showNewModal());
         }
+        
+        // Fechar modal
+        const btnFechar = document.getElementById('fechar-modal-cotacao');
+        if (btnFechar) {
+            btnFechar.addEventListener('click', () => this.hideModal());
+        }
+        
+        const btnCancelar = document.getElementById('cancelar-cotacao');
+        if (btnCancelar) {
+            btnCancelar.addEventListener('click', () => this.hideModal());
+        }
+        
+        // Submeter formulário
+        const form = document.getElementById('form-cotacao');
+        if (form) {
+            form.addEventListener('submit', (e) => this.handleSubmit(e));
+        }
+        
+        // Fechar modal clicando fora
+        const modal = document.getElementById('modal-nova-cotacao');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.hideModal();
+                }
+            });
+        }
     },
     
     loadData() {
@@ -107,8 +134,8 @@ const Cotacoes = {
             container.innerHTML = `
                 <div class="p-8 text-center text-gray-500">
                     <p>Nenhuma cotação encontrada</p>
-                    <button onclick="Cotacoes.showNewModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Criar Nova Cotação
+                    <button onclick="Cotacoes.showNewModal()" class="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+                        <i class="fas fa-plus mr-2"></i>Criar Nova Cotação
                     </button>
                 </div>
             `;
@@ -183,7 +210,73 @@ const Cotacoes = {
     
     // Ações básicas
     showNewModal() {
-        alert('Modal de nova cotação será implementado na próxima etapa');
+        const modal = document.getElementById('modal-nova-cotacao');
+        if (modal) {
+            modal.classList.add('show');
+            modal.style.display = 'flex';
+            console.log('✅ Modal de nova cotação aberto');
+        } else {
+            console.warn('Modal não encontrado');
+            alert('Modal de nova cotação não encontrado');
+        }
+    },
+    
+    hideModal() {
+        const modal = document.getElementById('modal-nova-cotacao');
+        if (modal) {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            console.log('✅ Modal fechado');
+        }
+    },
+    
+    handleSubmit(e) {
+        e.preventDefault();
+        console.log('📝 Processando formulário...');
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        // Extrair dados básicos do formulário
+        const data = {
+            cliente: formData.get('cliente_nome') || 'Cliente Teste',
+            modalidade: formData.get('modalidade') || 'rodoviario',
+            origem: this.getOrigemFromForm(formData),
+            destino: this.getDestinoFromForm(formData)
+        };
+        
+        console.log('📋 Dados extraídos:', data);
+        
+        // Validação básica
+        if (!data.cliente || !data.origem || !data.destino) {
+            alert('Por favor, preencha todos os campos obrigatórios');
+            return;
+        }
+        
+        // Criar cotação
+        const novaCotacao = this.create(data);
+        
+        // Fechar modal e limpar formulário
+        this.hideModal();
+        form.reset();
+        
+        alert(`Cotação ${novaCotacao.numero} criada com sucesso!`);
+    },
+    
+    getOrigemFromForm(formData) {
+        // Tentar diferentes campos de origem
+        return formData.get('origem_endereco') || 
+               formData.get('origem_cidade') || 
+               formData.get('porto_origem') || 
+               'Origem não informada';
+    },
+    
+    getDestinoFromForm(formData) {
+        // Tentar diferentes campos de destino
+        return formData.get('destino_endereco') || 
+               formData.get('destino_cidade') || 
+               formData.get('porto_destino') || 
+               'Destino não informado';
     },
     
     viewDetails(id) {
