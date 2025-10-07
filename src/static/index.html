@@ -5816,19 +5816,12 @@
             try {
                 console.log('Aceitando cotação:', cotacaoId);
                 
-                // Usar endpoint correto da API v133
-                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/aceitar`, {
-                    method: 'PUT', // Mudado de POST para PUT
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        observacoes: 'Cotação aceita pelo operador'
-                    })
+                // Usar API centralizada
+                const resultado = await API.aceitarCotacao(cotacaoId, {
+                    observacoes: 'Cotação aceita pelo operador'
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
+                if (resultado.success) {
                     // Disparar notificação em tempo real
                     if (typeof SistemaNotificacoes !== 'undefined') {
                         SistemaNotificacoes.mostrar(
@@ -5846,7 +5839,7 @@
                         status: 'aceita_operador',
                         status_display: 'Aceita pelo Operador',
                         status_color: 'bg-blue-100 text-blue-800',
-                        operador_nome: 'Operador Atual', // Pode ser obtido do contexto do usuário
+                        operador_nome: 'Operador Atual',
                         data_aceite: new Date().toISOString()
                     };
                     atualizarCotacaoNosCarregados(cotacaoAtualizada);
@@ -5854,9 +5847,7 @@
                     carregarCotacoes(); // Recarregar lista
                     carregarEstatisticasCotacoes(); // Atualizar estatísticas
                 } else {
-                    // Fallback para desenvolvimento sem backend
-                    console.warn('Backend não disponível, simulando aceitação');
-                    mostrarMensagem('Cotação aceita com sucesso! (modo desenvolvimento)', 'success');
+                    mostrarMensagem('Erro ao aceitar cotação: ' + resultado.message, 'error');
                     
                     // Atualizar dados locais mesmo no fallback
                     const cotacaoAtualizada = {
@@ -5912,43 +5903,31 @@
             try {
                 console.log('Negando cotação:', cotacaoId);
                 
-                const response = await fetch(`/api/v133/cotacoes/${cotacaoId}/negar`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        motivo: motivo,
-                        observacoes: 'Cotação negada pelo operador'
-                    })
-                });
+                // Usar API centralizada
+                const resultado = await API.negarCotacao(cotacaoId, motivo);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    mostrarMensagem('Cotação negada com sucesso!', 'success');
+                if (resultado.success) {
+                    mostrarMensagem('✅ Cotação negada com sucesso!', 'success');
+                    
+                    // Atualizar dados locais
+                    const cotacaoAtualizada = {
+                        id: cotacaoId,
+                        status: 'negada',
+                        status_display: 'Negada',
+                        status_color: 'bg-red-100 text-red-800',
+                        motivo_negacao: motivo,
+                        data_negacao: new Date().toISOString()
+                    };
+                    atualizarCotacaoNosCarregados(cotacaoAtualizada);
+                    
                     carregarCotacoes();
                     carregarEstatisticasCotacoes();
                 } else {
-                    // Fallback para desenvolvimento
-                    console.warn('Backend não disponível, simulando negação');
-                    mostrarMensagem('Cotação negada com sucesso! (modo desenvolvimento)', 'success');
-                    
-                    // Simular mudança de status localmente
-                    const cotacaoElement = document.querySelector(`[data-cotacao-id="${cotacaoId}"]`).closest('.cotacao-card');
-                    if (cotacaoElement) {
-                        const statusBadge = cotacaoElement.querySelector('.status-badge');
-                        if (statusBadge) {
-                            statusBadge.textContent = 'Negada';
-                            statusBadge.className = 'status-badge bg-red-100 text-red-800';
-                        }
-                    }
+                    mostrarMensagem('Erro ao negar cotação: ' + resultado.message, 'error');
                 }
             } catch (error) {
                 console.error('Erro ao negar cotação:', error);
-                
-                // Fallback para desenvolvimento
-                console.warn('Erro de rede, simulando negação');
-                mostrarMensagem('Cotação negada com sucesso! (modo desenvolvimento)', 'success');
+                mostrarMensagem('Erro ao negar cotação', 'error');
             }
         }
 
