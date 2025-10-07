@@ -187,9 +187,21 @@ function corrigirNavegacaoEmpresas() {
                         window.loadEmpresas(1, true);
                     } else {
                         console.warn('Função loadEmpresas não encontrada');
-                        // Tentar forçar carregamento via evento
-                        const event = new CustomEvent('loadEmpresas', { detail: { page: 1, force: true } });
-                        document.dispatchEvent(event);
+                        // Tentar carregar via API diretamente
+                        if (window.API && window.API.getEmpresas) {
+                            console.log('📋 Carregando empresas via API...');
+                            window.API.getEmpresas(1).then(response => {
+                                if (response.success && response.empresas) {
+                                    console.log(`✅ ${response.empresas.length} empresas carregadas via API`);
+                                    // Tentar renderizar se função displayEmpresas existir
+                                    if (typeof displayEmpresas === 'function') {
+                                        displayEmpresas(response);
+                                    }
+                                }
+                            }).catch(error => {
+                                console.warn('Erro ao carregar empresas via API:', error);
+                            });
+                        }
                     }
                 }, 200);
             } else {
@@ -204,6 +216,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         corrigirNavegacaoEmpresas();
         
+        // Corrigir problemas de Chart.js
+        setTimeout(corrigirProblemaChartjs, 500);
+        
         // Se estivermos na seção analytics, atualizar métricas
         const analyticsSection = document.getElementById('secao-analytics-v133');
         if (analyticsSection && analyticsSection.style.display !== 'none') {
@@ -215,6 +230,90 @@ document.addEventListener('DOMContentLoaded', function() {
 // 5. Verificar se métodos da API estão disponíveis
 if (window.API) {
     console.log('✅ API carregada com métodos:', Object.keys(window.API));
+}
+
+// 6. Corrigir problema de Chart.js - Canvas já em uso
+function corrigirProblemaChartjs() {
+    // Destruir todos os gráficos Chart.js existentes antes de criar novos
+    if (window.Chart && window.Chart.instances) {
+        Object.keys(window.Chart.instances).forEach(key => {
+            const chart = window.Chart.instances[key];
+            if (chart) {
+                try {
+                    chart.destroy();
+                    console.log(`🧹 Gráfico Chart.js ${key} destruído`);
+                } catch (error) {
+                    console.warn(`Erro ao destruir gráfico ${key}:`, error);
+                }
+            }
+        });
+    }
+    
+    // Limpar todos os canvas que possam ter gráficos
+    const canvasElements = document.querySelectorAll('canvas[id*="chart"]');
+    canvasElements.forEach(canvas => {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    });
+    
+    console.log('🧹 Canvas de gráficos limpos');
+}
+
+// 7. Interceptar erros de Chart.js e corrigir automaticamente
+if (window.Chart) {
+    const originalChart = window.Chart;
+    window.Chart = function(ctx, config) {
+        // Se o canvas já está em uso, destruir o gráfico anterior
+        if (ctx && ctx.canvas && ctx.canvas.chartInstance) {
+            try {
+                ctx.canvas.chartInstance.destroy();
+                console.log('🔧 Gráfico anterior destruído automaticamente');
+            } catch (error) {
+                console.warn('Erro ao destruir gráfico anterior:', error);
+            }
+        }
+        
+        // Criar novo gráfico
+        const chart = new originalChart(ctx, config);
+        
+        // Salvar referência para futuras limpezas
+        if (ctx && ctx.canvas) {
+            ctx.canvas.chartInstance = chart;
+        }
+        
+        return chart;
+    };
+    
+    // Copiar propriedades estáticas
+    Object.keys(originalChart).forEach(key => {
+        window.Chart[key] = originalChart[key];
+    });
+    
+    console.log('🔧 Chart.js interceptado para correção automática');
+}
+
+// 8. Evitar carregamento múltiplo de analytics
+let analyticsCarregando = false;
+if (window.carregarDadosAnalytics) {
+    const originalCarregarDadosAnalytics = window.carregarDadosAnalytics;
+    window.carregarDadosAnalytics = function() {
+        if (analyticsCarregando) {
+            console.log('⏳ Analytics já está carregando, pulando...');
+            return;
+        }
+        
+        analyticsCarregando = true;
+        console.log('📊 Iniciando carregamento de analytics...');
+        
+        return originalCarregarDadosAnalytics.apply(this, arguments).finally(() => {
+            analyticsCarregando = false;
+            console.log('✅ Carregamento de analytics finalizado');
+        });
+    };
+    
+    console.log('🔧 Carregamento de analytics otimizado');
 }
 
 console.log('✅ Correções do sistema aplicadas');

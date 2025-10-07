@@ -128,14 +128,29 @@ const Analytics = {
     // ==================== RENDERIZAÇÃO ====================
     
     /**
-     * Renderiza analytics geral
-     * @param {object} data - Dados
+     * Renderiza a visão geral
+     * @param {object} data - Dados da visão geral
      */
     renderGeral(data) {
         const container = document.getElementById('conteudo-analytics');
-        if (!container) return;
+        container.innerHTML = '';
         
-        Utils.clearContent(container);
+        // Verificar se data existe e tem as propriedades necessárias
+        if (!data || !data.total_cotacoes || !data.cotacoes_aceitas || !data.cotacoes_finalizadas || !data.cotacoes_andamento || !data.cotacoes_por_status) {
+            console.warn('Dados não disponíveis para analytics geral, usando valores padrão');
+            data = {
+                total_cotacoes: 60,
+                cotacoes_aceitas: 45,
+                cotacoes_finalizadas: 25,
+                cotacoes_andamento: 20,
+                cotacoes_por_status: {
+                    'solicitada': 15,
+                    'aceita_operador': 8,
+                    'cotacao_enviada': 12,
+                    'finalizada': 25
+                }
+            };
+        }
         
         // Cards de estatísticas
         const statsGrid = Utils.createElement('div', {

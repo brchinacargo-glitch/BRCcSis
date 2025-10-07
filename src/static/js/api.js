@@ -309,10 +309,24 @@ const API = {
 
     async getEmpresas(page = 1, filters = {}) {
         try {
+            // Garantir que page seja um número
+            const pageNum = typeof page === 'number' ? page : parseInt(page) || 1;
+            
+            // Filtrar apenas propriedades válidas
+            const validFilters = {};
+            if (filters && typeof filters === 'object') {
+                Object.keys(filters).forEach(key => {
+                    const value = filters[key];
+                    if (value !== null && value !== undefined && value !== '') {
+                        validFilters[key] = value;
+                    }
+                });
+            }
+            
             const params = new URLSearchParams({
-                page: page,
-                per_page: 10,
-                ...filters
+                page: pageNum.toString(),
+                per_page: '10',
+                ...validFilters
             });
             
             const response = await fetch(`${this.baseURL}/v133/empresas?${params}`);
