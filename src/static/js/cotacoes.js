@@ -5,6 +5,11 @@ console.log('📋 Cotações Simples v2.0');
 
 const Cotacoes = {
     cotacoes: [],
+    filtros: {
+        cliente: '',
+        status: '',
+        modalidade: ''
+    },
     
     init() {
         console.log('🚀 Inicializando cotações simples...');
@@ -43,6 +48,58 @@ const Cotacoes = {
                 if (e.target === modal) {
                     this.hideModal();
                 }
+            });
+        }
+        
+        // Filtros
+        this.setupFiltros();
+    },
+    
+    setupFiltros() {
+        // Busca por cliente (com debounce)
+        const buscaCliente = document.getElementById('busca-cliente');
+        if (buscaCliente) {
+            let timeout;
+            buscaCliente.addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    this.filtros.cliente = e.target.value.toLowerCase();
+                    this.aplicarFiltros();
+                }, 300);
+            });
+        }
+        
+        // Filtro por status
+        const filtroStatus = document.getElementById('filtro-status');
+        if (filtroStatus) {
+            filtroStatus.addEventListener('change', (e) => {
+                this.filtros.status = e.target.value;
+                this.aplicarFiltros();
+            });
+        }
+        
+        // Filtro por modalidade
+        const filtroModalidade = document.getElementById('filtro-modalidade');
+        if (filtroModalidade) {
+            filtroModalidade.addEventListener('change', (e) => {
+                this.filtros.modalidade = e.target.value;
+                this.aplicarFiltros();
+            });
+        }
+        
+        // Botão aplicar filtros
+        const btnAplicar = document.getElementById('btn-aplicar-filtros');
+        if (btnAplicar) {
+            btnAplicar.addEventListener('click', () => {
+                this.aplicarFiltros();
+            });
+        }
+        
+        // Botão limpar filtros
+        const btnLimpar = document.getElementById('btn-limpar-filtros');
+        if (btnLimpar) {
+            btnLimpar.addEventListener('click', () => {
+                this.limparFiltros();
             });
         }
     },
@@ -109,6 +166,62 @@ const Cotacoes = {
                     origem: 'Belo Horizonte - MG',
                     destino: 'Brasília - DF',
                     data: new Date().toLocaleDateString()
+                },
+                {
+                    id: 4,
+                    numero: 'COT-004',
+                    cliente: 'Comércio Global',
+                    status: 'solicitada',
+                    modalidade: 'aereo',
+                    origem: 'Guarulhos - SP',
+                    destino: 'Manaus - AM',
+                    data: new Date().toLocaleDateString()
+                },
+                {
+                    id: 5,
+                    numero: 'COT-005',
+                    cliente: 'Empresa ABC Ltda',
+                    status: 'negada',
+                    modalidade: 'maritimo',
+                    origem: 'Rio Grande - RS',
+                    destino: 'Fortaleza - CE',
+                    data: new Date().toLocaleDateString()
+                },
+                {
+                    id: 6,
+                    numero: 'COT-006',
+                    cliente: 'Indústria Beta',
+                    status: 'cotacao_enviada',
+                    modalidade: 'rodoviario',
+                    origem: 'Curitiba - PR',
+                    destino: 'Florianópolis - SC',
+                    data: new Date().toLocaleDateString(),
+                    resposta: {
+                        valor_frete: 1850.00,
+                        prazo_entrega: 5,
+                        empresa_prestadora: 'transportadora-a',
+                        tipo_servico: 'normal',
+                        seguro_incluso: true,
+                        observacoes: 'Frete inclui seguro total da carga.'
+                    }
+                },
+                {
+                    id: 7,
+                    numero: 'COT-007',
+                    cliente: 'Comércio Sul',
+                    status: 'finalizada',
+                    modalidade: 'maritimo',
+                    origem: 'Porto de Santos - SP',
+                    destino: 'Porto de Itajaí - SC',
+                    data: new Date().toLocaleDateString(),
+                    resposta: {
+                        valor_frete: 4200.00,
+                        prazo_entrega: 12,
+                        empresa_prestadora: 'logistica-express',
+                        tipo_servico: 'normal',
+                        seguro_incluso: false,
+                        observacoes: 'Transporte marítimo com seguro opcional.'
+                    }
                 }
             ];
             this.saveToStorage();
@@ -130,31 +243,127 @@ const Cotacoes = {
         
         container.innerHTML = '';
         
-        if (this.cotacoes.length === 0) {
+        // Aplicar filtros
+        const cotacoesFiltradas = this.filtrarCotacoes();
+        
+        if (cotacoesFiltradas.length === 0) {
+            const mensagem = this.cotacoes.length === 0 ? 
+                'Nenhuma cotação encontrada' : 
+                'Nenhuma cotação corresponde aos filtros aplicados';
+                
             container.innerHTML = `
                 <div class="p-8 text-center text-gray-500">
-                    <p>Nenhuma cotação encontrada</p>
-                    <button onclick="Cotacoes.showNewModal()" class="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
-                        <i class="fas fa-plus mr-2"></i>Criar Nova Cotação
-                    </button>
+                    <p>${mensagem}</p>
+                    ${this.cotacoes.length === 0 ? `
+                        <button onclick="Cotacoes.showNewModal()" class="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+                            <i class="fas fa-plus mr-2"></i>Criar Nova Cotação
+                        </button>
+                    ` : `
+                        <button onclick="Cotacoes.limparFiltros()" class="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                            <i class="fas fa-eraser mr-2"></i>Limpar Filtros
+                        </button>
+                    `}
                 </div>
             `;
             return;
         }
         
-        this.cotacoes.forEach(cotacao => {
+        cotacoesFiltradas.forEach(cotacao => {
             const card = this.createCard(cotacao);
             container.appendChild(card);
         });
         
         console.log('✅ Lista renderizada:', this.cotacoes.length, 'cotações');
+        this.atualizarContador();
+    },
+    
+    aplicarFiltros() {
+        console.log('🔍 Aplicando filtros:', this.filtros);
+        this.render();
+    },
+    
+    limparFiltros() {
+        // Resetar filtros
+        this.filtros = {
+            cliente: '',
+            status: '',
+            modalidade: ''
+        };
+        
+        // Limpar campos da interface
+        const buscaCliente = document.getElementById('busca-cliente');
+        const filtroStatus = document.getElementById('filtro-status');
+        const filtroModalidade = document.getElementById('filtro-modalidade');
+        
+        if (buscaCliente) buscaCliente.value = '';
+        if (filtroStatus) filtroStatus.value = '';
+        if (filtroModalidade) filtroModalidade.value = '';
+        
+        // Re-renderizar
+        this.render();
+        console.log('✅ Filtros limpos');
+    },
+    
+    filtrarCotacoes() {
+        return this.cotacoes.filter(cotacao => {
+            // Filtro por cliente
+            if (this.filtros.cliente) {
+                const cliente = cotacao.cliente.toLowerCase();
+                if (!cliente.includes(this.filtros.cliente)) {
+                    return false;
+                }
+            }
+            
+            // Filtro por status
+            if (this.filtros.status) {
+                if (cotacao.status !== this.filtros.status) {
+                    return false;
+                }
+            }
+            
+            // Filtro por modalidade
+            if (this.filtros.modalidade) {
+                if (cotacao.modalidade !== this.filtros.modalidade) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    },
+    
+    atualizarContador() {
+        const cotacoesFiltradas = this.filtrarCotacoes();
+        const total = this.cotacoes.length;
+        const filtradas = cotacoesFiltradas.length;
+        
+        // Criar ou atualizar contador
+        let contador = document.getElementById('contador-resultados');
+        if (!contador) {
+            contador = document.createElement('div');
+            contador.id = 'contador-resultados';
+            contador.className = 'text-sm text-gray-600 mb-4';
+            
+            const container = document.getElementById('lista-cotacoes');
+            if (container && container.parentNode) {
+                container.parentNode.insertBefore(contador, container);
+            }
+        }
+        
+        if (filtradas === total) {
+            contador.textContent = `${total} cotação${total !== 1 ? 'ões' : ''} encontrada${total !== 1 ? 's' : ''}`;
+        } else {
+            contador.textContent = `${filtradas} de ${total} cotação${total !== 1 ? 'ões' : ''} encontrada${filtradas !== 1 ? 's' : ''}`;
+        }
     },
     
     createCard(cotacao) {
         const statusColors = {
             'solicitada': 'bg-yellow-100 text-yellow-800',
             'aceita_operador': 'bg-blue-100 text-blue-800',
-            'finalizada': 'bg-green-100 text-green-800'
+            'cotacao_enviada': 'bg-green-100 text-green-800',
+            'finalizada': 'bg-green-100 text-green-800',
+            'negada': 'bg-red-100 text-red-800'
         };
         
         const card = document.createElement('div');
@@ -189,7 +398,9 @@ const Cotacoes = {
         const statusMap = {
             'solicitada': 'Solicitada',
             'aceita_operador': 'Aceita',
-            'finalizada': 'Finalizada'
+            'cotacao_enviada': 'Resposta Enviada',
+            'finalizada': 'Finalizada',
+            'negada': 'Negada'
         };
         return statusMap[status] || status;
     },
@@ -197,14 +408,45 @@ const Cotacoes = {
     getActionButtons(cotacao) {
         if (cotacao.status === 'solicitada') {
             return `
-                <button onclick="Cotacoes.accept(${cotacao.id})" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                    Aceitar
+                <button data-action="aceitar-cotacao" data-cotacao-id="${cotacao.id}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    <i class="fas fa-check mr-1"></i>Aceitar
                 </button>
-                <button onclick="Cotacoes.reject(${cotacao.id})" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                    Negar
+                <button data-action="negar-cotacao" data-cotacao-id="${cotacao.id}" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    <i class="fas fa-times mr-1"></i>Negar
                 </button>
             `;
         }
+        
+        if (cotacao.status === 'aceita_operador') {
+            return `
+                <button data-action="responder-cotacao" data-cotacao-id="${cotacao.id}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    <i class="fas fa-reply mr-1"></i>Responder
+                </button>
+            `;
+        }
+        
+        if (cotacao.status === 'cotacao_enviada') {
+            return `
+                <button data-action="ver-resposta" data-cotacao-id="${cotacao.id}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm mr-2">
+                    <i class="fas fa-eye mr-1"></i>Ver Resposta
+                </button>
+                <button data-action="aprovar-cotacao" data-cotacao-id="${cotacao.id}" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm mr-2">
+                    <i class="fas fa-check mr-1"></i>Aprovar
+                </button>
+                <button data-action="recusar-cotacao" data-cotacao-id="${cotacao.id}" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                    <i class="fas fa-times mr-1"></i>Recusar
+                </button>
+            `;
+        }
+        
+        if (cotacao.status === 'finalizada') {
+            return `
+                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <i class="fas fa-check-circle mr-1"></i>Finalizada
+                </span>
+            `;
+        }
+        
         return '';
     },
     
@@ -293,6 +535,12 @@ const Cotacoes = {
                 cotacao.status = 'aceita_operador';
                 this.saveToStorage();
                 this.render();
+                
+                // Atualizar dashboard
+                if (window.Dashboard && typeof Dashboard.refresh === 'function') {
+                    Dashboard.refresh();
+                }
+                
                 console.log('✅ Cotação aceita:', id);
             }
         }
@@ -307,6 +555,12 @@ const Cotacoes = {
                 cotacao.motivo_negacao = motivo;
                 this.saveToStorage();
                 this.render();
+                
+                // Atualizar dashboard
+                if (window.Dashboard && typeof Dashboard.refresh === 'function') {
+                    Dashboard.refresh();
+                }
+                
                 console.log('✅ Cotação negada:', id, motivo);
             }
         }
@@ -326,6 +580,12 @@ const Cotacoes = {
         this.cotacoes.push(newCotacao);
         this.saveToStorage();
         this.render();
+        
+        // Atualizar dashboard
+        if (window.Dashboard && typeof Dashboard.refresh === 'function') {
+            Dashboard.refresh();
+        }
+        
         console.log('✅ Nova cotação criada:', newCotacao);
         return newCotacao;
     }

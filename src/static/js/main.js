@@ -20,6 +20,21 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Cotações inicializado');
     }
     
+    if (typeof AceitarNegarCotacoes !== 'undefined' && AceitarNegarCotacoes.init) {
+        AceitarNegarCotacoes.init();
+        console.log('✅ Sistema aceitar/negar inicializado');
+    }
+    
+    if (typeof ModalRespostaMelhorado !== 'undefined' && ModalRespostaMelhorado.init) {
+        ModalRespostaMelhorado.init();
+        console.log('✅ Modal resposta melhorado inicializado');
+    }
+    
+    if (typeof FinalizarCotacoes !== 'undefined' && FinalizarCotacoes.init) {
+        FinalizarCotacoes.init();
+        console.log('✅ Sistema de finalização inicializado');
+    }
+    
     // Mostrar dashboard inicial
     if (typeof UI !== 'undefined' && UI.showSection) {
         UI.showSection('dashboard');
