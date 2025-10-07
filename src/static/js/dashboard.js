@@ -419,7 +419,7 @@ const Dashboard = {
                 }
             }
         });
-        } catch (error) {
+    } catch (error) {
             console.error('Erro ao criar gráfico certificações:', error);
         }
     },
