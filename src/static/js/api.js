@@ -247,28 +247,23 @@ const API = {
     async getOperadores() {
         try {
             const response = await fetch(`${this.baseURL}/v133/operadores`);
-            if (!response.ok) {
-                // Fallback para dados simulados se endpoint não existir
-                return {
-                    success: true,
-                    operadores: [
-                        { id: 1, nome: 'João Silva', email: 'joao@brcargo.com' },
-                        { id: 2, nome: 'Maria Santos', email: 'maria@brcargo.com' },
-                        { id: 3, nome: 'Pedro Costa', email: 'pedro@brcargo.com' },
-                        { id: 4, nome: 'Ana Oliveira', email: 'ana@brcargo.com' }
-                    ]
-                };
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            return await response.json();
         } catch (error) {
+            console.warn('Endpoint operadores não disponível, usando fallback:', error.message);
+            
             // Retornar dados simulados em caso de erro
             return {
                 success: true,
                 operadores: [
-                    { id: 1, nome: 'João Silva', email: 'joao@brcargo.com' },
-                    { id: 2, nome: 'Maria Santos', email: 'maria@brcargo.com' },
+                    { id: 1, nome: 'Maria Santos', email: 'maria@brcargo.com' },
+                    { id: 2, nome: 'João Silva', email: 'joao@brcargo.com' },
                     { id: 3, nome: 'Pedro Costa', email: 'pedro@brcargo.com' },
-                    { id: 4, nome: 'Ana Oliveira', email: 'ana@brcargo.com' }
+                    { id: 4, nome: 'Ana Oliveira', email: 'ana@brcargo.com' },
+                    { id: 5, nome: 'Carlos Mendes', email: 'carlos@brcargo.com' }
                 ]
             };
         }
@@ -750,7 +745,7 @@ const API = {
     async reatribuirCotacao(cotacaoId, operadorId, dados) {
         try {
             const response = await fetch(`${this.baseURL}/v133/cotacoes/${cotacaoId}/reatribuir`, {
-                method: 'PUT',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -770,7 +765,7 @@ const API = {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
         } catch (error) {
-            console.error('Erro ao reatribuir cotação:', error);
+            console.warn('Endpoint reatribuir não disponível, usando fallback:', error);
             
             // Fallback para desenvolvimento
             console.log('📝 Simulando reatribuição de cotação:', { cotacaoId, operadorId, dados });
@@ -805,7 +800,7 @@ const API = {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
         } catch (error) {
-            console.error('Erro ao buscar conversas:', error);
+            console.warn('Endpoint conversas não disponível, usando fallback:', error.message);
             
             // Fallback: retornar conversa vazia
             return {

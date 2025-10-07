@@ -486,3 +486,52 @@ def obter_historico_cotacao(cotacao_id):
             'message': f'Erro interno: {str(e)}'
         }), 500
 
+# ==================== ENDPOINT TEMPORÁRIO PARA TESTES ====================
+
+@cotacao_v133_bp.route("/cotacoes/test", methods=["GET"])
+def obter_cotacoes_teste():
+    """Endpoint temporário para testar dados reais (SEM AUTENTICAÇÃO)"""
+    try:
+        # Buscar todas as cotações para teste
+        cotacoes = Cotacao.query.order_by(Cotacao.created_at.desc()).limit(10).all()
+        
+        return jsonify({
+            'success': True,
+            'total': len(cotacoes),
+            'cotacoes': [cotacao.to_dict() for cotacao in cotacoes],
+            'message': 'Dados reais do banco de dados'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Erro interno: {str(e)}'
+        }), 500
+
+@cotacao_v133_bp.route("/operadores/test", methods=["GET"])
+def obter_operadores_teste():
+    """Endpoint temporário para testar operadores reais (SEM AUTENTICAÇÃO)"""
+    try:
+        from src.models.usuario import Usuario, TipoUsuario
+        
+        # Buscar operadores reais
+        operadores = Usuario.query.filter(
+            Usuario.tipo_usuario.in_([TipoUsuario.OPERADOR, TipoUsuario.ADMINISTRADOR, TipoUsuario.GERENTE])
+        ).all()
+        
+        return jsonify({
+            'success': True,
+            'operadores': [{
+                'id': op.id,
+                'nome': op.nome_completo,
+                'email': op.email,
+                'tipo': op.tipo_usuario.value
+            } for op in operadores]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Erro interno: {str(e)}'
+        }), 500
+
