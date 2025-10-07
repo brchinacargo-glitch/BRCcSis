@@ -1,490 +1,240 @@
-// ==================== MÓDULO DE COTAÇÕES ====================
-// Gerencia cotações e suas operações
+// ==================== COTAÇÕES SIMPLES ====================
+// CRUD básico e funcional - SEM over-engineering
+
+console.log('📋 Cotações Simples v2.0');
 
 const Cotacoes = {
-    // Estado
-    currentTab: 'todas',
     cotacoes: [],
-    filtrosAtivos: {},
     
-    // ==================== INICIALIZAÇÃO ====================
-    
-    /**
-     * Inicializa o módulo
-     */
     init() {
+        console.log('🚀 Inicializando cotações simples...');
         this.setupEventListeners();
+        this.loadData();
     },
     
-    /**
-     * Configura event listeners
-     */
     setupEventListeners() {
         // Botão de nova cotação
-        document.getElementById('btn-nova-cotacao')?.addEventListener('click', () => {
-            this.showNewCotacaoModal();
-        });
-        
-        // Tabs de filtro
-        const tabs = document.querySelectorAll('.tab-modalidade');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                this.switchTab(tab.dataset.tab);
-            });
-        });
-    },
-    
-    // ==================== CARREGAMENTO ====================
-    
-    /**
-     * Carrega cotações
-     */
-    async load() {
-        try {
-            const response = await API.getCotacoes();
-            
-            if (response.success) {
-                this.cotacoes = response.data || [];
-                this.render();
-            } else {
-                Utils.showError(response.message || 'Erro ao carregar cotações');
-            }
-        } catch (error) {
-            console.error('Erro ao carregar cotações:', error);
-            Utils.showError('Erro ao carregar cotações');
+        const btnNova = document.getElementById('btn-nova-cotacao');
+        if (btnNova) {
+            btnNova.addEventListener('click', () => this.showNewModal());
         }
     },
     
-    // ==================== RENDERIZAÇÃO ====================
+    loadData() {
+        // Tentar API primeiro
+        if (window.API && typeof API.getCotacoes === 'function') {
+            this.loadFromAPI();
+        } else {
+            // Fallback: localStorage
+            this.loadFromStorage();
+        }
+    },
     
-    /**
-     * Renderiza lista de cotações
-     */
+    async loadFromAPI() {
+        try {
+            const response = await API.getCotacoes();
+            if (response.success) {
+                this.cotacoes = response.cotacoes || response.data || [];
+                this.render();
+                console.log('✅ Cotações carregadas da API:', this.cotacoes.length);
+            } else {
+                this.loadFromStorage();
+            }
+        } catch (error) {
+            console.log('📋 API não disponível, usando localStorage');
+            this.loadFromStorage();
+        }
+    },
+    
+    loadFromStorage() {
+        const saved = localStorage.getItem('cotacoes');
+        if (saved) {
+            this.cotacoes = JSON.parse(saved);
+        } else {
+            // Dados de exemplo
+            this.cotacoes = [
+                {
+                    id: 1,
+                    numero: 'COT-001',
+                    cliente: 'Empresa ABC Ltda',
+                    status: 'solicitada',
+                    modalidade: 'rodoviario',
+                    origem: 'São Paulo - SP',
+                    destino: 'Rio de Janeiro - RJ',
+                    data: new Date().toLocaleDateString()
+                },
+                {
+                    id: 2,
+                    numero: 'COT-002',
+                    cliente: 'Transportes XYZ',
+                    status: 'aceita_operador',
+                    modalidade: 'maritimo',
+                    origem: 'Santos - SP',
+                    destino: 'Salvador - BA',
+                    data: new Date().toLocaleDateString()
+                },
+                {
+                    id: 3,
+                    numero: 'COT-003',
+                    cliente: 'Logística 123',
+                    status: 'finalizada',
+                    modalidade: 'rodoviario',
+                    origem: 'Belo Horizonte - MG',
+                    destino: 'Brasília - DF',
+                    data: new Date().toLocaleDateString()
+                }
+            ];
+            this.saveToStorage();
+        }
+        this.render();
+        console.log('✅ Cotações carregadas do localStorage:', this.cotacoes.length);
+    },
+    
+    saveToStorage() {
+        localStorage.setItem('cotacoes', JSON.stringify(this.cotacoes));
+    },
+    
     render() {
         const container = document.getElementById('lista-cotacoes');
-        if (!container) return;
-        
-        Utils.clearContent(container);
-        
-        // Aplicar filtros
-        let cotacoesFiltradas = this.aplicarTodosFiltros();
-        
-        if (cotacoesFiltradas.length === 0) {
-            const noResults = Utils.createElement('div', {
-                className: 'p-8 text-center text-gray-500'
-            }, 'Nenhuma cotação encontrada com os filtros aplicados');
-            container.appendChild(noResults);
+        if (!container) {
+            console.warn('Container lista-cotacoes não encontrado');
             return;
         }
         
-        // Mostrar contador de resultados
-        this.mostrarContadorResultados(cotacoesFiltradas.length, this.cotacoes.length);
+        container.innerHTML = '';
         
-        cotacoesFiltradas.forEach(cotacao => {
-            const card = this.createCotacaoCard(cotacao);
+        if (this.cotacoes.length === 0) {
+            container.innerHTML = `
+                <div class="p-8 text-center text-gray-500">
+                    <p>Nenhuma cotação encontrada</p>
+                    <button onclick="Cotacoes.showNewModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Criar Nova Cotação
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        this.cotacoes.forEach(cotacao => {
+            const card = this.createCard(cotacao);
             container.appendChild(card);
         });
+        
+        console.log('✅ Lista renderizada:', this.cotacoes.length, 'cotações');
     },
     
-    /**
-     * Aplica todos os filtros (tabs + filtros avançados)
-     */
-    aplicarTodosFiltros() {
-        let cotacoesFiltradas = this.cotacoes;
-        
-        // Filtrar por tab
-        if (this.currentTab !== 'todas') {
-            cotacoesFiltradas = cotacoesFiltradas.filter(c => c.modalidade === this.currentTab);
-        }
-        
-        // Aplicar filtros avançados
-        if (Object.keys(this.filtrosAtivos).length > 0) {
-            cotacoesFiltradas = cotacoesFiltradas.filter(cotacao => {
-                return this.cotacaoPassaFiltros(cotacao);
-            });
-        }
-        
-        return cotacoesFiltradas;
-    },
-    
-    /**
-     * Verifica se cotação passa pelos filtros
-     */
-    cotacaoPassaFiltros(cotacao) {
-        const filtros = this.filtrosAtivos;
-        
-        // Filtro por status
-        if (filtros.status && cotacao.status !== filtros.status) {
-            return false;
-        }
-        
-        // Filtro por modalidade (além da tab)
-        if (filtros.modalidade && cotacao.modalidade !== filtros.modalidade) {
-            return false;
-        }
-        
-        // Filtro por operador
-        if (filtros.operador && cotacao.operador_id != filtros.operador) {
-            return false;
-        }
-        
-        // Filtro por cliente
-        if (filtros.cliente) {
-            const cliente = filtros.cliente.toLowerCase();
-            const nomeCliente = (cotacao.cliente_nome || '').toLowerCase();
-            const cnpjCliente = (cotacao.cliente_cnpj || '').toLowerCase();
-            
-            if (!nomeCliente.includes(cliente) && !cnpjCliente.includes(cliente)) {
-                return false;
-            }
-        }
-        
-        // Filtro por data
-        if (filtros.dataInicio) {
-            const dataInicio = new Date(filtros.dataInicio);
-            const dataCotacao = new Date(cotacao.data_criacao);
-            if (dataCotacao < dataInicio) {
-                return false;
-            }
-        }
-        
-        if (filtros.dataFim) {
-            const dataFim = new Date(filtros.dataFim);
-            dataFim.setHours(23, 59, 59);
-            const dataCotacao = new Date(cotacao.data_criacao);
-            if (dataCotacao > dataFim) {
-                return false;
-            }
-        }
-        
-        // Filtro por valor
-        if (filtros.valorMin && cotacao.valor_frete) {
-            const valorFrete = parseFloat(cotacao.valor_frete) || 0;
-            if (valorFrete < filtros.valorMin) {
-                return false;
-            }
-        }
-        
-        if (filtros.valorMax && cotacao.valor_frete) {
-            const valorFrete = parseFloat(cotacao.valor_frete) || 0;
-            if (valorFrete > filtros.valorMax) {
-                return false;
-            }
-        }
-        
-        return true;
-    },
-    
-    /**
-     * Aplica filtros externos (chamado pelo sistema de filtros)
-     */
-    aplicarFiltros(filtros) {
-        this.filtrosAtivos = filtros;
-        this.render();
-    },
-    
-    /**
-     * Mostra contador de resultados
-     */
-    mostrarContadorResultados(filtradas, total) {
-        const contador = document.getElementById('contador-cotacoes');
-        if (contador) {
-            if (filtradas === total) {
-                contador.textContent = `${total} cotação${total !== 1 ? 'ões' : ''}`;
-            } else {
-                contador.textContent = `${filtradas} de ${total} cotação${total !== 1 ? 'ões' : ''}`;
-            }
-        }
-    },
-    
-    /**
-     * Cria card de cotação
-     * @param {object} cotacao - Dados da cotação
-     * @returns {HTMLElement}
-     */
-    createCotacaoCard(cotacao) {
-        const card = Utils.createElement('div', {
-            className: `cotacao-card bg-white rounded-lg shadow-md p-6 mb-4 ${cotacao.status || ''}`
-        });
-        
-        // Header
-        const header = Utils.createElement('div', {
-            className: 'flex items-start justify-between mb-4'
-        });
-        
-        const info = Utils.createElement('div');
-        const title = Utils.createElement('h4', {
-            className: 'text-lg font-semibold text-gray-900'
-        });
-        Utils.setTextContent(title, `Cotação #${cotacao.numero_cotacao || cotacao.id}`);
-        
-        const subtitle = Utils.createElement('p', {
-            className: 'text-sm text-gray-600'
-        });
-        Utils.setTextContent(subtitle, `Empresa: ${cotacao.empresa_nome || 'N/A'}`);
-        
-        info.appendChild(title);
-        info.appendChild(subtitle);
-        
-        // Status badge
-        const statusBadge = Utils.createElement('span', {
-            className: `status-badge status-${cotacao.status || 'solicitada'}`
-        });
-        Utils.setTextContent(statusBadge, this.getStatusDisplay(cotacao.status));
-        
-        header.appendChild(info);
-        header.appendChild(statusBadge);
-        
-        // Detalhes
-        const details = Utils.createElement('div', {
-            className: 'grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4'
-        });
-        
-        const addDetail = (label, value) => {
-            const detail = Utils.createElement('div');
-            const labelEl = Utils.createElement('span', {
-                className: 'font-medium text-gray-700'
-            });
-            Utils.setTextContent(labelEl, label + ': ');
-            const valueEl = Utils.createElement('span', {
-                className: 'text-gray-600'
-            });
-            Utils.setTextContent(valueEl, value || 'N/A');
-            detail.appendChild(labelEl);
-            detail.appendChild(valueEl);
-            details.appendChild(detail);
+    createCard(cotacao) {
+        const statusColors = {
+            'solicitada': 'bg-yellow-100 text-yellow-800',
+            'aceita_operador': 'bg-blue-100 text-blue-800',
+            'finalizada': 'bg-green-100 text-green-800'
         };
         
-        addDetail('Modalidade', cotacao.modalidade || 'N/A');
-        addDetail('Origem', cotacao.origem || 'N/A');
-        addDetail('Destino', cotacao.destino || 'N/A');
-        
-        // Botões de ação
-        const actions = Utils.createElement('div', {
-            className: 'flex space-x-2 mt-4'
-        });
-        
-        const btnView = Utils.createElement('button', {
-            className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
-        });
-        Utils.setTextContent(btnView, 'Ver Detalhes');
-        btnView.addEventListener('click', () => this.viewDetails(cotacao.id));
-        
-        actions.appendChild(btnView);
-        
-        // Botões específicos por status
-        if (cotacao.status === 'solicitada') {
-            const btnAccept = Utils.createElement('button', {
-                className: 'px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors'
-            });
-            Utils.setTextContent(btnAccept, 'Aceitar');
-            btnAccept.addEventListener('click', () => this.accept(cotacao.id));
-            actions.appendChild(btnAccept);
-            
-            const btnReject = Utils.createElement('button', {
-                className: 'px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors'
-            });
-            Utils.setTextContent(btnReject, 'Negar');
-            btnReject.addEventListener('click', () => this.reject(cotacao.id));
-            actions.appendChild(btnReject);
-        }
-        
-        // Botão para responder cotação aceita pelo operador
-        if (cotacao.status === 'aceita_operador' && this.canRespond(cotacao)) {
-            const btnResponder = Utils.createElement('button', {
-                className: 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
-            });
-            Utils.setTextContent(btnResponder, 'Responder');
-            btnResponder.addEventListener('click', () => this.openResponseModal(cotacao.id));
-            actions.appendChild(btnResponder);
-        }
-        
-        card.appendChild(header);
-        card.appendChild(details);
-        card.appendChild(actions);
-        
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-6 mb-4';
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold">${cotacao.numero}</h3>
+                    <p class="text-gray-600">${cotacao.cliente}</p>
+                </div>
+                <span class="px-2 py-1 rounded-full text-sm ${statusColors[cotacao.status] || 'bg-gray-100 text-gray-800'}">
+                    ${this.getStatusText(cotacao.status)}
+                </span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div><strong>Modalidade:</strong> ${cotacao.modalidade}</div>
+                <div><strong>Data:</strong> ${cotacao.data}</div>
+                <div><strong>Origem:</strong> ${cotacao.origem}</div>
+                <div><strong>Destino:</strong> ${cotacao.destino}</div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="Cotacoes.viewDetails(${cotacao.id})" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Ver Detalhes
+                </button>
+                ${this.getActionButtons(cotacao)}
+            </div>
+        `;
         return card;
     },
     
-    /**
-     * Obtém texto de exibição do status
-     * @param {string} status - Status da cotação
-     * @returns {string}
-     */
-    getStatusDisplay(status) {
+    getStatusText(status) {
         const statusMap = {
             'solicitada': 'Solicitada',
-            'aceita_operador': 'Aceita pelo Operador',
-            'cotacao_enviada': 'Cotação Enviada',
-            'aceita_consultor': 'Aceita pelo Consultor',
-            'negada_consultor': 'Negada',
+            'aceita_operador': 'Aceita',
             'finalizada': 'Finalizada'
         };
         return statusMap[status] || status;
     },
     
-    // ==================== AÇÕES ====================
-    
-    /**
-     * Alterna tab
-     * @param {string} tab - Nome da tab
-     */
-    switchTab(tab) {
-        this.currentTab = tab;
-        
-        // Atualizar classes das tabs
-        document.querySelectorAll('.tab-modalidade').forEach(t => {
-            t.classList.remove('active');
-        });
-        
-        const activeTab = document.querySelector(`.tab-modalidade[data-tab="${tab}"]`);
-        if (activeTab) {
-            activeTab.classList.add('active');
-        }
-        
-        this.render();
-    },
-    
-    /**
-     * Mostra modal de nova cotação
-     */
-    showNewCotacaoModal() {
-        UI.showModal('modal-nova-cotacao');
-    },
-    
-    /**
-     * Visualiza detalhes de cotação
-     * @param {number} id - ID da cotação
-     */
-    async viewDetails(id) {
-        try {
-            const response = await API.getCotacaoById(id);
-            
-            if (response.success || response.id) {
-                const cotacao = response.data || response;
-                this.showDetailsModal(cotacao);
-            } else {
-                Utils.showError('Erro ao carregar detalhes da cotação');
-            }
-        } catch (error) {
-            console.error('Erro ao visualizar cotação:', error);
-            Utils.showError('Erro ao carregar detalhes da cotação');
-        }
-    },
-    
-    /**
-     * Mostra modal com detalhes da cotação
-     * @param {object} cotacao - Dados da cotação
-     */
-    showDetailsModal(cotacao) {
-        // Usar o novo modal de detalhes expandido
-        if (window.CotacaoDetalhes) {
-            window.CotacaoDetalhes.abrirModal(cotacao.id);
-        } else {
-            // Fallback para implementação simples
-            const details = `
-Cotação #${cotacao.numero_cotacao || cotacao.id}
-Empresa: ${cotacao.empresa_nome || 'N/A'}
-Status: ${this.getStatusDisplay(cotacao.status)}
-Modalidade: ${cotacao.modalidade || 'N/A'}
-Origem: ${cotacao.origem || 'N/A'}
-Destino: ${cotacao.destino || 'N/A'}
+    getActionButtons(cotacao) {
+        if (cotacao.status === 'solicitada') {
+            return `
+                <button onclick="Cotacoes.accept(${cotacao.id})" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Aceitar
+                </button>
+                <button onclick="Cotacoes.reject(${cotacao.id})" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    Negar
+                </button>
             `;
-            alert(details);
+        }
+        return '';
+    },
+    
+    // Ações básicas
+    showNewModal() {
+        alert('Modal de nova cotação será implementado na próxima etapa');
+    },
+    
+    viewDetails(id) {
+        const cotacao = this.cotacoes.find(c => c.id === id);
+        if (cotacao) {
+            alert(`Detalhes da Cotação ${cotacao.numero}:\n\nCliente: ${cotacao.cliente}\nStatus: ${this.getStatusText(cotacao.status)}\nOrigem: ${cotacao.origem}\nDestino: ${cotacao.destino}`);
         }
     },
     
-    /**
-     * Aceita cotação
-     * @param {number} id - ID da cotação
-     */
-    async accept(id) {
-        if (!Utils.confirm('Deseja aceitar esta cotação?')) {
-            return;
-        }
-        
-        try {
-            const response = await API.aceitarCotacao(id);
-            
-            if (response.success) {
-                Utils.showSuccess('Cotação aceita com sucesso');
-                this.load();
-            } else {
-                Utils.showError(response.message || 'Erro ao aceitar cotação');
+    accept(id) {
+        if (confirm('Aceitar esta cotação?')) {
+            const cotacao = this.cotacoes.find(c => c.id === id);
+            if (cotacao) {
+                cotacao.status = 'aceita_operador';
+                this.saveToStorage();
+                this.render();
+                console.log('✅ Cotação aceita:', id);
             }
-        } catch (error) {
-            console.error('Erro ao aceitar cotação:', error);
-            Utils.showError('Erro ao aceitar cotação');
         }
     },
     
-    /**
-     * Nega cotação
-     * @param {number} id - ID da cotação
-     */
-    async reject(id) {
+    reject(id) {
         const motivo = prompt('Motivo da negação:');
-        if (!motivo) return;
+        if (motivo) {
+            const cotacao = this.cotacoes.find(c => c.id === id);
+            if (cotacao) {
+                cotacao.status = 'negada';
+                cotacao.motivo_negacao = motivo;
+                this.saveToStorage();
+                this.render();
+                console.log('✅ Cotação negada:', id, motivo);
+            }
+        }
+    },
+    
+    // Criar nova cotação
+    create(data) {
+        const newId = Math.max(...this.cotacoes.map(c => c.id), 0) + 1;
+        const newCotacao = {
+            id: newId,
+            numero: `COT-${String(newId).padStart(3, '0')}`,
+            ...data,
+            status: 'solicitada',
+            data: new Date().toLocaleDateString()
+        };
         
-        try {
-            const response = await API.negarCotacao(id, motivo);
-            
-            if (response.success) {
-                Utils.showSuccess('Cotação negada');
-                this.load();
-            } else {
-                Utils.showError(response.message || 'Erro ao negar cotação');
-            }
-        } catch (error) {
-            console.error('Erro ao negar cotação:', error);
-            Utils.showError('Erro ao negar cotação');
-        }
-    },
-    
-    /**
-     * Cria nova cotação
-     * @param {object} data - Dados da cotação
-     */
-    async create(data) {
-        try {
-            const response = await API.createCotacao(data);
-            
-            if (response.success) {
-                Utils.showSuccess('Cotação criada com sucesso');
-                UI.hideModal('modal-nova-cotacao');
-                this.load();
-            } else {
-                Utils.showError(response.message || 'Erro ao criar cotação');
-            }
-        } catch (error) {
-            console.error('Erro ao criar cotação:', error);
-            Utils.showError('Erro ao criar cotação');
-        }
-    },
-    
-    /**
-     * Verifica se pode responder a cotação
-     * @param {object} cotacao - Dados da cotação
-     * @returns {boolean}
-     */
-    canRespond(cotacao) {
-        // Verificar se usuário tem permissão (operador)
-        // Por enquanto, assumindo que todos podem responder
-        // Esta lógica pode ser expandida conforme necessário
-        return cotacao && cotacao.status === 'aceita_operador';
-    },
-    
-    /**
-     * Abre modal de resposta de cotação
-     * @param {number} cotacaoId - ID da cotação
-     */
-    openResponseModal(cotacaoId) {
-        if (window.ModalRespostaCotacao) {
-            window.ModalRespostaCotacao.open(cotacaoId);
-        } else {
-            console.error('Modal de resposta de cotação não encontrado');
-            Utils.showError('Erro ao abrir modal de resposta');
-        }
+        this.cotacoes.push(newCotacao);
+        this.saveToStorage();
+        this.render();
+        console.log('✅ Nova cotação criada:', newCotacao);
+        return newCotacao;
     }
 };
 
