@@ -477,7 +477,7 @@ def obter_historico_cotacao(cotacao_id):
         
         return jsonify({
             'success': True,
-            'historico': [item.to_dict() for item in historico]
+            'historico': historico
         }), 200
         
     except Exception as e:

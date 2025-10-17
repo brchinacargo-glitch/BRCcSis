@@ -108,7 +108,7 @@ class Notificacao(db.Model):
         
         for operador in operadores:
             titulo = f"Nova Cotação Disponível - {cotacao.numero_cotacao}"
-            mensagem = f"Uma nova cotação foi solicitada por {cotacao.consultor.nome}. " \
+            mensagem = f"Uma nova cotação foi solicitada por {cotacao.consultor.nome_completo}. " \
                       f"Empresa: {cotacao.empresa_transporte.value}. " \
                       f"Cliente: {cotacao.cliente_nome}."
             
@@ -124,7 +124,7 @@ class Notificacao(db.Model):
     def notificar_cotacao_aceita(cotacao):
         """Notifica consultor que operador aceitou a cotação"""
         titulo = f"Cotação Aceita - {cotacao.numero_cotacao}"
-        mensagem = f"Sua cotação foi aceita pelo operador {cotacao.operador.nome}. " \
+        mensagem = f"Sua cotação foi aceita pelo operador {cotacao.operador.nome_completo}. " \
                   f"Aguarde o retorno com os valores."
         
         Notificacao.criar_notificacao(
@@ -139,7 +139,7 @@ class Notificacao(db.Model):
     def notificar_cotacao_respondida(cotacao):
         """Notifica consultor que cotação foi respondida"""
         titulo = f"Cotação Respondida - {cotacao.numero_cotacao}"
-        mensagem = f"Sua cotação foi respondida pelo operador {cotacao.operador.nome}. " \
+        mensagem = f"Sua cotação foi respondida pelo operador {cotacao.operador.nome_completo}. " \
                   f"Valor: R$ {cotacao.cotacao_valor_frete or 'A consultar'}. " \
                   f"Prazo: {cotacao.cotacao_prazo_entrega or 'A consultar'} dias."
         
@@ -156,7 +156,7 @@ class Notificacao(db.Model):
         """Notifica operador sobre decisão final do consultor"""
         status_texto = "aceita" if aceita else "recusada"
         titulo = f"Cotação {status_texto.title()} - {cotacao.numero_cotacao}"
-        mensagem = f"A cotação foi {status_texto} pelo consultor {cotacao.consultor.nome}."
+        mensagem = f"A cotação foi {status_texto} pelo consultor {cotacao.consultor.nome_completo}."
         
         Notificacao.criar_notificacao(
             usuario_id=cotacao.operador_id,

@@ -503,6 +503,13 @@ class HistoricoCotacao(db.Model):
         db.session.commit()
         return historico
     
+    @staticmethod
+    def obter_historico_cotacao(cotacao_id):
+        """Obtém o histórico completo de uma cotação"""
+        historico_items = HistoricoCotacao.query.filter_by(cotacao_id=cotacao_id)\
+            .order_by(HistoricoCotacao.timestamp.asc()).all()
+        return [item.to_dict() for item in historico_items]
+    
     def to_dict(self):
         """Converte o histórico para dicionário"""
         return {
