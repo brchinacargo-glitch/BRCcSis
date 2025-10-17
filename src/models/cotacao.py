@@ -344,7 +344,7 @@ class Cotacao(db.Model):
         if self.status != StatusCotacao.SOLICITADA:
             raise ValueError("Cotação não está disponível para aceitação")
         
-        status_anterior = self.status.value
+        status_anterior = self.status
         self.operador_id = operador_id
         self.status = StatusCotacao.ACEITA_OPERADOR
         self.data_aceite_operador = get_brasilia_time()
@@ -354,7 +354,7 @@ class Cotacao(db.Model):
             cotacao_id=self.id,
             usuario_id=operador_id,
             status_anterior=status_anterior,
-            status_novo=self.status.value,
+            status_novo=self.status,
             observacoes=observacoes
         )
         
@@ -370,7 +370,7 @@ class Cotacao(db.Model):
         if self.status != StatusCotacao.ACEITA_OPERADOR:
             raise ValueError("Cotação não está em status adequado para envio")
         
-        status_anterior = self.status.value
+        status_anterior = self.status
         self.cotacao_valor_frete = valor_frete
         self.cotacao_prazo_entrega = prazo_entrega
         self.cotacao_observacoes = observacoes
@@ -383,7 +383,7 @@ class Cotacao(db.Model):
             cotacao_id=self.id,
             usuario_id=self.operador_id,
             status_anterior=status_anterior,
-            status_novo=self.status.value,
+            status_novo=self.status,
             observacoes=f"Valor: R$ {valor_frete}, Prazo: {prazo_entrega} dias. {observacoes or ''}"
         )
         
@@ -399,7 +399,7 @@ class Cotacao(db.Model):
         if self.status != StatusCotacao.COTACAO_ENVIADA:
             raise ValueError("Cotação não está disponível para aceitação pelo consultor")
         
-        status_anterior = self.status.value
+        status_anterior = self.status
         self.status = StatusCotacao.ACEITA_CONSULTOR
         self.data_resposta_cliente = get_brasilia_time()
         
@@ -408,7 +408,7 @@ class Cotacao(db.Model):
             cotacao_id=self.id,
             usuario_id=self.consultor_id,
             status_anterior=status_anterior,
-            status_novo=self.status.value,
+            status_novo=self.status,
             observacoes=observacoes
         )
         
@@ -424,7 +424,7 @@ class Cotacao(db.Model):
         if self.status != StatusCotacao.COTACAO_ENVIADA:
             raise ValueError("Cotação não está disponível para negação pelo consultor")
         
-        status_anterior = self.status.value
+        status_anterior = self.status
         self.status = StatusCotacao.NEGADA_CONSULTOR
         self.data_resposta_cliente = get_brasilia_time()
         
@@ -433,7 +433,7 @@ class Cotacao(db.Model):
             cotacao_id=self.id,
             usuario_id=self.consultor_id,
             status_anterior=status_anterior,
-            status_novo=self.status.value,
+            status_novo=self.status,
             observacoes=observacoes
         )
         
@@ -460,7 +460,7 @@ class Cotacao(db.Model):
             cotacao_id=cotacao.id,
             usuario_id=consultor_id,
             status_anterior=None,
-            status_novo=cotacao.status.value,
+            status_novo=cotacao.status,
             observacoes="Cotação criada"
         )
         
@@ -506,19 +506,57 @@ class HistoricoCotacao(db.Model):
     @staticmethod
     def obter_historico_cotacao(cotacao_id):
         """Obtém o histórico completo de uma cotação"""
-        historico_items = HistoricoCotacao.query.filter_by(cotacao_id=cotacao_id)\
-            .order_by(HistoricoCotacao.timestamp.asc()).all()
-        return [item.to_dict() for item in historico_items]
+        try:
+            historico_items = HistoricoCotacao.query.filter_by(cotacao_id=cotacao_id)\
+                .order_by(HistoricoCotacao.timestamp.asc()).all()
+            return [item.to_dict() for item in historico_items]
+        except Exception as e:
+            # Se houver problema com enum, fazer consulta raw e processar manualmente
+            from sqlalchemy import text
+            result = db.session.execute(text("""
+                SELECT id, cotacao_id, usuario_id, status_anterior, status_novo, 
+                       observacoes, timestamp
+                FROM historico_cotacoes 
+                WHERE cotacao_id = :cotacao_id 
+                ORDER BY timestamp ASC
+            """), {'cotacao_id': cotacao_id})
+            
+            historico = []
+            for row in result:
+                # Buscar nome do usuário
+                from .usuario import Usuario
+                usuario = Usuario.query.get(row.usuario_id)
+                
+                historico.append({
+                    'id': row.id,
+                    'cotacao_id': row.cotacao_id,
+                    'usuario_id': row.usuario_id,
+                    'usuario_nome': usuario.nome_completo if usuario else None,
+                    'status_anterior': row.status_anterior,
+                    'status_novo': row.status_novo,
+                    'observacoes': row.observacoes,
+                    'timestamp': row.timestamp.isoformat() if hasattr(row.timestamp, 'isoformat') else str(row.timestamp)
+                })
+            
+            return historico
     
     def to_dict(self):
         """Converte o histórico para dicionário"""
+        # Lidar com dados históricos que podem ser strings ou enums
+        def get_status_value(status):
+            if status is None:
+                return None
+            if hasattr(status, 'value'):
+                return status.value
+            return str(status)
+        
         return {
             'id': self.id,
             'cotacao_id': self.cotacao_id,
             'usuario_id': self.usuario_id,
             'usuario_nome': self.usuario.nome_completo if self.usuario else None,
-            'status_anterior': self.status_anterior.value if self.status_anterior else None,
-            'status_novo': self.status_novo.value,
+            'status_anterior': get_status_value(self.status_anterior),
+            'status_novo': get_status_value(self.status_novo),
             'observacoes': self.observacoes,
             'timestamp': self.timestamp.isoformat() if self.timestamp else None
         }
