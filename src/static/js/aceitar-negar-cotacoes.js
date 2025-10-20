@@ -133,6 +133,9 @@ const AceitarNegarCotacoes = {
             </div>
         `;
         
+        // Adicionar estilos CSS para os modais
+        this.addModalStyles();
+        
         // Adicionar modais ao body
         document.body.appendChild(modalAceitar);
         document.body.appendChild(modalNegar);
@@ -305,6 +308,58 @@ const AceitarNegarCotacoes = {
         }
     },
     
+    addModalStyles() {
+        // Verificar se os estilos já existem
+        if (document.getElementById('aceitar-negar-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'aceitar-negar-styles';
+        style.textContent = `
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                backdrop-filter: blur(2px);
+            }
+            
+            .modal.show {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease-out;
+            }
+            
+            .modal-content {
+                animation: slideIn 0.3s ease-out;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes slideIn {
+                from { 
+                    opacity: 0; 
+                    transform: translateY(-50px) scale(0.95); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: translateY(0) scale(1); 
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+    },
+
     mostrarSucesso(mensagem) {
         // Criar toast de sucesso
         const toast = document.createElement('div');

@@ -5878,7 +5878,12 @@
             }
         }
 
-        // Event delegation para botões de ação das cotações
+        // Event delegation DESABILITADO - usando sistemas modulares
+        // Os event listeners agora são gerenciados pelos módulos específicos:
+        // - AceitarNegarCotacoes.js para aceitar/negar
+        // - ModalRespostaMelhorado.js para responder
+        // - FinalizarCotacoes.js para aprovar/recusar/finalizar
+        /*
         document.addEventListener('click', function(e) {
             const target = e.target.closest('[data-action]');
             if (!target) return;
@@ -5918,6 +5923,7 @@
                     break;
             }
         });
+        */
 
         // Função para aceitar cotação
         async function aceitarCotacao(cotacaoId) {
