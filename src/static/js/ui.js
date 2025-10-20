@@ -99,8 +99,12 @@ const UI = {
         
         switch(section) {
             case 'dashboard':
+                Utils.show('dashboard');
                 if (Dashboard && typeof Dashboard.loadData === 'function') {
-                    Dashboard.loadData();
+                    // Aguardar um pouco para garantir que a seção esteja visível
+                    setTimeout(() => {
+                        Dashboard.loadData();
+                    }, 100);
                 }
                 break;
             case 'empresas':

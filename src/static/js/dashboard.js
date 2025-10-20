@@ -14,6 +14,16 @@ const Dashboard = {
     
     async loadData() {
         try {
+            // Verificar se a seção dashboard está visível
+            const dashboardSection = document.getElementById('dashboard');
+            if (!dashboardSection || dashboardSection.style.display === 'none') {
+                console.log('📊 Dashboard não visível, pulando carregamento');
+                return;
+            }
+
+            // Destruir gráficos existentes antes de carregar novos
+            this.destroyCharts();
+
             // Tentar usar dados das cotações carregadas
             if (window.Cotacoes && window.Cotacoes.cotacoes && window.Cotacoes.cotacoes.length > 0) {
                 console.log('📊 Usando dados das cotações carregadas');
@@ -102,6 +112,9 @@ const Dashboard = {
         // Destruir gráficos existentes para evitar conflitos
         this.destroyCharts();
         
+        // Verificar e resolver conflitos de canvas
+        this.resolveCanvasConflicts();
+        
         // Gráfico por Status
         this.createStatusChart(porStatus);
         
@@ -110,14 +123,46 @@ const Dashboard = {
         
         console.log('✅ Gráficos criados');
     },
+
+    resolveCanvasConflicts() {
+        // Verificar se há gráficos Chart.js usando os canvas do dashboard
+        const canvasIds = ['chart-status-cotacoes', 'chart-cotacoes-mes'];
+        
+        canvasIds.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                // Verificar se há uma instância Chart.js ativa
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    console.log(`🔧 Destruindo gráfico existente no canvas ${canvasId}`);
+                    existingChart.destroy();
+                }
+            }
+        });
+    },
     
     destroyCharts() {
+        // Destruir gráficos do dashboard
         Object.values(this.charts).forEach(chart => {
-            if (chart) {
-                chart.destroy();
+            if (chart && typeof chart.destroy === 'function') {
+                try {
+                    chart.destroy();
+                } catch (error) {
+                    console.warn('Erro ao destruir gráfico:', error);
+                }
             }
         });
         this.charts = {};
+
+        // Limpar canvas específicos do dashboard
+        const canvasIds = ['chart-status-cotacoes', 'chart-cotacoes-mes'];
+        canvasIds.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        });
     },
     
     createStatusChart(dados) {
@@ -155,8 +200,8 @@ const Dashboard = {
     },
     
     createModalidadeChart(dados) {
-        // Usar o canvas de certificações para modalidades
-        const canvas = document.getElementById('chart-certificacoes');
+        // Usar o canvas de cotações por mês para modalidades
+        const canvas = document.getElementById('chart-cotacoes-mes');
         if (!canvas) return;
         
         const labels = Object.keys(dados);
