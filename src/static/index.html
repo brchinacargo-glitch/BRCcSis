@@ -1115,6 +1115,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM carregado, inicializando sistema...');
             
+            // GARANTIR que o dashboard seja mostrado por padrão
+            console.log('🏠 Inicializando com dashboard como seção padrão...');
+            showSection('dashboard');
+            
             // Inicializar dados
             loadDashboardStats();
             loadEmpresas();
@@ -12084,50 +12088,7 @@
     <!-- Inicialização -->
     <script src="js/main.js"></script>
     
-    <!-- Debug: Script de teste do modal (remover em produção) -->
-    <script>
-        console.log('🔧 DEBUG: Verificando correções do modal de cotação...');
-        
-        // Aguardar carregamento completo
-        setTimeout(() => {
-            const modal = document.getElementById('modal-cotacao');
-            const modalAntigo = document.getElementById('modal-nova-cotacao');
-            const btnDashboard = document.getElementById('btn-solicitar-cotacao');
-            const btnCotacoes = document.getElementById('btn-nova-cotacao');
-            
-            console.log('✅ Verificações:');
-            console.log('- Modal correto existe:', !!modal);
-            console.log('- Modal antigo removido:', !modalAntigo);
-            console.log('- Botão dashboard existe:', !!btnDashboard);
-            console.log('- Botão cotações existe:', !!btnCotacoes);
-            console.log('- Função abrirModalCotacao existe:', typeof abrirModalCotacao === 'function');
-            
-            if (modal) {
-                const styles = window.getComputedStyle(modal);
-                console.log('- Modal CSS overflow-y:', styles.overflowY);
-                console.log('- Modal CSS padding:', styles.padding);
-                
-                // Verificar modalidade padrão
-                const rodoviarioInput = document.querySelector('input[name="empresa_transporte"][value="brcargo_rodoviario"]');
-                console.log('- Input rodoviário existe:', !!rodoviarioInput);
-                if (rodoviarioInput) {
-                    console.log('- Rodoviário selecionado por padrão:', rodoviarioInput.checked);
-                }
-            }
-            
-            // Teste automático do modal
-            console.log('🧪 Testando abertura do modal...');
-            if (typeof abrirModalCotacao === 'function') {
-                // Simular clique no botão dashboard
-                setTimeout(() => {
-                    console.log('Simulando clique no botão dashboard...');
-                    if (btnDashboard) {
-                        btnDashboard.click();
-                    }
-                }, 1000);
-            }
-        }, 2000);
-    </script>
+    <!-- Debug removido para evitar interferência no comportamento normal do sistema -->
     
 </body>
 </html>
