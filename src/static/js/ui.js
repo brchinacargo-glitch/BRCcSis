@@ -162,16 +162,12 @@ const UI = {
     /**
      * Configura modal para fechar ao clicar fora
      * @param {string} modalId - ID do modal
+     * DESABILITADO: Modal só deve fechar pelo botão X
      */
     setupModalClose(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.hideModal(modalId);
-                }
-            });
-        }
+        // Funcionalidade desabilitada conforme solicitado
+        // Modal só deve fechar pelo botão X, não ao clicar fora
+        console.log(`Modal ${modalId} configurado para não fechar ao clicar fora`);
     },
     
     // ==================== LOADING ====================

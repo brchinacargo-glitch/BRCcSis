@@ -121,7 +121,7 @@ const Dashboard = {
     },
     
     createStatusChart(dados) {
-        const canvas = document.getElementById('chart-status');
+        const canvas = document.getElementById('chart-status-cotacoes');
         if (!canvas) return;
         
         const labels = Object.keys(dados);
@@ -155,7 +155,8 @@ const Dashboard = {
     },
     
     createModalidadeChart(dados) {
-        const canvas = document.getElementById('chart-modalidades');
+        // Usar o canvas de certificações para modalidades
+        const canvas = document.getElementById('chart-certificacoes');
         if (!canvas) return;
         
         const labels = Object.keys(dados);

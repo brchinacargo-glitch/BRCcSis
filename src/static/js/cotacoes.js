@@ -41,14 +41,12 @@ const Cotacoes = {
             form.addEventListener('submit', (e) => this.handleSubmit(e));
         }
         
-        // Fechar modal clicando fora
+        // Fechar modal clicando fora - DESABILITADO
+        // Modal só deve fechar pelo botão X, conforme solicitado
         const modal = document.getElementById('modal-nova-cotacao');
         if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.hideModal();
-                }
-            });
+            console.log('Modal de cotações configurado para não fechar ao clicar fora');
+            // Funcionalidade removida - modal só fecha pelo botão X
         }
         
         // Filtros
