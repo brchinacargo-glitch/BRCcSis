@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Cotações inicializado');
     }
     
+    if (typeof Empresas !== 'undefined' && Empresas.init) {
+        Empresas.init();
+        console.log('✅ Empresas inicializado');
+    }
+    
+    if (typeof Analytics !== 'undefined' && Analytics.init) {
+        Analytics.init();
+        console.log('✅ Analytics inicializado');
+    }
+    
     if (typeof AceitarNegarCotacoes !== 'undefined' && AceitarNegarCotacoes.init) {
         AceitarNegarCotacoes.init();
         console.log('✅ Sistema aceitar/negar inicializado');
