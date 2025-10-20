@@ -18,36 +18,17 @@ const Cotacoes = {
     },
     
     setupEventListeners() {
-        // Botão de nova cotação
+        // Botão de nova cotação - CORRIGIDO para usar modal unificado
         const btnNova = document.getElementById('btn-nova-cotacao');
         if (btnNova) {
-            btnNova.addEventListener('click', () => this.showNewModal());
+            // Remover event listeners anteriores
+            btnNova.replaceWith(btnNova.cloneNode(true));
+            // Não adicionar event listener aqui - será gerenciado pelo index.html
+            console.log('Botão nova cotação configurado para usar modal unificado');
         }
         
-        // Fechar modal
-        const btnFechar = document.getElementById('fechar-modal-cotacao');
-        if (btnFechar) {
-            btnFechar.addEventListener('click', () => this.hideModal());
-        }
-        
-        const btnCancelar = document.getElementById('cancelar-cotacao');
-        if (btnCancelar) {
-            btnCancelar.addEventListener('click', () => this.hideModal());
-        }
-        
-        // Submeter formulário
-        const form = document.getElementById('form-cotacao');
-        if (form) {
-            form.addEventListener('submit', (e) => this.handleSubmit(e));
-        }
-        
-        // Fechar modal clicando fora - DESABILITADO
-        // Modal só deve fechar pelo botão X, conforme solicitado
-        const modal = document.getElementById('modal-nova-cotacao');
-        if (modal) {
-            console.log('Modal de cotações configurado para não fechar ao clicar fora');
-            // Funcionalidade removida - modal só fecha pelo botão X
-        }
+        // Event listeners do modal são gerenciados pelo index.html
+        console.log('Event listeners do modal gerenciados pelo sistema principal');
         
         // Filtros
         this.setupFiltros();

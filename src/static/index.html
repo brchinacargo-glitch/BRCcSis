@@ -5295,8 +5295,17 @@
                     form.reset();
                 }
                 
-                // Inicializar campos baseado na modalidade selecionada
+                // Garantir que rodoviário seja selecionado por padrão
                 setTimeout(() => {
+                    const rodoviarioInput = document.querySelector('input[name="empresa_transporte"][value="brcargo_rodoviario"]');
+                    if (rodoviarioInput) {
+                        rodoviarioInput.checked = true;
+                        console.log('Rodoviário selecionado por padrão');
+                        // Disparar evento change para aplicar as regras
+                        rodoviarioInput.dispatchEvent(new Event('change'));
+                    }
+                    
+                    // Inicializar campos baseado na modalidade selecionada
                     if (typeof inicializarCamposPorModalidade === 'function') {
                         inicializarCamposPorModalidade();
                     }
@@ -5799,6 +5808,19 @@
         // Função para criar cotação
         async function criarCotacao(formData) {
             try {
+                console.log('🚀 Criando cotação com dados:', formData);
+                
+                // Validar dados essenciais
+                if (!formData.empresa_transporte) {
+                    throw new Error('Modalidade de transporte não selecionada');
+                }
+                
+                if (!formData.cliente_nome || !formData.cliente_cnpj) {
+                    throw new Error('Dados do cliente são obrigatórios');
+                }
+                
+                console.log('✅ Validação inicial passou, enviando para API...');
+                
                 const response = await fetch('/api/cotacoes', {
                     method: 'POST',
                     headers: {
@@ -10534,7 +10556,11 @@
             }
             
             if (btnNovaCotacao) {
-                btnNovaCotacao.addEventListener('click', abrirModalCotacao);
+                btnNovaCotacao.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Botão Nova Cotação clicado - abrindo modal correto');
+                    abrirModalCotacao(); // Usar o modal correto (modal-cotacao)
+                });
             }
             
             // Controle de campos específicos por modalidade
@@ -10786,9 +10812,12 @@
             if (formCotacao) {
                 formCotacao.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    console.log('📝 Formulário de cotação submetido');
                     
                     const formData = new FormData(formCotacao);
                     const data = {};
+                    
+                    console.log('📋 Processando dados do formulário...');
                     
                     // Converter FormData para objeto
                     for (let [key, value] of formData.entries()) {
@@ -11821,7 +11850,8 @@
     </div>
     
     <!-- ==================== MODAL DE NOVA COTAÇÃO MELHORADO ==================== -->
-    <div id="modal-nova-cotacao" class="modal">
+    <!-- DESABILITADO: Usando apenas modal-cotacao para unificar comportamento -->
+    <!-- <div id="modal-nova-cotacao" class="modal">
         <div class="modal-content bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="modal-header bg-gradient-to-r from-orange-600 to-red-600 text-white p-6 rounded-t-lg">
                 <div class="flex justify-between items-center">
@@ -11977,7 +12007,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <style>
     .modal {
@@ -12061,18 +12091,40 @@
         // Aguardar carregamento completo
         setTimeout(() => {
             const modal = document.getElementById('modal-cotacao');
+            const modalAntigo = document.getElementById('modal-nova-cotacao');
             const btnDashboard = document.getElementById('btn-solicitar-cotacao');
             const btnCotacoes = document.getElementById('btn-nova-cotacao');
             
-            console.log('Modal existe:', !!modal);
-            console.log('Botão dashboard existe:', !!btnDashboard);
-            console.log('Botão cotações existe:', !!btnCotacoes);
-            console.log('Função abrirModalCotacao existe:', typeof abrirModalCotacao === 'function');
+            console.log('✅ Verificações:');
+            console.log('- Modal correto existe:', !!modal);
+            console.log('- Modal antigo removido:', !modalAntigo);
+            console.log('- Botão dashboard existe:', !!btnDashboard);
+            console.log('- Botão cotações existe:', !!btnCotacoes);
+            console.log('- Função abrirModalCotacao existe:', typeof abrirModalCotacao === 'function');
             
             if (modal) {
                 const styles = window.getComputedStyle(modal);
-                console.log('Modal CSS - overflow-y:', styles.overflowY);
-                console.log('Modal CSS - padding:', styles.padding);
+                console.log('- Modal CSS overflow-y:', styles.overflowY);
+                console.log('- Modal CSS padding:', styles.padding);
+                
+                // Verificar modalidade padrão
+                const rodoviarioInput = document.querySelector('input[name="empresa_transporte"][value="brcargo_rodoviario"]');
+                console.log('- Input rodoviário existe:', !!rodoviarioInput);
+                if (rodoviarioInput) {
+                    console.log('- Rodoviário selecionado por padrão:', rodoviarioInput.checked);
+                }
+            }
+            
+            // Teste automático do modal
+            console.log('🧪 Testando abertura do modal...');
+            if (typeof abrirModalCotacao === 'function') {
+                // Simular clique no botão dashboard
+                setTimeout(() => {
+                    console.log('Simulando clique no botão dashboard...');
+                    if (btnDashboard) {
+                        btnDashboard.click();
+                    }
+                }, 1000);
             }
         }, 2000);
     </script>
