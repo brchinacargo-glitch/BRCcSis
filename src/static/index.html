@@ -6151,7 +6151,14 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                // Fallback: inserir antes do final do body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             
             // Adicionar event listener para Enter no chat
             const chatInput = document.getElementById('chat-input');
@@ -7245,7 +7252,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-aprovacao');
         }
         
@@ -7523,7 +7536,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-recusa');
         }
         
@@ -7805,7 +7824,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-edicao-resposta');
         }
         
@@ -8259,7 +8284,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-finalizacao');
         }
         
@@ -8553,7 +8584,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-historico');
         }
         
@@ -9486,7 +9523,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             
             // Configurar event listeners
             configurarEventListenersResposta();
@@ -10138,7 +10181,13 @@
                 </div>
             `;
             
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            // Inserir o modal antes dos scripts, não no final do body
+            const scriptsContainer = document.querySelector('script');
+            if (scriptsContainer) {
+                scriptsContainer.insertAdjacentHTML('beforebegin', modalHTML);
+            } else {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             return document.getElementById('modal-detalhes-cotacao');
         }
         
