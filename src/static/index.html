@@ -3514,8 +3514,19 @@
             }, 100);
         });
 
-        // Event listener para recarregar gráficos removido para evitar conflitos
-        // O carregamento de gráficos já é feito na função showSection
+        // Event listener para recarregar gráficos - RESTAURADO
+        document.addEventListener('DOMContentLoaded', function() {
+            // Recarregar gráficos quando necessário
+            const reloadChartsBtn = document.getElementById('reload-charts');
+            if (reloadChartsBtn) {
+                reloadChartsBtn.addEventListener('click', function() {
+                    console.log('🔄 Recarregando gráficos...');
+                    if (typeof Dashboard !== 'undefined' && Dashboard.loadCharts) {
+                        Dashboard.loadCharts();
+                    }
+                });
+            }
+        });
 
         // Funções de exportação de relatórios
         document.getElementById('btn-export-pdf').addEventListener('click', function() {
@@ -4247,8 +4258,8 @@
         </div>
     </div>
 
-    <!-- Seção de Cotações -->
-    <div id="secao-cotacoes" class="hidden">
+    <!-- Seção de Cotações - RESTAURADA -->
+    <div id="secao-cotacoes" style="display: none;">
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">
@@ -4519,8 +4530,8 @@
         </div>
      </div>
 
-    <!-- Seção de Analytics v1.3.3 -->
-    <div id="secao-analytics-v133" class="hidden">
+    <!-- Seção de Analytics v1.3.3 - RESTAURADA -->
+    <div id="secao-analytics-v133" style="display: none;">
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">
@@ -5567,10 +5578,28 @@
             console.log('Filtros de usuário integrados ao sistema de filtros avançados');
         }
         
-        // Função para configurar abas de modalidade - DESABILITADA (usando sistema de filtros unificado)
+        // Função para configurar abas de modalidade - REATIVADA
         function configurarAbasModalidade() {
-            // Sistema de tabs desabilitado - usando filtros avançados
-            console.log('Sistema de tabs desabilitado - usando filtros avançados');
+            console.log('✅ Sistema de abas de modalidade ativo');
+            
+            // Configurar navegação por modalidade
+            const abasModalidade = document.querySelectorAll('[data-modalidade]');
+            abasModalidade.forEach(aba => {
+                aba.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const modalidade = this.getAttribute('data-modalidade');
+                    
+                    // Atualizar modalidade ativa
+                    modalidadeAtiva = modalidade;
+                    
+                    // Atualizar aparência das abas
+                    abasModalidade.forEach(a => a.classList.remove('active', 'bg-blue-600', 'text-white'));
+                    this.classList.add('active', 'bg-blue-600', 'text-white');
+                    
+                    // Recarregar cotações da modalidade
+                    carregarCotacoesPorModalidade(1);
+                });
+            });
         }
         
         // Função para carregar cotações por modalidade
@@ -11994,6 +12023,9 @@
     
     <!-- ==================== SCRIPTS LIMPOS v2.0 ==================== -->
     <!-- Apenas arquivos que REALMENTE existem -->
+    
+    <!-- Sistema de correção unificado -->
+    <script src="js/system-fix.js"></script>
     
     <!-- Módulos essenciais -->
     <script src="js/api.js"></script>
