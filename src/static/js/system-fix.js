@@ -125,9 +125,17 @@ const SystemInit = {
         // Sistema de modais
         window.SimpleModal = {
             show: (modalId) => {
+                // Tratamento especial para modal-cotacao
+                if (modalId === 'modal-cotacao' && typeof abrirModalCotacao === 'function') {
+                    abrirModalCotacao();
+                    console.log(`📋 Modal ${modalId} aberto via sistema principal`);
+                    return;
+                }
+                
                 const modal = document.getElementById(modalId);
                 if (modal) {
-                    modal.style.display = 'block';
+                    modal.classList.add('show');
+                    modal.style.display = 'flex';
                     console.log(`📋 Modal ${modalId} aberto`);
                 } else {
                     console.error(`❌ Modal ${modalId} não encontrado`);
@@ -135,8 +143,16 @@ const SystemInit = {
             },
             
             hide: (modalId) => {
+                // Tratamento especial para modal-cotacao
+                if (modalId === 'modal-cotacao' && typeof fecharModalCotacao === 'function') {
+                    fecharModalCotacao();
+                    console.log(`📋 Modal ${modalId} fechado via sistema principal`);
+                    return;
+                }
+                
                 const modal = document.getElementById(modalId);
                 if (modal) {
+                    modal.classList.remove('show');
                     modal.style.display = 'none';
                     console.log(`📋 Modal ${modalId} fechado`);
                 } else {

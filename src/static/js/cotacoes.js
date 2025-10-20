@@ -429,23 +429,37 @@ const Cotacoes = {
     
     // Ações básicas
     showNewModal() {
-        const modal = document.getElementById('modal-nova-cotacao');
-        if (modal) {
-            modal.classList.add('show');
-            modal.style.display = 'flex';
-            console.log('✅ Modal de nova cotação aberto');
+        // Usar a função do sistema principal
+        if (typeof abrirModalCotacao === 'function') {
+            abrirModalCotacao();
+            console.log('✅ Modal de nova cotação aberto via sistema principal');
         } else {
-            console.warn('Modal não encontrado');
-            alert('Modal de nova cotação não encontrado');
+            // Fallback para caso a função não esteja disponível
+            const modal = document.getElementById('modal-cotacao');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                console.log('✅ Modal de nova cotação aberto (fallback)');
+            } else {
+                console.warn('Modal não encontrado');
+                alert('Modal de nova cotação não encontrado');
+            }
         }
     },
     
     hideModal() {
-        const modal = document.getElementById('modal-nova-cotacao');
-        if (modal) {
-            modal.classList.remove('show');
-            modal.style.display = 'none';
-            console.log('✅ Modal fechado');
+        // Usar a função do sistema principal
+        if (typeof fecharModalCotacao === 'function') {
+            fecharModalCotacao();
+            console.log('✅ Modal fechado via sistema principal');
+        } else {
+            // Fallback para caso a função não esteja disponível
+            const modal = document.getElementById('modal-cotacao');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                console.log('✅ Modal fechado (fallback)');
+            }
         }
     },
     
