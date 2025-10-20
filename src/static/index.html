@@ -124,11 +124,14 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            padding: 20px 0;
         }
         .modal.show {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            min-height: 100vh;
         }
         .fade-in {
             animation: fadeIn 0.3s ease-in;
@@ -3748,7 +3751,7 @@
 
     <!-- Modal de Cotação -->
     <div id="modal-cotacao" class="modal">
-        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 fade-in my-4" style="max-height: calc(100vh - 80px); overflow-y: auto;">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-2xl font-bold text-gray-800">
@@ -5257,16 +5260,8 @@
                 // Sempre mostrar o botão por enquanto para debug
                 btnSolicitarCotacao.style.display = 'flex';
                 
-                // Remover event listeners anteriores
-                btnSolicitarCotacao.replaceWith(btnSolicitarCotacao.cloneNode(true));
-                const newBtn = document.getElementById('btn-solicitar-cotacao');
-                
-                console.log('Adicionando event listener ao botão...');
-                newBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Botão clicado! Abrindo modal...');
-                    abrirModalCotacao();
-                });
+                // Event listener será configurado pelo UI.js
+                console.log('Botão de cotação configurado - event listener será adicionado pelo UI.js');
                 
                 // Verificar permissões em background
                 const temPermissao = await verificarPermissoesCotacao();
@@ -5274,7 +5269,7 @@
                 
                 if (!temPermissao) {
                     console.log('Usuário sem permissão, ocultando botão');
-                    newBtn.style.display = 'none';
+                    btnSolicitarCotacao.style.display = 'none';
                 }
             } else {
                 console.log('Botão não encontrado!');
@@ -5290,8 +5285,15 @@
             if (modal) {
                 console.log('Adicionando classe show ao modal');
                 modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
+                // Não bloquear scroll do body para permitir scroll do modal
+                // document.body.style.overflow = 'hidden';
                 console.log('Modal deve estar visível agora');
+                
+                // Limpar formulário antes de abrir
+                const form = document.getElementById('form-cotacao');
+                if (form) {
+                    form.reset();
+                }
                 
                 // Inicializar campos baseado na modalidade selecionada
                 setTimeout(() => {
@@ -5309,9 +5311,13 @@
             const modal = document.getElementById('modal-cotacao');
             if (modal) {
                 modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
+                // Restaurar scroll do body se necessário
+                // document.body.style.overflow = 'auto';
                 // Limpar formulário
-                document.getElementById('form-cotacao').reset();
+                const form = document.getElementById('form-cotacao');
+                if (form) {
+                    form.reset();
+                }
             }
         }
 
@@ -12047,6 +12053,29 @@
     
     <!-- Inicialização -->
     <script src="js/main.js"></script>
+    
+    <!-- Debug: Script de teste do modal (remover em produção) -->
+    <script>
+        console.log('🔧 DEBUG: Verificando correções do modal de cotação...');
+        
+        // Aguardar carregamento completo
+        setTimeout(() => {
+            const modal = document.getElementById('modal-cotacao');
+            const btnDashboard = document.getElementById('btn-solicitar-cotacao');
+            const btnCotacoes = document.getElementById('btn-nova-cotacao');
+            
+            console.log('Modal existe:', !!modal);
+            console.log('Botão dashboard existe:', !!btnDashboard);
+            console.log('Botão cotações existe:', !!btnCotacoes);
+            console.log('Função abrirModalCotacao existe:', typeof abrirModalCotacao === 'function');
+            
+            if (modal) {
+                const styles = window.getComputedStyle(modal);
+                console.log('Modal CSS - overflow-y:', styles.overflowY);
+                console.log('Modal CSS - padding:', styles.padding);
+            }
+        }, 2000);
+    </script>
     
 </body>
 </html>

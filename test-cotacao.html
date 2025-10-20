@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Modal de Cotação</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        .modal.show {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-8">Teste - Modal de Cotação</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Simulação Dashboard -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Dashboard</h2>
+                <button id="btn-solicitar-cotacao" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                    <i class="fas fa-calculator mr-2"></i>Solicitar Cotação
+                </button>
+            </div>
+            
+            <!-- Simulação Aba Cotações -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Aba de Cotações</h2>
+                <button id="btn-nova-cotacao" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nova Cotação
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+            <strong>Teste:</strong>
+            <ul class="list-disc list-inside mt-2">
+                <li>Clique no botão "Solicitar Cotação" da dashboard - deve abrir o modal</li>
+                <li>Clique no botão "Nova Cotação" da aba - deve abrir o modal</li>
+                <li>Verifique se o modal tem scroll quando necessário</li>
+                <li>Verifique se não há duplicação de modais</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Modal de Cotação -->
+    <div id="modal-cotacao" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 fade-in my-4" style="max-height: calc(100vh - 80px); overflow-y: auto;">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-calculator mr-2 text-orange-600"></i>
+                        Solicitar Cotação
+                    </h3>
+                    <button id="fechar-modal-cotacao" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="form-cotacao" class="space-y-6">
+                    <!-- Empresa de Transporte -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Empresa de Transporte</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="radio" name="empresa_transporte" value="brcargo_rodoviario" checked class="mr-3">
+                                <div>
+                                    <div class="font-semibold text-green-600">BRCargo Rodoviário</div>
+                                    <div class="text-sm text-gray-500">Disponível</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="radio" name="empresa_transporte" value="brcargo_maritimo" class="mr-3">
+                                <div>
+                                    <div class="font-semibold text-blue-600">BRCargo Marítimo</div>
+                                    <div class="text-sm text-gray-500">Disponível</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="radio" name="empresa_transporte" value="frete_aereo" class="mr-3">
+                                <div>
+                                    <div class="font-semibold text-purple-600">Frete Aéreo</div>
+                                    <div class="text-sm text-gray-500">Disponível</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Dados do Cliente -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Dados do Cliente</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Número do Cliente *</label>
+                                <input type="text" name="numero_cliente" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nome/Razão Social *</label>
+                                <input type="text" name="cliente_nome" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">CNPJ *</label>
+                                <input type="text" name="cliente_cnpj" required placeholder="00.000.000/0000-00" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Endereço *</label>
+                                <input type="text" name="cliente_endereco" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mais campos para testar scroll -->
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Origem</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">CEP Origem</label>
+                                <input type="text" name="origem_cep" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cidade Origem</label>
+                                <input type="text" name="origem_cidade" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Destino</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">CEP Destino</label>
+                                <input type="text" name="destino_cep" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cidade Destino</label>
+                                <input type="text" name="destino_cidade" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex justify-end space-x-4 pt-6 border-t">
+                        <button type="button" id="cancelar-cotacao" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+                            Solicitar Cotação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para abrir modal de cotação
+        function abrirModalCotacao() {
+            console.log('Função abrirModalCotacao chamada');
+            const modal = document.getElementById('modal-cotacao');
+            console.log('Modal encontrado:', modal);
+            
+            if (modal) {
+                console.log('Adicionando classe show ao modal');
+                modal.classList.add('show');
+                console.log('Modal deve estar visível agora');
+                
+                // Limpar formulário antes de abrir
+                const form = document.getElementById('form-cotacao');
+                if (form) {
+                    form.reset();
+                }
+            } else {
+                console.log('ERRO: Modal não encontrado!');
+            }
+        }
+
+        // Função para fechar modal de cotação
+        function fecharModalCotacao() {
+            const modal = document.getElementById('modal-cotacao');
+            if (modal) {
+                modal.classList.remove('show');
+                // Limpar formulário
+                const form = document.getElementById('form-cotacao');
+                if (form) {
+                    form.reset();
+                }
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botão da dashboard
+            document.getElementById('btn-solicitar-cotacao')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Botão dashboard clicado');
+                abrirModalCotacao();
+            });
+
+            // Botão da aba de cotações
+            document.getElementById('btn-nova-cotacao')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Botão nova cotação clicado');
+                abrirModalCotacao();
+            });
+
+            // Fechar modal
+            document.getElementById('fechar-modal-cotacao')?.addEventListener('click', fecharModalCotacao);
+            document.getElementById('cancelar-cotacao')?.addEventListener('click', fecharModalCotacao);
+
+            // Submeter formulário
+            document.getElementById('form-cotacao')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Formulário submetido! (teste)');
+                fecharModalCotacao();
+            });
+        });
+    </script>
+</body>
+</html>

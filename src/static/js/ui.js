@@ -52,8 +52,14 @@ const UI = {
             this.showSection('empresas');
         });
         
-        document.getElementById('btn-solicitar-cotacao')?.addEventListener('click', () => {
-            this.showSection('cotacoes');
+        document.getElementById('btn-solicitar-cotacao')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Abrir modal de cotação diretamente
+            if (typeof abrirModalCotacao === 'function') {
+                abrirModalCotacao();
+            } else {
+                console.error('Função abrirModalCotacao não encontrada');
+            }
         });
         
         // Logout
