@@ -158,16 +158,15 @@ const AceitarNegarCotacoes = {
         btnCancelarNegar?.addEventListener('click', () => this.fecharModal('modal-negar-cotacao'));
         btnConfirmarNegar?.addEventListener('click', () => this.confirmarNegacao());
         
-        // Fechar modais clicando no X ou fora
+        // Fechar modais - APENAS pelo botão X
         document.addEventListener('click', (e) => {
             if (e.target.matches('.modal-close')) {
                 const modal = e.target.closest('.modal');
                 if (modal) this.fecharModal(modal.id);
             }
             
-            if (e.target.matches('.modal')) {
-                this.fecharModal(e.target.id);
-            }
+            // REMOVIDO: Fechar ao clicar fora do modal
+            // Modal só deve fechar pelo botão X
         });
     },
     

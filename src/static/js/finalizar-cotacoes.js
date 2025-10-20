@@ -255,7 +255,7 @@ const FinalizarCotacoes = {
             this.atualizarContador(e.target, 'contador-recusa');
         });
         
-        // Fechar modais
+        // Fechar modais - APENAS pelo botão X
         document.addEventListener('click', (e) => {
             if (e.target.matches('.modal-close')) {
                 const modal = e.target.closest('.modal');
@@ -264,9 +264,8 @@ const FinalizarCotacoes = {
                 }
             }
             
-            if (e.target.matches('.modal') && e.target.id.includes('finalizar')) {
-                this.fecharModal(e.target.id);
-            }
+            // REMOVIDO: Fechar ao clicar fora do modal
+            // Modal só deve fechar pelo botão X
         });
     },
     

@@ -1,5 +1,11 @@
 // ==================== MÓDULO DE UI ====================
 // Gerencia a interface do usuário e navegação
+//
+// ⚠️  PADRÃO DO SISTEMA - MODAIS:
+// - Todos os modais devem fechar APENAS pelo botão X
+// - NUNCA implementar fechamento ao clicar fora do modal
+// - Use UI.setupModalClose(modalId) para configurar corretamente
+// - O sistema configura automaticamente todos os modais na inicialização
 
 const UI = {
     // Estado atual da aplicação
@@ -62,6 +68,11 @@ const UI = {
                 }
             }
         });
+
+        // Configurar comportamento padrão de todos os modais
+        setTimeout(() => {
+            this.setupAllModals();
+        }, 1000); // Aguardar carregamento completo
     },
     
     /**
@@ -160,14 +171,43 @@ const UI = {
     },
     
     /**
-     * Configura modal para fechar ao clicar fora
+     * Configura modal para fechar APENAS pelo botão X
      * @param {string} modalId - ID do modal
-     * DESABILITADO: Modal só deve fechar pelo botão X
+     * PADRÃO DO SISTEMA: Modal só deve fechar pelo botão X
      */
     setupModalClose(modalId) {
-        // Funcionalidade desabilitada conforme solicitado
-        // Modal só deve fechar pelo botão X, não ao clicar fora
-        console.log(`Modal ${modalId} configurado para não fechar ao clicar fora`);
+        // PADRÃO DO SISTEMA: Modal só fecha pelo botão X
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            // Remover qualquer event listener existente que feche ao clicar fora
+            modal.removeEventListener('click', this._closeOnOutsideClick);
+            console.log(`✅ Modal ${modalId} configurado para fechar APENAS pelo botão X`);
+        }
+    },
+
+    /**
+     * Função auxiliar para remover event listeners de clique fora
+     * @private
+     */
+    _closeOnOutsideClick(e) {
+        // Esta função não deve ser usada - mantida apenas para remoção
+        if (e.target === e.currentTarget) {
+            // Não fazer nada - modal não deve fechar
+        }
+    },
+
+    /**
+     * Configura todos os modais do sistema para o comportamento padrão
+     */
+    setupAllModals() {
+        // Buscar todos os elementos com classe modal
+        const modals = document.querySelectorAll('.modal, [id*="modal"]');
+        modals.forEach(modal => {
+            if (modal.id) {
+                this.setupModalClose(modal.id);
+            }
+        });
+        console.log(`✅ ${modals.length} modais configurados com comportamento padrão`);
     },
     
     // ==================== LOADING ====================

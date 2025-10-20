@@ -193,15 +193,14 @@ const ModalRespostaMelhorado = {
             this.enviarResposta();
         });
         
-        // Fechar modal
+        // Fechar modal - APENAS pelo botão X
         document.addEventListener('click', (e) => {
             if (e.target.matches('.modal-close') && e.target.closest('#modal-resposta-cotacao')) {
                 this.fecharModal();
             }
             
-            if (e.target.id === 'modal-resposta-cotacao') {
-                this.fecharModal();
-            }
+            // REMOVIDO: Fechar ao clicar fora do modal
+            // Modal só deve fechar pelo botão X
         });
         
         // Formatação do valor
