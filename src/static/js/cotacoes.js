@@ -18,13 +18,11 @@ const Cotacoes = {
     },
     
     setupEventListeners() {
-        // Botão de nova cotação - CORRIGIDO para usar modal unificado
+        // Botão de nova cotação - NÃO interferir com event listeners do index.html
         const btnNova = document.getElementById('btn-nova-cotacao');
         if (btnNova) {
-            // Remover event listeners anteriores
-            btnNova.replaceWith(btnNova.cloneNode(true));
-            // Não adicionar event listener aqui - será gerenciado pelo index.html
-            console.log('Botão nova cotação configurado para usar modal unificado');
+            // NÃO fazer replaceWith - isso remove os event listeners do index.html
+            console.log('Botão nova cotação encontrado - event listener será gerenciado pelo index.html');
         }
         
         // Event listeners do modal são gerenciados pelo index.html

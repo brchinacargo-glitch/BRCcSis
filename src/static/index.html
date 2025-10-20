@@ -1115,6 +1115,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM carregado, inicializando sistema...');
             
+            // LIMPAR dados de teste do localStorage
+            console.log('🧹 Limpando dados de teste...');
+            try {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.includes('teste') || key.includes('test') || key.includes('COT-999')) {
+                        localStorage.removeItem(key);
+                        console.log(`🗑️ Removido: ${key}`);
+                    }
+                });
+            } catch (error) {
+                console.log('⚠️ Erro ao limpar localStorage:', error);
+            }
+            
             // GARANTIR que o dashboard seja mostrado por padrão
             console.log('🏠 Inicializando com dashboard como seção padrão...');
             showSection('dashboard');
@@ -4589,7 +4603,8 @@
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white text-center p-4 mt-8">
-        <p>&copy; 2025 BRCcSis. Todos os direitos reservados. Projetado por Inácio Victor.    </div>
+        <p>&copy; 2025 BRCcSis. Todos os direitos reservados. Projetado por Inácio Victor.</p>
+    </footer>
 
     <!-- Modal de Importação Excel -->
     <div id="modal-importar-excel" class="modal">
@@ -10560,11 +10575,15 @@
             }
             
             if (btnNovaCotacao) {
+                console.log('✅ Botão Nova Cotação encontrado, configurando event listener...');
                 btnNovaCotacao.addEventListener('click', function(e) {
                     e.preventDefault();
-                    console.log('Botão Nova Cotação clicado - abrindo modal correto');
+                    console.log('🔘 Botão Nova Cotação clicado - abrindo modal correto');
                     abrirModalCotacao(); // Usar o modal correto (modal-cotacao)
                 });
+                console.log('✅ Event listener do botão Nova Cotação configurado');
+            } else {
+                console.error('❌ Botão Nova Cotação NÃO encontrado!');
             }
             
             // Controle de campos específicos por modalidade
